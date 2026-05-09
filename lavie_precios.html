@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lavié Smartphones — Módulos Samsung J</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: system-ui, -apple-system, sans-serif; background: #0f0f13; color: #f0f0f0; min-height: 100vh; padding: 2rem 1rem; }
+  .container { max-width: 900px; margin: 0 auto; }
+
+  header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; flex-wrap: wrap; gap: 12px; }
+  .logo { display: flex; align-items: center; gap: 10px; }
+  .logo-icon { width: 36px; height: 36px; background: #cc2255; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; color: #fff; }
+  .logo-text { font-size: 20px; font-weight: 600; color: #fff; }
+  .logo-sub { font-size: 12px; color: #888; margin-top: 1px; }
+
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 1.5rem; }
+  .card { background: #1a1a22; border: 1px solid #2a2a35; border-radius: 12px; padding: 1rem 1.25rem; }
+  .card-label { font-size: 12px; color: #888; margin-bottom: 6px; }
+  .card-value { font-size: 22px; font-weight: 600; color: #fff; }
+  .card-sub { font-size: 11px; color: #555; margin-top: 4px; }
+  .card.dolar .card-value { color: #4ade80; }
+
+  .toolbar { display: flex; align-items: center; gap: 8px; margin-bottom: 1rem; flex-wrap: wrap; }
+  input[type="text"], select {
+    background: #1a1a22; border: 1px solid #2a2a35; color: #f0f0f0;
+    border-radius: 8px; padding: 7px 12px; font-size: 13px; outline: none;
+  }
+  input[type="text"]:focus, select:focus { border-color: #cc2255; }
+  input[type="text"] { width: 180px; }
+  select option { background: #1a1a22; }
+
+  button {
+    background: #1a1a22; border: 1px solid #2a2a35; color: #f0f0f0;
+    border-radius: 8px; padding: 7px 14px; font-size: 13px; cursor: pointer;
+    display: flex; align-items: center; gap: 6px; transition: background 0.15s;
+  }
+  button:hover { background: #252530; border-color: #cc2255; }
+  button:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-export { margin-left: auto; }
+  .btn-imagen { background: #1a1022; border-color: #cc2255; color: #f0a0c0; }
+  .btn-imagen:hover { background: #2a1030; border-color: #ff3377; }
+
+  .table-wrap { border: 1px solid #2a2a35; border-radius: 12px; overflow: hidden; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead tr { background: #1a1a22; }
+  th { padding: 10px 14px; text-align: left; font-weight: 500; color: #888; border-bottom: 1px solid #2a2a35; }
+  th.r { text-align: right; }
+  tbody tr:nth-child(even) { background: #13131a; }
+  tbody tr:hover { background: #1e1e2a; }
+  td { padding: 9px 14px; border-bottom: 1px solid #1e1e26; color: #e0e0e0; }
+  td.r { text-align: right; }
+  td.ars-desc { color: #4ade80; text-align: right; }
+  td.usd { color: #60a5fa; text-align: right; }
+  td.nueva { background: #1a2a1a !important; }
+  tbody tr:last-child td { border-bottom: none; }
+
+  .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid #444; border-top-color: #cc2255; border-radius: 50%; animation: spin 0.7s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .status { font-size: 11px; color: #555; margin-top: 8px; }
+  .status.ok { color: #4ade80; }
+  .status.err { color: #f87171; }
+  .status.info { color: #60a5fa; }
+
+  .badge-desc { display: inline-block; background: #1a2e1a; color: #4ade80; font-size: 10px; padding: 2px 7px; border-radius: 20px; border: 1px solid #2a4a2a; }
+  .badge-nueva { display: inline-block; background: #1a2e1a; color: #4ade80; font-size: 10px; padding: 1px 6px; border-radius: 20px; margin-left: 6px; }
+
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 100; align-items: center; justify-content: center; padding: 1rem; }
+  .modal-overlay.visible { display: flex; }
+  .modal { background: #1a1a22; border: 1px solid #2a2a35; border-radius: 16px; padding: 1.5rem; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; }
+  .modal h3 { font-size: 16px; font-weight: 600; margin-bottom: 0.4rem; color: #fff; }
+  .modal-desc { font-size: 13px; color: #888; margin-bottom: 1.2rem; line-height: 1.5; }
+
+  .drop-zone { border: 2px dashed #2a2a35; border-radius: 12px; padding: 1.5rem 1rem; text-align: center; cursor: pointer; transition: border-color 0.2s, background 0.2s; color: #666; font-size: 13px; }
+  .drop-zone:hover, .drop-zone.drag-over { border-color: #cc2255; background: #1a0e16; color: #f0a0c0; }
+  .drop-zone input[type="file"] { display: none; }
+  .preview-img { max-width: 100%; max-height: 180px; border-radius: 8px; margin-top: 0.8rem; display: none; object-fit: contain; }
+
+  .modal-actions { display: flex; gap: 8px; margin-top: 1rem; justify-content: flex-end; flex-wrap: wrap; }
+  .btn-primary { background: #cc2255; border-color: #cc2255; color: #fff; font-weight: 500; }
+  .btn-primary:hover { background: #dd3366; border-color: #dd3366; }
+  .btn-cancel { color: #888; }
+
+  .resultado-ia { margin-top: 1rem; background: #0f1a0f; border: 1px solid #2a3a2a; border-radius: 8px; padding: 1rem; display: none; max-height: 220px; overflow-y: auto; }
+  .resultado-ia .ri-label { font-size: 12px; color: #888; margin-bottom: 8px; }
+  .resultado-ia .item { display: flex; align-items: center; padding: 5px 0; border-bottom: 1px solid #1a2a1a; font-size: 13px; gap: 8px; }
+  .resultado-ia .item:last-child { border-bottom: none; }
+  .resultado-ia .item-check { cursor: pointer; font-size: 15px; flex-shrink: 0; }
+  .resultado-ia .item-check.on { color: #4ade80; }
+  .resultado-ia .item-check.off { color: #444; }
+  .resultado-ia .item-modelo { color: #e0e0e0; flex: 1; }
+  .resultado-ia .item-precio { color: #4ade80; font-weight: 500; white-space: nowrap; }
+
+  .api-key-section { margin-bottom: 1rem; }
+  .api-key-section label { font-size: 12px; color: #888; display: block; margin-bottom: 4px; }
+  .api-key-section input { width: 100%; background: #0f0f13; border: 1px solid #2a2a35; color: #f0f0f0; border-radius: 8px; padding: 7px 12px; font-size: 12px; font-family: monospace; outline: none; }
+  .api-key-section input:focus { border-color: #cc2255; }
+  .api-key-hint { font-size: 11px; color: #555; margin-top: 4px; }
+  .api-key-hint a { color: #60a5fa; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <div class="logo">
+      <div class="logo-icon">L</div>
+      <div>
+        <div class="logo-text">Lavié Smartphones</div>
+        <div class="logo-sub">Módulos Samsung Serie J</div>
+      </div>
+    </div>
+    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+      <button class="btn-imagen" onclick="abrirModal()">📷 Cargar imagen de precios</button>
+      <button onclick="fetchDolar()" id="btn-actualizar">🔄 Actualizar dólar</button>
+    </div>
+  </header>
+
+  <div class="cards">
+    <div class="card dolar">
+      <div class="card-label">Dólar blue (venta)</div>
+      <div class="card-value" id="dolar-val"><span class="spinner"></span></div>
+      <div class="card-sub" id="dolar-hora">Consultando...</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Descuento en efectivo</div>
+      <div class="card-value">5%</div>
+      <div class="card-sub">sobre precio lista</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Modelos cargados</div>
+      <div class="card-value" id="total-modelos">29</div>
+      <div class="card-sub">serie J Samsung</div>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <input type="text" id="buscar" placeholder="🔍 Buscar modelo..." oninput="renderTabla()" />
+    <select id="filtro-tipo" onchange="renderTabla()">
+      <option value="">Todos los tipos</option>
+      <option value="HD">HD</option>
+      <option value="Incell">Incell</option>
+      <option value="Oled">Oled</option>
+      <option value="Prime">Prime</option>
+    </select>
+    <button class="btn-export" onclick="exportarCSV()">⬇ Exportar CSV</button>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Modelo</th>
+          <th class="r">Precio ARS</th>
+          <th class="r">Con 5% desc. <span class="badge-desc">efectivo</span></th>
+          <th class="r">USD blue</th>
+        </tr>
+      </thead>
+      <tbody id="tabla-body"></tbody>
+    </table>
+  </div>
+  <p class="status" id="estado-api"></p>
+
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal">
+    <h3>📷 Cargar imagen de precios</h3>
+    <p class="modal-desc">Subí una foto o captura con precios. La IA lee los productos automáticamente y los agrega a la tabla.</p>
+
+    <div class="api-key-section">
+      <label>Clave API de Anthropic</label>
+      <input type="password" id="api-key-input" placeholder="sk-ant-api03-..." />
+      <p class="api-key-hint">Necesaria para leer la imagen con IA. Conseguila gratis en <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a> → API Keys. Se guarda en tu navegador.</p>
+    </div>
+
+    <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
+      <input type="file" id="file-input" accept="image/*" onchange="onFileSelected(event)" />
+      <div id="drop-text">🖼️ Hacé clic aquí o arrastrá una imagen</div>
+      <img id="preview-img" class="preview-img" alt="Vista previa" />
+    </div>
+
+    <div class="resultado-ia" id="resultado-ia">
+      <p class="ri-label">Productos detectados — tildá los que querés agregar:</p>
+      <div id="lista-detectados"></div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="cerrarModal()">Cancelar</button>
+      <button class="btn-primary" id="btn-analizar" onclick="analizarImagen()" disabled>🔍 Analizar imagen</button>
+      <button class="btn-primary" id="btn-agregar" onclick="agregarDetectados()" style="display:none;">✓ Agregar a tabla</button>
+    </div>
+    <p class="status" id="estado-modal"></p>
+  </div>
+</div>
+
+<script>
+let productos = [
+  {modelo:"J1 Ace HD", precio:11400, nueva:false},
+  {modelo:"J1 2016 HD", precio:9300, nueva:false},
+  {modelo:"J2 Core", precio:12400, nueva:false},
+  {modelo:"J2 HD", precio:9300, nueva:false},
+  {modelo:"J3 HD", precio:12100, nueva:false},
+  {modelo:"J3 Incell", precio:12400, nueva:false},
+  {modelo:"J4 HD", precio:12100, nueva:false},
+  {modelo:"J4 Incell", precio:14500, nueva:false},
+  {modelo:"J4 Oled", precio:35300, nueva:false},
+  {modelo:"J4+/J6+ Premium", precio:13300, nueva:false},
+  {modelo:"J4+/J6+", precio:12400, nueva:false},
+  {modelo:"J5 HD", precio:12000, nueva:false},
+  {modelo:"J5 Incell", precio:13500, nueva:false},
+  {modelo:"J5 Prime", precio:12400, nueva:false},
+  {modelo:"J6 HD", precio:12400, nueva:false},
+  {modelo:"J6 Incell", precio:14500, nueva:false},
+  {modelo:"J6 Oled", precio:49800, nueva:false},
+  {modelo:"J7 HD", precio:12400, nueva:false},
+  {modelo:"J7 Incell", precio:14500, nueva:false},
+  {modelo:"J7 Oled", precio:35300, nueva:false},
+  {modelo:"J7 2016 HD", precio:12400, nueva:false},
+  {modelo:"J7 2016 Incell", precio:14500, nueva:false},
+  {modelo:"J7 2016 Oled", precio:35300, nueva:false},
+  {modelo:"J7 Prime", precio:13500, nueva:false},
+  {modelo:"J7 Pro Incell", precio:16600, nueva:false},
+  {modelo:"J7 Pro Oled", precio:35300, nueva:false},
+  {modelo:"J8 HD", precio:14500, nueva:false},
+  {modelo:"J8 Incell", precio:16600, nueva:false},
+  {modelo:"J8 Oled", precio:49800, nueva:false},
+];
+
+let dolarBlue = null;
+let imagenBase64 = null;
+let imagenMime = null;
+let detectados = [];
+
+window.addEventListener('load', () => {
+  const saved = localStorage.getItem('lavie_apikey');
+  if (saved) document.getElementById('api-key-input').value = saved;
+});
+
+const dropZone = document.getElementById('drop-zone');
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault();
+  dropZone.classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (file && file.type.startsWith('image/')) procesarArchivo(file);
+});
+
+function onFileSelected(e) {
+  const file = e.target.files[0];
+  if (file) procesarArchivo(file);
+}
+
+function procesarArchivo(file) {
+  imagenMime = file.type;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    imagenBase64 = ev.target.result.split(',')[1];
+    const preview = document.getElementById('preview-img');
+    preview.src = ev.target.result;
+    preview.style.display = 'block';
+    document.getElementById('drop-text').textContent = '✓ ' + file.name;
+    document.getElementById('btn-analizar').disabled = false;
+    document.getElementById('resultado-ia').style.display = 'none';
+    document.getElementById('btn-agregar').style.display = 'none';
+    setEstadoModal('', '');
+  };
+  reader.readAsDataURL(file);
+}
+
+function abrirModal() {
+  document.getElementById('modal-overlay').classList.add('visible');
+  setEstadoModal('', '');
+  document.getElementById('resultado-ia').style.display = 'none';
+  document.getElementById('btn-agregar').style.display = 'none';
+  document.getElementById('btn-analizar').disabled = true;
+  document.getElementById('preview-img').style.display = 'none';
+  document.getElementById('drop-text').textContent = '🖼️ Hacé clic aquí o arrastrá una imagen';
+  document.getElementById('file-input').value = '';
+  imagenBase64 = null;
+}
+
+function cerrarModal() {
+  document.getElementById('modal-overlay').classList.remove('visible');
+}
+
+async function analizarImagen() {
+  const apiKey = document.getElementById('api-key-input').value.trim();
+  if (!apiKey) { setEstadoModal('err', '✗ Ingresá tu clave API de Anthropic.'); return; }
+  if (!imagenBase64) { setEstadoModal('err', '✗ Seleccioná una imagen.'); return; }
+
+  localStorage.setItem('lavie_apikey', apiKey);
+
+  const btn = document.getElementById('btn-analizar');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Analizando...';
+  setEstadoModal('info', 'Enviando imagen a Claude...');
+  document.getElementById('resultado-ia').style.display = 'none';
+  document.getElementById('btn-agregar').style.display = 'none';
+
+  try {
+    const resp = await fetch('/api/anthropic', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01'
+      },
+      body: JSON.stringify({
+        model: 'claude-opus-4-5',
+        max_tokens: 1024,
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'image', source: { type: 'base64', media_type: imagenMime, data: imagenBase64 } },
+            { type: 'text', text: `Analizá esta imagen de lista de precios de repuestos para celulares.
+Extraé TODOS los pares modelo-precio visibles.
+Respondé ÚNICAMENTE con un array JSON válido, sin texto extra, sin bloques de código markdown, sin explicaciones.
+Formato exacto: [{"modelo":"nombre","precio":12345},{"modelo":"otro","precio":67890}]
+Los precios deben ser números enteros. Si ves $12.400 escribí 12400. Si ves $9.300 escribí 9300.` }
+          ]
+        }]
+      })
+    });
+
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({}));
+      throw new Error(err.error?.message || 'Error HTTP ' + resp.status);
+    }
+
+    const data = await resp.json();
+    const texto = data.content.map(b => b.text || '').join('').trim();
+    const clean = texto.replace(/```json|```/g, '').trim();
+    let parsed;
+    try { parsed = JSON.parse(clean); } catch(e) { throw new Error('La IA no devolvió un formato válido. Intentá con una imagen más clara.'); }
+    if (!Array.isArray(parsed) || parsed.length === 0) throw new Error('No se encontraron productos en la imagen.');
+
+    detectados = parsed.map((p, i) => ({ modelo: String(p.modelo), precio: Number(p.precio), seleccionado: true, id: 'd' + i }));
+    mostrarDetectados();
+    setEstadoModal('ok', `✓ ${detectados.length} productos detectados. Revisá y confirmá.`);
+
+  } catch(err) {
+    setEstadoModal('err', '✗ ' + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '🔍 Analizar imagen';
+  }
+}
+
+function mostrarDetectados() {
+  const lista = document.getElementById('lista-detectados');
+  lista.innerHTML = detectados.map(p => `
+    <div class="item">
+      <span class="item-check ${p.seleccionado ? 'on' : 'off'}" onclick="toggleDetectado('${p.id}')">
+        ${p.seleccionado ? '☑' : '☐'}
+      </span>
+      <span class="item-modelo">${p.modelo}</span>
+      <span class="item-precio">$${Number(p.precio).toLocaleString('es-AR')}</span>
+    </div>
+  `).join('');
+  document.getElementById('resultado-ia').style.display = 'block';
+  document.getElementById('btn-agregar').style.display = 'flex';
+}
+
+function toggleDetectado(id) {
+  const p = detectados.find(d => d.id === id);
+  if (p) { p.seleccionado = !p.seleccionado; mostrarDetectados(); }
+}
+
+function agregarDetectados() {
+  const sel = detectados.filter(d => d.seleccionado);
+  if (sel.length === 0) { setEstadoModal('err', '✗ Seleccioná al menos un producto.'); return; }
+
+  let agregados = 0, actualizados = 0;
+  sel.forEach(d => {
+    const existe = productos.find(p => p.modelo.toLowerCase() === d.modelo.toLowerCase());
+    if (existe) { existe.precio = d.precio; existe.nueva = true; actualizados++; }
+    else { productos.push({ modelo: d.modelo, precio: d.precio, nueva: true }); agregados++; }
+  });
+
+  document.getElementById('total-modelos').textContent = productos.length;
+  renderTabla();
+  cerrarModal();
+
+  const msgs = [];
+  if (agregados) msgs.push(`${agregados} producto${agregados > 1 ? 's' : ''} agregado${agregados > 1 ? 's' : ''}`);
+  if (actualizados) msgs.push(`${actualizados} actualizado${actualizados > 1 ? 's' : ''}`);
+  const el = document.getElementById('estado-api');
+  el.className = 'status ok';
+  el.textContent = '✓ ' + msgs.join(', ') + ' desde la imagen.';
+
+  setTimeout(() => { productos.forEach(p => p.nueva = false); renderTabla(); }, 4000);
+}
+
+function setEstadoModal(tipo, msg) {
+  const el = document.getElementById('estado-modal');
+  el.className = tipo ? 'status ' + tipo : 'status';
+  el.textContent = msg;
+}
+
+async function fetchDolar() {
+  const btn = document.getElementById('btn-actualizar');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Actualizando...';
+  document.getElementById('dolar-val').innerHTML = '<span class="spinner"></span>';
+
+  try {
+    const resp = await fetch('https://dolarapi.com/v1/dolares/blue');
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const data = await resp.json();
+    dolarBlue = data.venta;
+    const now = new Date();
+    document.getElementById('dolar-val').textContent = '$' + dolarBlue.toLocaleString('es-AR');
+    document.getElementById('dolar-hora').textContent = 'Actualizado ' + now.toLocaleTimeString('es-AR', {hour:'2-digit', minute:'2-digit'});
+    const el = document.getElementById('estado-api');
+    el.className = 'status ok';
+    el.textContent = '✓ Dólar blue obtenido de dolarapi.com · ' + now.toLocaleDateString('es-AR');
+    renderTabla();
+  } catch(err) {
+    document.getElementById('dolar-val').textContent = 'Error';
+    document.getElementById('dolar-hora').textContent = 'Sin conexión';
+    const el = document.getElementById('estado-api');
+    el.className = 'status err';
+    el.textContent = '✗ No se pudo conectar a dolarapi.com.';
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '🔄 Actualizar dólar';
+  }
+}
+
+function renderTabla() {
+  const buscar = document.getElementById('buscar').value.toLowerCase();
+  const tipo = document.getElementById('filtro-tipo').value;
+  const tbody = document.getElementById('tabla-body');
+  const filtrados = productos.filter(p =>
+    p.modelo.toLowerCase().includes(buscar) && (tipo === '' || p.modelo.includes(tipo))
+  );
+  if (!filtrados.length) {
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#555;padding:2rem;">Sin resultados</td></tr>';
+    return;
+  }
+  tbody.innerHTML = filtrados.map(p => {
+    const desc = Math.round(p.precio * 0.95);
+    const usd = dolarBlue ? (p.precio / dolarBlue).toFixed(2) : '—';
+    const n = p.nueva ? ' nueva' : '';
+    const badge = p.nueva ? '<span class="badge-nueva">✨ nuevo</span>' : '';
+    return `<tr>
+      <td class="${n}">${p.modelo}${badge}</td>
+      <td class="r${n}">$${p.precio.toLocaleString('es-AR')}</td>
+      <td class="ars-desc${n}">$${desc.toLocaleString('es-AR')}</td>
+      <td class="usd${n}">${usd !== '—' ? 'U$D ' + usd : '—'}</td>
+    </tr>`;
+  }).join('');
+}
+
+function exportarCSV() {
+  const buscar = document.getElementById('buscar').value.toLowerCase();
+  const tipo = document.getElementById('filtro-tipo').value;
+  const filtrados = productos.filter(p =>
+    p.modelo.toLowerCase().includes(buscar) && (tipo === '' || p.modelo.includes(tipo))
+  );
+  let csv = 'Modelo,Precio ARS,ARS con 5% desc.,USD Blue\n';
+  filtrados.forEach(p => {
+    const desc = Math.round(p.precio * 0.95);
+    const usd = dolarBlue ? (p.precio / dolarBlue).toFixed(2) : '';
+    csv += `"${p.modelo}",${p.precio},${desc},${usd}\n`;
+  });
+  const blob = new Blob(['\uFEFF' + csv], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'lavie_modulos_samsung_j.csv';
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a); URL.revokeObjectURL(url);
+}
+
+fetchDolar();
+renderTabla();
+</script>
+</body>
+</html>
