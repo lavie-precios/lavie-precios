@@ -3,64 +3,184 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lavié Smartphones — Gestión de Stock</title>
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<title>Lavié Smartphones — Módulos Samsung J</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: system-ui, -apple-system, sans-serif; background: #0f0f13; color: #f0f0f0; min-height: 100vh; padding: 2rem 1rem; }
-  .container { max-width: 950px; margin: 0 auto; }
+  .container { max-width: 900px; margin: 0 auto; }
 
   header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; flex-wrap: wrap; gap: 12px; }
-  .logo-text { font-size: 22px; font-weight: 700; color: #fff; }
-  .logo-text span { color: #cc2255; }
-  
-  .stats { display: flex; gap: 15px; }
-  .stat-card { background: #1a1a22; padding: 10px 15px; border-radius: 10px; border: 1px solid #2a2a35; text-align: center; }
-  .stat-label { font-size: 10px; color: #888; text-transform: uppercase; margin-bottom: 2px; }
-  .stat-value { font-size: 16px; font-weight: 700; color: #4ade80; }
+  .logo { display: flex; align-items: center; gap: 10px; }
+  .logo-icon { width: 36px; height: 36px; background: #cc2255; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; color: #fff; }
+  .logo-text { font-size: 20px; font-weight: 600; color: #fff; }
+  .logo-sub { font-size: 12px; color: #888; margin-top: 1px; }
 
-  .toolbar { background: #1a1a22; padding: 15px; border-radius: 12px; border: 1px solid #2a2a35; margin-bottom: 1.5rem; display: flex; gap: 10px; flex-wrap: wrap; }
-  input, select, button { background: #0f0f13; border: 1px solid #3a3a45; color: #fff; padding: 10px; border-radius: 8px; font-size: 13px; outline: none; }
-  input#buscar { flex-grow: 1; }
-  
-  button { cursor: pointer; font-weight: 600; transition: 0.2s; display: flex; align-items: center; gap: 6px; }
-  .btn-ia { background: #cc2255; border-color: #cc2255; }
-  .btn-excel { background: #1a2a1a; border-color: #2a4a2a; color: #4ade80; }
-  button:hover { opacity: 0.8; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 1.5rem; }
+  .card { background: #1a1a22; border: 1px solid #2a2a35; border-radius: 12px; padding: 1rem 1.25rem; }
+  .card-label { font-size: 12px; color: #888; margin-bottom: 6px; }
+  .card-value { font-size: 22px; font-weight: 600; color: #fff; }
+  .card-sub { font-size: 11px; color: #555; margin-top: 4px; }
+  .card.dolar .card-value { color: #4ade80; }
 
-  .table-wrap { background: #1a1a22; border-radius: 12px; border: 1px solid #2a2a35; overflow-x: auto; }
-  table { width: 100%; border-collapse: collapse; min-width: 600px; }
-  th { text-align: left; padding: 12px; font-size: 11px; color: #888; text-transform: uppercase; border-bottom: 1px solid #2a2a35; }
-  td { padding: 12px; border-bottom: 1px solid #22222a; font-size: 14px; }
-  
-  .ars { font-weight: 700; color: #fff; }
-  .desc { color: #4ade80; font-weight: 600; }
-  .usd { color: #60a5fa; }
-  
-  .btn-wa { background: #25d366; color: white; padding: 5px 10px; border-radius: 6px; text-decoration: none; font-size: 12px; font-weight: 700; }
+  .toolbar { display: flex; align-items: center; gap: 8px; margin-bottom: 1rem; flex-wrap: wrap; }
+  input[type="text"], select {
+    background: #1a1a22; border: 1px solid #2a2a35; color: #f0f0f0;
+    border-radius: 8px; padding: 7px 12px; font-size: 13px; outline: none;
+  }
+  input[type="text"]:focus, select:focus { border-color: #cc2255; }
+  input[type="text"] { width: 180px; }
+  select option { background: #1a1a22; }
 
-  /* Modal Estilos rápidos */
-  .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); align-items: center; justify-content: center; z-index: 100; padding: 20px; }
-  .modal-content { background: #1a1a22; padding: 20px; border-radius: 15px; max-width: 500px; width: 100%; border: 1px solid #3a3a45; }
-  .preview-img { width: 100%; max-height: 200px; object-fit: contain; margin: 10px 0; display: none; border-radius: 8px; }
+  button {
+    background: #1a1a22; border: 1px solid #2a2a35; color: #f0f0f0;
+    border-radius: 8px; padding: 7px 14px; font-size: 13px; cursor: pointer;
+    display: flex; align-items: center; gap: 6px; transition: background 0.15s;
+  }
+  button:hover { background: #252530; border-color: #cc2255; }
+  button:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-export { margin-left: auto; }
+  .btn-imagen { background: #1a1022; border-color: #cc2255; color: #f0a0c0; }
+  .btn-imagen:hover { background: #2a1030; border-color: #ff3377; }
+  .btn-import { background: #0e1a10; border-color: #2a7a3a; color: #6ade80; }
+  .btn-import:hover { background: #152a18; border-color: #4ade80; }
+
+  .table-wrap { border: 1px solid #2a2a35; border-radius: 12px; overflow: hidden; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead tr { background: #1a1a22; }
+  th { padding: 10px 14px; text-align: left; font-weight: 500; color: #888; border-bottom: 1px solid #2a2a35; }
+  th.r { text-align: right; }
+  tbody tr:nth-child(even) { background: #13131a; }
+  tbody tr:hover { background: #1e1e2a; }
+  td { padding: 9px 14px; border-bottom: 1px solid #1e1e26; color: #e0e0e0; }
+  td.r { text-align: right; }
+  td.ars-desc { color: #4ade80; text-align: right; }
+  td.usd { color: #60a5fa; text-align: right; }
+  td.nueva { background: #1a2a1a !important; }
+  tbody tr:last-child td { border-bottom: none; }
+
+  .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid #444; border-top-color: #cc2255; border-radius: 50%; animation: spin 0.7s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .status { font-size: 11px; color: #555; margin-top: 8px; }
+  .status.ok { color: #4ade80; }
+  .status.err { color: #f87171; }
+  .status.info { color: #60a5fa; }
+
+  .badge-desc { display: inline-block; background: #1a2e1a; color: #4ade80; font-size: 10px; padding: 2px 7px; border-radius: 20px; border: 1px solid #2a4a2a; }
+  .badge-nueva { display: inline-block; background: #1a2e1a; color: #4ade80; font-size: 10px; padding: 1px 6px; border-radius: 20px; margin-left: 6px; }
+
+  /* Modales */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 100; align-items: center; justify-content: center; padding: 1rem; }
+  .modal-overlay.visible { display: flex; }
+  .modal { background: #1a1a22; border: 1px solid #2a2a35; border-radius: 16px; padding: 1.5rem; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; }
+  .modal h3 { font-size: 16px; font-weight: 600; margin-bottom: 0.4rem; color: #fff; }
+  .modal-desc { font-size: 13px; color: #888; margin-bottom: 1.2rem; line-height: 1.5; }
+
+  .drop-zone { border: 2px dashed #2a2a35; border-radius: 12px; padding: 1.5rem 1rem; text-align: center; cursor: pointer; transition: border-color 0.2s, background 0.2s; color: #666; font-size: 13px; }
+  .drop-zone:hover, .drop-zone.drag-over { border-color: #cc2255; background: #1a0e16; color: #f0a0c0; }
+  .drop-zone input[type="file"] { display: none; }
+  .preview-img { max-width: 100%; max-height: 180px; border-radius: 8px; margin-top: 0.8rem; display: none; object-fit: contain; }
+
+  .modal-actions { display: flex; gap: 8px; margin-top: 1rem; justify-content: flex-end; flex-wrap: wrap; }
+  .btn-primary { background: #cc2255; border-color: #cc2255; color: #fff; font-weight: 500; }
+  .btn-primary:hover { background: #dd3366; border-color: #dd3366; }
+  .btn-cancel { color: #888; }
+
+  .resultado-ia { margin-top: 1rem; background: #0f1a0f; border: 1px solid #2a3a2a; border-radius: 8px; padding: 1rem; display: none; max-height: 220px; overflow-y: auto; }
+  .resultado-ia .ri-label { font-size: 12px; color: #888; margin-bottom: 8px; }
+  .resultado-ia .item { display: flex; align-items: center; padding: 5px 0; border-bottom: 1px solid #1a2a1a; font-size: 13px; gap: 8px; }
+  .resultado-ia .item:last-child { border-bottom: none; }
+  .resultado-ia .item-check { cursor: pointer; font-size: 15px; flex-shrink: 0; }
+  .resultado-ia .item-check.on { color: #4ade80; }
+  .resultado-ia .item-check.off { color: #444; }
+  .resultado-ia .item-modelo { color: #e0e0e0; flex: 1; }
+  .resultado-ia .item-precio { color: #4ade80; font-weight: 500; white-space: nowrap; }
+
+  .api-key-section { margin-bottom: 1rem; }
+  .api-key-section label { font-size: 12px; color: #888; display: block; margin-bottom: 4px; }
+  .api-key-section input { width: 100%; background: #0f0f13; border: 1px solid #2a2a35; color: #f0f0f0; border-radius: 8px; padding: 7px 12px; font-size: 12px; font-family: monospace; outline: none; }
+  .api-key-section input:focus { border-color: #cc2255; }
+  .api-key-hint { font-size: 11px; color: #555; margin-top: 4px; }
+  .api-key-hint a { color: #60a5fa; }
+
+  /* Modal importar */
+  .modal-import { background: #1a1a22; border: 1px solid #2a3a2a; border-radius: 16px; padding: 1.5rem; width: 100%; max-width: 520px; max-height: 92vh; overflow-y: auto; }
+  .modal-import h3 { font-size: 16px; font-weight: 600; margin-bottom: 0.4rem; color: #fff; }
+
+  .import-drop { border: 2px dashed #2a3a2a; border-radius: 12px; padding: 2rem 1rem; text-align: center; cursor: pointer; transition: border-color 0.2s, background 0.2s; color: #666; font-size: 13px; }
+  .import-drop:hover, .import-drop.drag-over { border-color: #4ade80; background: #0e1a10; color: #6ade80; }
+  .import-drop input[type="file"] { display: none; }
+  .import-drop-icon { font-size: 30px; margin-bottom: 6px; }
+
+  .col-map { margin-top: 1rem; display: none; }
+  .col-map-title { font-size: 12px; color: #888; margin-bottom: 6px; }
+  .col-map-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; font-size: 13px; }
+  .col-map-row label { color: #ccc; min-width: 80px; }
+  .col-map-row select { flex: 1; font-size: 12px; padding: 5px 8px; }
+
+  .import-preview { margin-top: 1rem; display: none; }
+  .import-preview-title { font-size: 12px; color: #888; margin-bottom: 6px; }
+  .import-table-wrap { border: 1px solid #2a2a35; border-radius: 8px; overflow: hidden; max-height: 180px; overflow-y: auto; }
+  .import-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .import-table th { background: #13131a; padding: 6px 10px; text-align: left; color: #888; font-weight: 500; border-bottom: 1px solid #2a2a35; position: sticky; top: 0; }
+  .import-table td { padding: 5px 10px; border-bottom: 1px solid #1e1e26; color: #ccc; }
+  .import-table tr:last-child td { border-bottom: none; }
+
+  .modo-row { display: flex; gap: 8px; margin-bottom: 1rem; }
+  .modo-btn { flex: 1; padding: 7px 10px; border-radius: 8px; font-size: 12px; text-align: center; cursor: pointer; border: 1px solid #2a2a35; background: #13131a; color: #888; transition: all 0.15s; }
+  .modo-btn:hover { border-color: #4ade80; color: #ccc; }
+  .modo-btn.active { background: #0e1a10; border-color: #4ade80; color: #4ade80; font-weight: 500; }
+
+  .btn-confirm-import { background: #1a3a1a; border-color: #4ade80; color: #4ade80; }
+  .btn-confirm-import:hover { background: #253a25; }
 </style>
 </head>
 <body>
-
 <div class="container">
+
   <header>
-    <div class="logo-text">Lavié <span>Smartphones</span></div>
-    <div class="stats">
-      <div class="stat-card"><div class="stat-label">Dólar Blue</div><div class="stat-value" id="val-dolar">...</div></div>
-      <div class="stat-card"><div class="stat-label">Modelos</div><div class="stat-value" id="total-modelos">0</div></div>
+    <div class="logo">
+      <div class="logo-icon">L</div>
+      <div>
+        <div class="logo-text">Lavié Smartphones</div>
+        <div class="logo-sub">Catálogo de repuestos</div>
+      </div>
+    </div>
+    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+      <button class="btn-import" onclick="abrirModalImport()">📂 Importar CSV / XLS</button>
+      <button class="btn-imagen" onclick="abrirModal()">📷 Cargar imagen IA</button>
+      <button onclick="fetchDolar()" id="btn-actualizar">🔄 Actualizar dólar</button>
     </div>
   </header>
 
+  <div class="cards">
+    <div class="card dolar">
+      <div class="card-label">Dólar blue (venta)</div>
+      <div class="card-value" id="dolar-val"><span class="spinner"></span></div>
+      <div class="card-sub" id="dolar-hora">Consultando...</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Descuento en efectivo</div>
+      <div class="card-value">5%</div>
+      <div class="card-sub">sobre precio lista</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Modelos cargados</div>
+      <div class="card-value" id="total-modelos">29</div>
+      <div class="card-sub">en catálogo</div>
+    </div>
+  </div>
+
   <div class="toolbar">
-    <input type="text" id="buscar" placeholder="🔍 Buscar modelo o marca..." oninput="renderTabla()" />
-    <button class="btn-ia" onclick="document.getElementById('modal-ia').style.display='flex'">📷 Escanear Lista</button>
-    <button class="btn-excel" onclick="document.getElementById('upload-stock').click()">📁 Subir Excel</button>
-    <input type="file" id="upload-stock" accept=".csv, .xlsx, .xls" style="display:none" onchange="importarArchivo(event)" />
+    <input type="text" id="buscar" placeholder="🔍 Buscar modelo..." oninput="renderTabla()" />
+    <select id="filtro-tipo" onchange="renderTabla()">
+      <option value="">Todos los tipos</option>
+      <option value="HD">HD</option>
+      <option value="Incell">Incell</option>
+      <option value="Oled">Oled</option>
+      <option value="Prime">Prime</option>
+    </select>
+    <button onclick="exportarCSV()" style="margin-left:auto;">⬇ Exportar CSV</button>
   </div>
 
   <div class="table-wrap">
@@ -68,152 +188,507 @@
       <thead>
         <tr>
           <th>Modelo</th>
-          <th>Precio Lista</th>
-          <th>Efectivo (-5%)</th>
-          <th>U$D Blue</th>
-          <th>Acción</th>
+          <th class="r">Precio ARS</th>
+          <th class="r">Con 5% desc. <span class="badge-desc">efectivo</span></th>
+          <th class="r">USD blue</th>
         </tr>
       </thead>
-      <tbody id="lista-productos"></tbody>
+      <tbody id="tabla-body"></tbody>
     </table>
+  </div>
+  <p class="status" id="estado-api"></p>
+
+</div>
+
+<!-- MODAL IMAGEN IA -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal">
+    <h3>📷 Cargar imagen de precios</h3>
+    <p class="modal-desc">Subí una foto o captura con precios. La IA lee los productos automáticamente y los agrega a la tabla.</p>
+    <div class="api-key-section">
+      <label>Clave API de Anthropic</label>
+      <input type="password" id="api-key-input" placeholder="sk-ant-api03-..." />
+      <p class="api-key-hint">Conseguila en <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a> → API Keys.</p>
+    </div>
+    <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
+      <input type="file" id="file-input" accept="image/*" onchange="onFileSelected(event)" />
+      <div id="drop-text">🖼️ Hacé clic aquí o arrastrá una imagen</div>
+      <img id="preview-img" class="preview-img" alt="Vista previa" />
+    </div>
+    <div class="resultado-ia" id="resultado-ia">
+      <p class="ri-label">Productos detectados — tildá los que querés agregar:</p>
+      <div id="lista-detectados"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="cerrarModal()">Cancelar</button>
+      <button class="btn-primary" id="btn-analizar" onclick="analizarImagen()" disabled>🔍 Analizar imagen</button>
+      <button class="btn-primary" id="btn-agregar" onclick="agregarDetectados()" style="display:none;">✓ Agregar a tabla</button>
+    </div>
+    <p class="status" id="estado-modal"></p>
   </div>
 </div>
 
-<div id="modal-ia" class="modal">
-  <div class="modal-content">
-    <h3>Escanear con IA</h3>
-    <p style="font-size: 12px; color: #888; margin: 10px 0;">Subí una foto de tu lista. Los nuevos modelos se sumarán a la tabla actual.</p>
-    <input type="password" id="api-key" placeholder="Pegá tu Clave API de Anthropic" style="width:100%; margin-bottom:10px;">
-    <input type="file" id="foto-ia" accept="image/*" onchange="previsualizar(event)">
-    <img id="img-preview" class="preview-img">
-    <div style="display:flex; gap:10px; margin-top:15px;">
-      <button onclick="document.getElementById('modal-ia').style.display='none'" style="flex:1">Cancelar</button>
-      <button class="btn-ia" id="btn-procesar" onclick="procesarImagen()" style="flex:1; justify-content:center;">Analizar y Sumar</button>
+<!-- MODAL IMPORTAR CSV/XLS -->
+<div class="modal-overlay" id="modal-import-overlay">
+  <div class="modal-import">
+    <h3>📂 Importar catálogo CSV / XLS</h3>
+    <p class="modal-desc" style="font-size:13px;color:#888;margin-bottom:1rem;line-height:1.5;">
+      Aceptá archivos <strong style="color:#ccc;">.csv</strong> o <strong style="color:#ccc;">.xlsx / .xls</strong>.<br>
+      El archivo debe tener al menos una columna con el nombre del modelo y otra con el precio.
+    </p>
+
+    <div class="col-map-title">¿Qué hacer con los productos existentes?</div>
+    <div class="modo-row">
+      <div class="modo-btn active" id="modo-agregar" onclick="setModo('agregar')">➕ Agregar / actualizar</div>
+      <div class="modo-btn" id="modo-reemplazar" onclick="setModo('reemplazar')">🔄 Reemplazar todo el catálogo</div>
+    </div>
+
+    <div class="import-drop" id="import-drop" onclick="document.getElementById('import-file').click()">
+      <input type="file" id="import-file" accept=".csv,.xlsx,.xls" onchange="onImportFile(event)" />
+      <div class="import-drop-icon">📄</div>
+      <div id="import-drop-text">Hacé clic aquí o arrastrá tu archivo CSV / XLS</div>
+      <div style="font-size:11px;color:#555;margin-top:4px;">Formatos: .csv · .xlsx · .xls</div>
+    </div>
+
+    <div class="col-map" id="col-map">
+      <div class="col-map-title" style="margin-top:1rem;">Mapeá las columnas del archivo:</div>
+      <div class="col-map-row">
+        <label>Modelo →</label>
+        <select id="col-modelo"></select>
+      </div>
+      <div class="col-map-row">
+        <label>Precio →</label>
+        <select id="col-precio"></select>
+      </div>
+    </div>
+
+    <div class="import-preview" id="import-preview">
+      <div class="import-preview-title" id="import-preview-title">Vista previa:</div>
+      <div class="import-table-wrap">
+        <table class="import-table" id="import-table"></table>
+      </div>
+    </div>
+
+    <p class="status" id="estado-import" style="margin-top:8px;"></p>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="cerrarModalImport()">Cancelar</button>
+      <button class="btn-confirm-import btn-primary" id="btn-confirmar-import" onclick="confirmarImport()" disabled>
+        ✓ Importar productos
+      </button>
     </div>
   </div>
 </div>
 
+<!-- SheetJS para leer XLSX/XLS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
 <script>
-// Base de datos inicial (se irá llenando con fotos o excels)
 let productos = [
-  { modelo: "Samsung J7 Prime", precio: 17800 },
-  { modelo: "Samsung J2 Core", precio: 11500 }
+  {modelo:"J1 Ace HD",precio:11400,nueva:false},
+  {modelo:"J1 2016 HD",precio:9300,nueva:false},
+  {modelo:"J2 Core",precio:12400,nueva:false},
+  {modelo:"J2 HD",precio:9300,nueva:false},
+  {modelo:"J3 HD",precio:12100,nueva:false},
+  {modelo:"J3 Incell",precio:12400,nueva:false},
+  {modelo:"J4 HD",precio:12100,nueva:false},
+  {modelo:"J4 Incell",precio:14500,nueva:false},
+  {modelo:"J4 Oled",precio:35300,nueva:false},
+  {modelo:"J4+/J6+ Premium",precio:13300,nueva:false},
+  {modelo:"J4+/J6+",precio:12400,nueva:false},
+  {modelo:"J5 HD",precio:12000,nueva:false},
+  {modelo:"J5 Incell",precio:13500,nueva:false},
+  {modelo:"J5 Prime",precio:12400,nueva:false},
+  {modelo:"J6 HD",precio:12400,nueva:false},
+  {modelo:"J6 Incell",precio:14500,nueva:false},
+  {modelo:"J6 Oled",precio:49800,nueva:false},
+  {modelo:"J7 HD",precio:12400,nueva:false},
+  {modelo:"J7 Incell",precio:14500,nueva:false},
+  {modelo:"J7 Oled",precio:35300,nueva:false},
+  {modelo:"J7 2016 HD",precio:12400,nueva:false},
+  {modelo:"J7 2016 Incell",precio:14500,nueva:false},
+  {modelo:"J7 2016 Oled",precio:35300,nueva:false},
+  {modelo:"J7 Prime",precio:13500,nueva:false},
+  {modelo:"J7 Pro Incell",precio:16600,nueva:false},
+  {modelo:"J7 Pro Oled",precio:35300,nueva:false},
+  {modelo:"J8 HD",precio:14500,nueva:false},
+  {modelo:"J8 Incell",precio:16600,nueva:false},
+  {modelo:"J8 Oled",precio:49800,nueva:false},
 ];
 
-let dolarBlue = 0;
-const MI_TELEFONO = "5493624000000"; // <-- CAMBIÁ ESTO POR TU WHATSAPP REAL
+let dolarBlue = null;
+let imagenBase64 = null;
+let imagenMime = null;
+let detectados = [];
+let importRows = [];
+let importHeaders = [];
+let modoImport = 'agregar';
 
-async function obtenerDolar() {
-  try {
-    const res = await fetch('https://dolarapi.com/v1/dolares/blue');
-    const data = await res.json();
-    dolarBlue = data.compra;
-    document.getElementById('val-dolar').textContent = `$${dolarBlue}`;
-    renderTabla();
-  } catch(e) { document.getElementById('val-dolar').textContent = 'Error'; }
+// ── IMPORTAR CSV/XLS ─────────────────────────────────────────────────────────
+function setModo(m) {
+  modoImport = m;
+  document.getElementById('modo-agregar').classList.toggle('active', m === 'agregar');
+  document.getElementById('modo-reemplazar').classList.toggle('active', m === 'reemplazar');
 }
 
-function renderTabla() {
-  const query = document.getElementById('buscar').value.toLowerCase();
-  const filtered = productos.filter(p => p.modelo.toLowerCase().includes(query));
-  document.getElementById('total-modelos').textContent = filtered.length;
-
-  document.getElementById('lista-productos').innerHTML = filtered.map(p => {
-    const efectivo = Math.round(p.precio * 0.95);
-    const usd = dolarBlue ? (p.precio / dolarBlue).toFixed(2) : '—';
-    const waLink = `https://wa.me/${MI_TELEFONO}?text=Hola! Tenés stock del módulo ${encodeURIComponent(p.modelo)}?`;
-    
-    return `<tr>
-      <td>${p.modelo}</td>
-      <td class="ars">$${p.precio.toLocaleString('es-AR')}</td>
-      <td class="desc">$${efectivo.toLocaleString('es-AR')}</td>
-      <td class="usd">U$D ${usd}</td>
-      <td><a href="${waLink}" target="_blank" class="btn-wa">Consultar</a></td>
-    </tr>`;
-  }).join('');
+function abrirModalImport() {
+  importRows = []; importHeaders = [];
+  document.getElementById('modal-import-overlay').classList.add('visible');
+  document.getElementById('import-drop-text').textContent = 'Hacé clic aquí o arrastrá tu archivo CSV / XLS';
+  document.getElementById('col-map').style.display = 'none';
+  document.getElementById('import-preview').style.display = 'none';
+  document.getElementById('btn-confirmar-import').disabled = true;
+  document.getElementById('estado-import').textContent = '';
+  document.getElementById('import-file').value = '';
+  setModo('agregar');
 }
 
-// Lógica para ir SUMANDO imágenes
-function previsualizar(e) {
+function cerrarModalImport() {
+  document.getElementById('modal-import-overlay').classList.remove('visible');
+}
+
+// Drag & drop import
+const importDrop = document.getElementById('import-drop');
+importDrop.addEventListener('dragover', e => { e.preventDefault(); importDrop.classList.add('drag-over'); });
+importDrop.addEventListener('dragleave', () => importDrop.classList.remove('drag-over'));
+importDrop.addEventListener('drop', e => {
+  e.preventDefault(); importDrop.classList.remove('drag-over');
+  const f = e.dataTransfer.files[0];
+  if (f) procesarArchivoImport(f);
+});
+
+function onImportFile(e) {
+  const f = e.target.files[0];
+  if (f) procesarArchivoImport(f);
+}
+
+function procesarArchivoImport(file) {
+  const ext = file.name.split('.').pop().toLowerCase();
+  setEstadoImport('info', 'Leyendo archivo...');
+  document.getElementById('import-drop-text').textContent = '✓ ' + file.name;
   const reader = new FileReader();
-  reader.onload = () => {
-    const img = document.getElementById('img-preview');
-    img.src = reader.result;
-    img.style.display = 'block';
-  };
-  reader.readAsDataURL(e.target.files[0]);
+
+  if (ext === 'csv') {
+    reader.onload = ev => {
+      try {
+        const parsed = parsearCSV(ev.target.result);
+        if (!parsed.length) throw new Error('El archivo CSV está vacío o no tiene datos válidos.');
+        cargarDatosImport(parsed);
+      } catch(e) { setEstadoImport('err', '✗ ' + e.message); }
+    };
+    reader.readAsText(file, 'UTF-8');
+
+  } else if (ext === 'xlsx' || ext === 'xls') {
+    reader.onload = ev => {
+      try {
+        const wb = XLSX.read(new Uint8Array(ev.target.result), { type: 'array' });
+        const ws = wb.Sheets[wb.SheetNames[0]];
+        const raw = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+        if (raw.length < 2) throw new Error('La hoja está vacía o solo tiene encabezados.');
+        const headers = raw[0].map(h => String(h).trim());
+        const rows = raw.slice(1)
+          .filter(r => r.some(v => String(v).trim() !== ''))
+          .map(r => {
+            const obj = {};
+            headers.forEach((h, i) => obj[h] = r[i] !== undefined ? String(r[i]).trim() : '');
+            return obj;
+          });
+        if (!rows.length) throw new Error('No se encontraron datos en la hoja.');
+        cargarDatosImport(rows);
+      } catch(e) { setEstadoImport('err', '✗ ' + e.message); }
+    };
+    reader.readAsArrayBuffer(file);
+  } else {
+    setEstadoImport('err', '✗ Formato no soportado. Usá .csv, .xlsx o .xls');
+  }
 }
 
-async function procesarImagen() {
-  const key = document.getElementById('api-key').value;
-  const fileInput = document.getElementById('foto-ia');
-  if(!key || !fileInput.files[0]) return alert("Falta la clave o la foto");
+function parsearCSV(text) {
+  const lineas = text.trim().split(/\r?\n/).filter(l => l.trim());
+  if (!lineas.length) return [];
+  const primera = lineas[0];
+  const sep = primera.includes(';') ? ';' : primera.includes('\t') ? '\t' : ',';
+  const headers = primera.split(sep).map(h => h.replace(/^"|"$/g,'').trim());
+  return lineas.slice(1).map(linea => {
+    // Parser CSV básico que respeta comillas
+    const cols = []; let cur = ''; let inQ = false;
+    for (let i = 0; i < linea.length; i++) {
+      const c = linea[i];
+      if (c === '"') { inQ = !inQ; }
+      else if (c === sep && !inQ) { cols.push(cur.trim()); cur = ''; }
+      else cur += c;
+    }
+    cols.push(cur.trim());
+    const obj = {};
+    headers.forEach((h, i) => obj[h] = cols[i] || '');
+    return obj;
+  });
+}
 
-  const btn = document.getElementById('btn-procesar');
-  btn.innerText = "⏳ Analizando...";
-  btn.disabled = true;
+function cargarDatosImport(rows) {
+  importRows = rows;
+  importHeaders = Object.keys(rows[0]);
+  const opts = importHeaders.map(h => `<option value="${h}">${h}</option>`).join('');
+  document.getElementById('col-modelo').innerHTML = opts;
+  document.getElementById('col-precio').innerHTML = opts;
 
-  // Convertir imagen a Base64
-  const base64 = await toBase64(fileInput.files[0]);
+  // Auto-detectar columnas
+  const cm = importHeaders.find(h => /modelo|product|nombre|descripcion|item|name/i.test(h)) || importHeaders[0];
+  const cp = importHeaders.find(h => /precio|price|costo|valor|value|importe/i.test(h)) || importHeaders[Math.min(1, importHeaders.length-1)];
+  document.getElementById('col-modelo').value = cm;
+  document.getElementById('col-precio').value = cp;
 
+  document.getElementById('col-map').style.display = 'block';
+  actualizarPreview();
+  document.getElementById('btn-confirmar-import').disabled = false;
+  setEstadoImport('ok', `✓ ${rows.length} filas leídas. Verificá el mapeo y confirmá.`);
+
+  document.getElementById('col-modelo').onchange = actualizarPreview;
+  document.getElementById('col-precio').onchange = actualizarPreview;
+}
+
+function actualizarPreview() {
+  const colM = document.getElementById('col-modelo').value;
+  const colP = document.getElementById('col-precio').value;
+  const muestra = importRows.slice(0, 5);
+  const tabla = document.getElementById('import-table');
+  tabla.innerHTML = `
+    <thead><tr><th>Modelo</th><th>Precio ARS</th></tr></thead>
+    <tbody>${muestra.map(r => {
+      const p = limpiarPrecio(r[colP]);
+      return `<tr><td>${r[colM] || '—'}</td><td style="color:#4ade80">${p ? '$' + Number(p).toLocaleString('es-AR') : '—'}</td></tr>`;
+    }).join('')}</tbody>`;
+  document.getElementById('import-preview-title').textContent = `Vista previa (${muestra.length} de ${importRows.length} filas):`;
+  document.getElementById('import-preview').style.display = 'block';
+}
+
+function limpiarPrecio(val) {
+  if (!val && val !== 0) return 0;
+  const n = parseInt(String(val).replace(/[^\d]/g, ''));
+  return isNaN(n) ? 0 : n;
+}
+
+function confirmarImport() {
+  const colM = document.getElementById('col-modelo').value;
+  const colP = document.getElementById('col-precio').value;
+  const nuevos = importRows
+    .map(r => ({ modelo: String(r[colM] || '').trim(), precio: limpiarPrecio(r[colP]) }))
+    .filter(p => p.modelo && p.precio > 0);
+
+  if (!nuevos.length) {
+    setEstadoImport('err', '✗ No se encontraron productos válidos. Verificá que las columnas sean correctas.');
+    return;
+  }
+
+  let agregados = 0, actualizados = 0;
+  if (modoImport === 'reemplazar') {
+    productos = nuevos.map(p => ({ ...p, nueva: true }));
+    agregados = nuevos.length;
+  } else {
+    nuevos.forEach(d => {
+      const existe = productos.find(p => p.modelo.toLowerCase() === d.modelo.toLowerCase());
+      if (existe) { existe.precio = d.precio; existe.nueva = true; actualizados++; }
+      else { productos.push({ modelo: d.modelo, precio: d.precio, nueva: true }); agregados++; }
+    });
+  }
+
+  document.getElementById('total-modelos').textContent = productos.length;
+  renderTabla();
+  cerrarModalImport();
+
+  const msgs = [];
+  if (agregados) msgs.push(`${agregados} producto${agregados>1?'s':''} agregado${agregados>1?'s':''}`);
+  if (actualizados) msgs.push(`${actualizados} actualizado${actualizados>1?'s':''}`);
+  const el = document.getElementById('estado-api');
+  el.className = 'status ok';
+  el.textContent = '✓ Importación exitosa: ' + msgs.join(', ') + '.';
+  setTimeout(() => { productos.forEach(p => p.nueva = false); renderTabla(); }, 5000);
+}
+
+function setEstadoImport(tipo, msg) {
+  const el = document.getElementById('estado-import');
+  el.className = tipo ? 'status ' + tipo : 'status';
+  el.textContent = msg;
+}
+
+// ── MODAL IMAGEN IA ──────────────────────────────────────────────────────────
+window.addEventListener('load', () => {
+  const saved = localStorage.getItem('lavie_apikey');
+  if (saved) document.getElementById('api-key-input').value = saved;
+});
+
+const dropZone = document.getElementById('drop-zone');
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault(); dropZone.classList.remove('drag-over');
+  const f = e.dataTransfer.files[0];
+  if (f && f.type.startsWith('image/')) procesarArchivo(f);
+});
+
+function onFileSelected(e) { const f = e.target.files[0]; if (f) procesarArchivo(f); }
+
+function procesarArchivo(file) {
+  imagenMime = file.type;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    imagenBase64 = ev.target.result.split(',')[1];
+    const preview = document.getElementById('preview-img');
+    preview.src = ev.target.result;
+    preview.style.display = 'block';
+    document.getElementById('drop-text').textContent = '✓ ' + file.name;
+    document.getElementById('btn-analizar').disabled = false;
+    document.getElementById('resultado-ia').style.display = 'none';
+    document.getElementById('btn-agregar').style.display = 'none';
+    setEstadoModal('', '');
+  };
+  reader.readAsDataURL(file);
+}
+
+function abrirModal() {
+  document.getElementById('modal-overlay').classList.add('visible');
+  setEstadoModal('', '');
+  document.getElementById('resultado-ia').style.display = 'none';
+  document.getElementById('btn-agregar').style.display = 'none';
+  document.getElementById('btn-analizar').disabled = true;
+  document.getElementById('preview-img').style.display = 'none';
+  document.getElementById('drop-text').textContent = '🖼️ Hacé clic aquí o arrastrá una imagen';
+  document.getElementById('file-input').value = '';
+  imagenBase64 = null;
+}
+
+function cerrarModal() { document.getElementById('modal-overlay').classList.remove('visible'); }
+
+async function analizarImagen() {
+  const apiKey = document.getElementById('api-key-input').value.trim();
+  if (!apiKey) { setEstadoModal('err', '✗ Ingresá tu clave API de Anthropic.'); return; }
+  if (!imagenBase64) { setEstadoModal('err', '✗ Seleccioná una imagen.'); return; }
+  localStorage.setItem('lavie_apikey', apiKey);
+  const btn = document.getElementById('btn-analizar');
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Analizando...';
+  setEstadoModal('info', 'Enviando imagen a Claude...');
+  document.getElementById('resultado-ia').style.display = 'none';
+  document.getElementById('btn-agregar').style.display = 'none';
   try {
     const resp = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: { 'x-api-key': key, 'anthropic-version': '2023-06-01', 'content-type': 'application/json', 'anthropic-dangerous-direct-browser-access': 'true' },
-      body: JSON.stringify({
-        model: "claude-3-haiku-20240307", // Modelo rápido y económico
-        max_tokens: 1000,
-        messages: [{ role: "user", content: [
-          { type: "image", source: { type: "base64", media_type: fileInput.files[0].type, data: base64.split(',')[1] } },
-          { type: "text", text: "Extrae los modelos de celulares y sus precios. Responde SOLO un array JSON: [{'modelo': 'nombre', 'precio': 12300}]. Si el modelo ya existe, extraer el precio más nuevo." }
-        ]}]
-      })
+      headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-calls': 'true' },
+      body: JSON.stringify({ model: 'claude-opus-4-5', max_tokens: 1024, messages: [{ role: 'user', content: [
+        { type: 'image', source: { type: 'base64', media_type: imagenMime, data: imagenBase64 } },
+        { type: 'text', text: 'Analizá esta imagen de lista de precios de repuestos para celulares. Extraé TODOS los pares modelo-precio visibles. Respondé ÚNICAMENTE con un array JSON válido, sin texto extra, sin bloques de código markdown, sin explicaciones. Formato exacto: [{"modelo":"nombre","precio":12345}] Los precios deben ser números enteros. Si ves $12.400 escribí 12400.' }
+      ]}] })
     });
-
+    if (!resp.ok) { const e = await resp.json().catch(()=>({})); throw new Error(e.error?.message || 'Error HTTP ' + resp.status); }
     const data = await resp.json();
-    const nuevos = JSON.parse(data.content[0].text);
-
-    // INTEGRACIÓN: Sumar sin duplicar
-    nuevos.forEach(n => {
-      const idx = productos.findIndex(p => p.modelo.toLowerCase() === n.modelo.toLowerCase());
-      if(idx !== -1) productos[idx].precio = n.precio; // Actualiza
-      else productos.push(n); // Agrega nuevo
-    });
-
-    renderTabla();
-    alert("¡Imagen procesada! Los datos se sumaron a la lista.");
-    document.getElementById('modal-ia').style.display='none';
-  } catch(e) { alert("Error con la IA. Verificá tu clave."); }
-  
-  btn.innerText = "Analizar y Sumar";
-  btn.disabled = false;
+    const texto = data.content.map(b => b.text||'').join('').trim().replace(/```json|```/g,'').trim();
+    let parsed;
+    try { parsed = JSON.parse(texto); } catch(e) { throw new Error('La IA no devolvió formato válido.'); }
+    if (!Array.isArray(parsed)||!parsed.length) throw new Error('No se encontraron productos en la imagen.');
+    detectados = parsed.map((p,i) => ({ modelo:String(p.modelo), precio:Number(p.precio), seleccionado:true, id:'d'+i }));
+    mostrarDetectados();
+    setEstadoModal('ok', `✓ ${detectados.length} productos detectados.`);
+  } catch(err) {
+    setEstadoModal('err', '✗ ' + err.message);
+  } finally {
+    btn.disabled = false; btn.innerHTML = '🔍 Analizar imagen';
+  }
 }
 
-const toBase64 = file => new Promise((res, rej) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => res(reader.result);
-});
-
-// Importar desde Excel
-function importarArchivo(e) {
-  const reader = new FileReader();
-  reader.onload = (ev) => {
-    const wb = XLSX.read(ev.target.result, {type: 'binary'});
-    const data = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
-    data.forEach(row => {
-      const mod = row.Modelo || Object.values(row)[0];
-      const pre = row.Precio || Object.values(row)[1];
-      const idx = productos.findIndex(p => p.modelo.toLowerCase() === String(mod).toLowerCase());
-      if(idx !== -1) productos[idx].precio = parseInt(pre);
-      else productos.push({ modelo: mod, precio: parseInt(pre) });
-    });
-    renderTabla();
-  };
-  reader.readAsBinaryString(e.target.files[0]);
+function mostrarDetectados() {
+  document.getElementById('lista-detectados').innerHTML = detectados.map(p => `
+    <div class="item">
+      <span class="item-check ${p.seleccionado?'on':'off'}" onclick="toggleDetectado('${p.id}')">${p.seleccionado?'☑':'☐'}</span>
+      <span class="item-modelo">${p.modelo}</span>
+      <span class="item-precio">$${Number(p.precio).toLocaleString('es-AR')}</span>
+    </div>`).join('');
+  document.getElementById('resultado-ia').style.display = 'block';
+  document.getElementById('btn-agregar').style.display = 'flex';
 }
 
-obtenerDolar();
+function toggleDetectado(id) {
+  const p = detectados.find(d=>d.id===id);
+  if (p) { p.seleccionado=!p.seleccionado; mostrarDetectados(); }
+}
+
+function agregarDetectados() {
+  const sel = detectados.filter(d=>d.seleccionado);
+  if (!sel.length) { setEstadoModal('err','✗ Seleccioná al menos un producto.'); return; }
+  let ag=0, ac=0;
+  sel.forEach(d => {
+    const e = productos.find(p=>p.modelo.toLowerCase()===d.modelo.toLowerCase());
+    if (e) { e.precio=d.precio; e.nueva=true; ac++; } else { productos.push({modelo:d.modelo,precio:d.precio,nueva:true}); ag++; }
+  });
+  document.getElementById('total-modelos').textContent = productos.length;
+  renderTabla(); cerrarModal();
+  const msgs=[]; if(ag) msgs.push(`${ag} agregado${ag>1?'s':''}`); if(ac) msgs.push(`${ac} actualizado${ac>1?'s':''}`);
+  const el=document.getElementById('estado-api'); el.className='status ok'; el.textContent='✓ '+msgs.join(', ')+' desde imagen.';
+  setTimeout(()=>{ productos.forEach(p=>p.nueva=false); renderTabla(); },4000);
+}
+
+function setEstadoModal(tipo, msg) {
+  const el=document.getElementById('estado-modal'); el.className=tipo?'status '+tipo:'status'; el.textContent=msg;
+}
+
+// ── DÓLAR ────────────────────────────────────────────────────────────────────
+async function fetchDolar() {
+  const btn=document.getElementById('btn-actualizar');
+  btn.disabled=true; btn.innerHTML='<span class="spinner"></span> Actualizando...';
+  document.getElementById('dolar-val').innerHTML='<span class="spinner"></span>';
+  try {
+    const resp=await fetch('https://dolarapi.com/v1/dolares/blue');
+    if (!resp.ok) throw new Error('HTTP '+resp.status);
+    const data=await resp.json();
+    dolarBlue=data.venta;
+    const now=new Date();
+    document.getElementById('dolar-val').textContent='$'+dolarBlue.toLocaleString('es-AR');
+    document.getElementById('dolar-hora').textContent='Actualizado '+now.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'});
+    const el=document.getElementById('estado-api'); el.className='status ok';
+    el.textContent='✓ Dólar blue de dolarapi.com · '+now.toLocaleDateString('es-AR');
+    renderTabla();
+  } catch(err) {
+    document.getElementById('dolar-val').textContent='Error';
+    document.getElementById('dolar-hora').textContent='Sin conexión';
+    const el=document.getElementById('estado-api'); el.className='status err';
+    el.textContent='✗ No se pudo conectar a dolarapi.com.';
+  } finally { btn.disabled=false; btn.innerHTML='🔄 Actualizar dólar'; }
+}
+
+// ── TABLA ────────────────────────────────────────────────────────────────────
+function renderTabla() {
+  const buscar=document.getElementById('buscar').value.toLowerCase();
+  const tipo=document.getElementById('filtro-tipo').value;
+  const tbody=document.getElementById('tabla-body');
+  const filtrados=productos.filter(p=>p.modelo.toLowerCase().includes(buscar)&&(tipo===''||p.modelo.includes(tipo)));
+  if (!filtrados.length) { tbody.innerHTML='<tr><td colspan="4" style="text-align:center;color:#555;padding:2rem;">Sin resultados</td></tr>'; return; }
+  tbody.innerHTML=filtrados.map(p=>{
+    const desc=Math.round(p.precio*0.95);
+    const usd=dolarBlue?(p.precio/dolarBlue).toFixed(2):'—';
+    const n=p.nueva?' nueva':''; const badge=p.nueva?'<span class="badge-nueva">✨ nuevo</span>':'';
+    return `<tr><td class="${n}">${p.modelo}${badge}</td><td class="r${n}">$${p.precio.toLocaleString('es-AR')}</td><td class="ars-desc${n}">$${desc.toLocaleString('es-AR')}</td><td class="usd${n}">${usd!=='—'?'U$D '+usd:'—'}</td></tr>`;
+  }).join('');
+}
+
+// ── EXPORTAR CSV ─────────────────────────────────────────────────────────────
+function exportarCSV() {
+  const buscar=document.getElementById('buscar').value.toLowerCase();
+  const tipo=document.getElementById('filtro-tipo').value;
+  const filtrados=productos.filter(p=>p.modelo.toLowerCase().includes(buscar)&&(tipo===''||p.modelo.includes(tipo)));
+  let csv='Modelo,Precio ARS,ARS con 5% desc.,USD Blue\n';
+  filtrados.forEach(p=>{
+    const desc=Math.round(p.precio*0.95);
+    const usd=dolarBlue?(p.precio/dolarBlue).toFixed(2):'';
+    csv+=`"${p.modelo}",${p.precio},${desc},${usd}\n`;
+  });
+  const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url; a.download='lavie_catalogo.csv';
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a); URL.revokeObjectURL(url);
+}
+
+fetchDolar();
+renderTabla();
 </script>
 </body>
 </html>
