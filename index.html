@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Lavié Smartphones — Módulos Samsung J</title>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: system-ui, -apple-system, sans-serif; background: #0f0f13; color: #f0f0f0; min-height: 100vh; padding: 2rem 1rem; }
@@ -15,435 +16,145 @@
   .logo-text { font-size: 20px; font-weight: 600; color: #fff; }
   .logo-sub { font-size: 12px; color: #888; margin-top: 1px; }
 
-  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 1.5rem; }
-  .card { background: #1a1a22; border: 1px solid #2a2a35; border-radius: 12px; padding: 1rem 1.25rem; }
-  .card-label { font-size: 12px; color: #888; margin-bottom: 6px; }
-  .card-value { font-size: 22px; font-weight: 600; color: #fff; }
-  .card-sub { font-size: 11px; color: #555; margin-top: 4px; }
-  .card.dolar .card-value { color: #4ade80; }
+  .stats { display: flex; gap: 20px; }
+  .stat-card { background: #1a1a20; padding: 12px 20px; border-radius: 12px; border: 1px solid #2a2a35; }
+  .stat-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: #888; margin-bottom: 4px; }
+  .stat-value { font-size: 18px; font-weight: 700; color: #4ade80; }
 
-  .toolbar { display: flex; align-items: center; gap: 8px; margin-bottom: 1rem; flex-wrap: wrap; }
-  input[type="text"], select {
-    background: #1a1a22; border: 1px solid #2a2a35; color: #f0f0f0;
-    border-radius: 8px; padding: 7px 12px; font-size: 13px; outline: none;
+  .toolbar { background: #1a1a20; padding: 16px; border-radius: 12px; border: 1px solid #2a2a35; margin-bottom: 1.5rem; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  input, select, button { background: #0f0f13; border: 1px solid #3a3a45; color: #fff; padding: 10px 14px; border-radius: 8px; font-size: 14px; outline: none; transition: 0.2s; }
+  input:focus, select:focus { border-color: #cc2255; }
+  input#buscar { flex-grow: 1; min-width: 200px; }
+  
+  button { cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+  button:hover { background: #22222a; border-color: #888; }
+  .btn-upload { background: #1a2a1a; border-color: #2a4a2a; color: #4ade80; }
+  .btn-upload:hover { background: #223a22; }
+  .btn-export { background: #22222a; color: #aaa; }
+
+  table { width: 100%; border-collapse: collapse; background: #1a1a20; border-radius: 12px; overflow: hidden; border: 1px solid #2a2a35; }
+  th { background: #252530; text-align: left; padding: 14px; font-size: 12px; text-transform: uppercase; color: #888; font-weight: 600; border-bottom: 1px solid #2a2a35; }
+  td { padding: 14px; border-bottom: 1px solid #22222a; font-size: 15px; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #21212a; }
+
+  .r { font-weight: 700; color: #fff; }
+  .ars-desc { color: #4ade80; font-weight: 600; }
+  .usd { color: #60a5fa; font-size: 14px; }
+  
+  .badge-nueva { background: #4ade8022; color: #4ade80; font-size: 10px; padding: 2px 6px; border-radius: 4px; margin-left: 8px; text-transform: uppercase; font-weight: 800; }
+  .nueva { animation: pulse-green 2s infinite; }
+  @keyframes pulse-green { 0% { background: #0000; } 50% { background: #4ade8011; } 100% { background: #0000; } }
+
+  @media (max-width: 600px) {
+    header { flex-direction: column; align-items: flex-start; }
+    .toolbar { flex-direction: column; align-items: stretch; }
+    td, th { padding: 10px; font-size: 13px; }
+    .usd { display: block; margin-top: 4px; }
   }
-  input[type="text"]:focus, select:focus { border-color: #cc2255; }
-  input[type="text"] { width: 180px; }
-  select option { background: #1a1a22; }
-
-  button {
-    background: #1a1a22; border: 1px solid #2a2a35; color: #f0f0f0;
-    border-radius: 8px; padding: 7px 14px; font-size: 13px; cursor: pointer;
-    display: flex; align-items: center; gap: 6px; transition: background 0.15s;
-  }
-  button:hover { background: #252530; border-color: #cc2255; }
-  button:disabled { opacity: 0.5; cursor: not-allowed; }
-  .btn-export { margin-left: auto; }
-  .btn-imagen { background: #1a1022; border-color: #cc2255; color: #f0a0c0; }
-  .btn-imagen:hover { background: #2a1030; border-color: #ff3377; }
-
-  .table-wrap { border: 1px solid #2a2a35; border-radius: 12px; overflow: hidden; }
-  table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  thead tr { background: #1a1a22; }
-  th { padding: 10px 14px; text-align: left; font-weight: 500; color: #888; border-bottom: 1px solid #2a2a35; }
-  th.r { text-align: right; }
-  tbody tr:nth-child(even) { background: #13131a; }
-  tbody tr:hover { background: #1e1e2a; }
-  td { padding: 9px 14px; border-bottom: 1px solid #1e1e26; color: #e0e0e0; }
-  td.r { text-align: right; }
-  td.ars-desc { color: #4ade80; text-align: right; }
-  td.usd { color: #60a5fa; text-align: right; }
-  td.nueva { background: #1a2a1a !important; }
-  tbody tr:last-child td { border-bottom: none; }
-
-  .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid #444; border-top-color: #cc2255; border-radius: 50%; animation: spin 0.7s linear infinite; }
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  .status { font-size: 11px; color: #555; margin-top: 8px; }
-  .status.ok { color: #4ade80; }
-  .status.err { color: #f87171; }
-  .status.info { color: #60a5fa; }
-
-  .badge-desc { display: inline-block; background: #1a2e1a; color: #4ade80; font-size: 10px; padding: 2px 7px; border-radius: 20px; border: 1px solid #2a4a2a; }
-  .badge-nueva { display: inline-block; background: #1a2e1a; color: #4ade80; font-size: 10px; padding: 1px 6px; border-radius: 20px; margin-left: 6px; }
-
-  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 100; align-items: center; justify-content: center; padding: 1rem; }
-  .modal-overlay.visible { display: flex; }
-  .modal { background: #1a1a22; border: 1px solid #2a2a35; border-radius: 16px; padding: 1.5rem; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; }
-  .modal h3 { font-size: 16px; font-weight: 600; margin-bottom: 0.4rem; color: #fff; }
-  .modal-desc { font-size: 13px; color: #888; margin-bottom: 1.2rem; line-height: 1.5; }
-
-  .drop-zone { border: 2px dashed #2a2a35; border-radius: 12px; padding: 1.5rem 1rem; text-align: center; cursor: pointer; transition: border-color 0.2s, background 0.2s; color: #666; font-size: 13px; }
-  .drop-zone:hover, .drop-zone.drag-over { border-color: #cc2255; background: #1a0e16; color: #f0a0c0; }
-  .drop-zone input[type="file"] { display: none; }
-  .preview-img { max-width: 100%; max-height: 180px; border-radius: 8px; margin-top: 0.8rem; display: none; object-fit: contain; }
-
-  .modal-actions { display: flex; gap: 8px; margin-top: 1rem; justify-content: flex-end; flex-wrap: wrap; }
-  .btn-primary { background: #cc2255; border-color: #cc2255; color: #fff; font-weight: 500; }
-  .btn-primary:hover { background: #dd3366; border-color: #dd3366; }
-  .btn-cancel { color: #888; }
-
-  .resultado-ia { margin-top: 1rem; background: #0f1a0f; border: 1px solid #2a3a2a; border-radius: 8px; padding: 1rem; display: none; max-height: 220px; overflow-y: auto; }
-  .resultado-ia .ri-label { font-size: 12px; color: #888; margin-bottom: 8px; }
-  .resultado-ia .item { display: flex; align-items: center; padding: 5px 0; border-bottom: 1px solid #1a2a1a; font-size: 13px; gap: 8px; }
-  .resultado-ia .item:last-child { border-bottom: none; }
-  .resultado-ia .item-check { cursor: pointer; font-size: 15px; flex-shrink: 0; }
-  .resultado-ia .item-check.on { color: #4ade80; }
-  .resultado-ia .item-check.off { color: #444; }
-  .resultado-ia .item-modelo { color: #e0e0e0; flex: 1; }
-  .resultado-ia .item-precio { color: #4ade80; font-weight: 500; white-space: nowrap; }
-
-  .api-key-section { margin-bottom: 1rem; }
-  .api-key-section label { font-size: 12px; color: #888; display: block; margin-bottom: 4px; }
-  .api-key-section input { width: 100%; background: #0f0f13; border: 1px solid #2a2a35; color: #f0f0f0; border-radius: 8px; padding: 7px 12px; font-size: 12px; font-family: monospace; outline: none; }
-  .api-key-section input:focus { border-color: #cc2255; }
-  .api-key-hint { font-size: 11px; color: #555; margin-top: 4px; }
-  .api-key-hint a { color: #60a5fa; }
 </style>
 </head>
 <body>
-<div class="container">
 
+<div class="container">
   <header>
     <div class="logo">
       <div class="logo-icon">L</div>
       <div>
-        <div class="logo-text">Lavié Smartphones</div>
-        <div class="logo-sub">Módulos Samsung Serie J</div>
+        <div class="logo-text">Lavié <span style="color:#cc2255">Smartphones</span></div>
+        <div class="logo-sub">Gestión de Stock — Serie J</div>
       </div>
     </div>
-    <div style="display:flex; gap:8px; flex-wrap:wrap;">
-      <button class="btn-imagen" onclick="abrirModal()">📷 Cargar imagen de precios</button>
-      <button onclick="fetchDolar()" id="btn-actualizar">🔄 Actualizar dólar</button>
+    <div class="stats">
+      <div class="stat-card">
+        <div class="stat-label">Modelos</div>
+        <div class="stat-value" id="total-modelos">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Dólar Blue</div>
+        <div class="stat-value" id="val-dolar">Cargando...</div>
+      </div>
     </div>
   </header>
-
-  <div class="cards">
-    <div class="card dolar">
-      <div class="card-label">Dólar blue (venta)</div>
-      <div class="card-value" id="dolar-val"><span class="spinner"></span></div>
-      <div class="card-sub" id="dolar-hora">Consultando...</div>
-    </div>
-    <div class="card">
-      <div class="card-label">Descuento en efectivo</div>
-      <div class="card-value">5%</div>
-      <div class="card-sub">sobre precio lista</div>
-    </div>
-    <div class="card">
-      <div class="card-label">Modelos cargados</div>
-      <div class="card-value" id="total-modelos">29</div>
-      <div class="card-sub">serie J Samsung</div>
-    </div>
-  </div>
 
   <div class="toolbar">
     <input type="text" id="buscar" placeholder="🔍 Buscar modelo..." oninput="renderTabla()" />
     <select id="filtro-tipo" onchange="renderTabla()">
       <option value="">Todos los tipos</option>
-      <option value="HD">HD</option>
-      <option value="Incell">Incell</option>
-      <option value="Oled">Oled</option>
       <option value="Prime">Prime</option>
+      <option value="Core">Core</option>
+      <option value="Neo">Neo</option>
+      <option value="Pro">Pro</option>
+      <option value="Plus">Plus</option>
     </select>
+    
+    <button class="btn-upload" onclick="document.getElementById('upload-stock').click()">
+      📁 Cargar Excel/CSV
+    </button>
+    <input type="file" id="upload-stock" accept=".csv, .xlsx, .xls" style="display:none" onchange="importarArchivo(event)" />
+    
     <button class="btn-export" onclick="exportarCSV()">⬇ Exportar CSV</button>
   </div>
 
-  <div class="table-wrap">
-    <table>
-      <thead>
-        <tr>
-          <th>Modelo</th>
-          <th class="r">Precio ARS</th>
-          <th class="r">Con 5% desc. <span class="badge-desc">efectivo</span></th>
-          <th class="r">USD blue</th>
-        </tr>
-      </thead>
-      <tbody id="tabla-body"></tbody>
-    </table>
-  </div>
-  <p class="status" id="estado-api"></p>
-
-</div>
-
-<!-- MODAL -->
-<div class="modal-overlay" id="modal-overlay">
-  <div class="modal">
-    <h3>📷 Cargar imagen de precios</h3>
-    <p class="modal-desc">Subí una foto o captura con precios. La IA lee los productos automáticamente y los agrega a la tabla.</p>
-
-    <div class="api-key-section">
-      <label>Clave API de Anthropic</label>
-      <input type="password" id="api-key-input" placeholder="sk-ant-api03-..." />
-      <p class="api-key-hint">Necesaria para leer la imagen con IA. Conseguila gratis en <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a> → API Keys. Se guarda en tu navegador.</p>
-    </div>
-
-    <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
-      <input type="file" id="file-input" accept="image/*" onchange="onFileSelected(event)" />
-      <div id="drop-text">🖼️ Hacé clic aquí o arrastrá una imagen</div>
-      <img id="preview-img" class="preview-img" alt="Vista previa" />
-    </div>
-
-    <div class="resultado-ia" id="resultado-ia">
-      <p class="ri-label">Productos detectados — tildá los que querés agregar:</p>
-      <div id="lista-detectados"></div>
-    </div>
-
-    <div class="modal-actions">
-      <button class="btn-cancel" onclick="cerrarModal()">Cancelar</button>
-      <button class="btn-primary" id="btn-analizar" onclick="analizarImagen()" disabled>🔍 Analizar imagen</button>
-      <button class="btn-primary" id="btn-agregar" onclick="agregarDetectados()" style="display:none;">✓ Agregar a tabla</button>
-    </div>
-    <p class="status" id="estado-modal"></p>
-  </div>
+  <table id="tabla-precios">
+    <thead>
+      <tr>
+        <th>Modelo</th>
+        <th>Precio Lista</th>
+        <th>Contado (-5%)</th>
+        <th>Dólar</th>
+      </tr>
+    </thead>
+    <tbody id="lista-productos">
+      </tbody>
+  </table>
 </div>
 
 <script>
 let productos = [
-  {modelo:"J1 Ace HD", precio:11400, nueva:false},
-  {modelo:"J1 2016 HD", precio:9300, nueva:false},
-  {modelo:"J2 Core", precio:12400, nueva:false},
-  {modelo:"J2 HD", precio:9300, nueva:false},
-  {modelo:"J3 HD", precio:12100, nueva:false},
-  {modelo:"J3 Incell", precio:12400, nueva:false},
-  {modelo:"J4 HD", precio:12100, nueva:false},
-  {modelo:"J4 Incell", precio:14500, nueva:false},
-  {modelo:"J4 Oled", precio:35300, nueva:false},
-  {modelo:"J4+/J6+ Premium", precio:13300, nueva:false},
-  {modelo:"J4+/J6+", precio:12400, nueva:false},
-  {modelo:"J5 HD", precio:12000, nueva:false},
-  {modelo:"J5 Incell", precio:13500, nueva:false},
-  {modelo:"J5 Prime", precio:12400, nueva:false},
-  {modelo:"J6 HD", precio:12400, nueva:false},
-  {modelo:"J6 Incell", precio:14500, nueva:false},
-  {modelo:"J6 Oled", precio:49800, nueva:false},
-  {modelo:"J7 HD", precio:12400, nueva:false},
-  {modelo:"J7 Incell", precio:14500, nueva:false},
-  {modelo:"J7 Oled", precio:35300, nueva:false},
-  {modelo:"J7 2016 HD", precio:12400, nueva:false},
-  {modelo:"J7 2016 Incell", precio:14500, nueva:false},
-  {modelo:"J7 2016 Oled", precio:35300, nueva:false},
-  {modelo:"J7 Prime", precio:13500, nueva:false},
-  {modelo:"J7 Pro Incell", precio:16600, nueva:false},
-  {modelo:"J7 Pro Oled", precio:35300, nueva:false},
-  {modelo:"J8 HD", precio:14500, nueva:false},
-  {modelo:"J8 Incell", precio:16600, nueva:false},
-  {modelo:"J8 Oled", precio:49800, nueva:false},
+  { modelo: "Samsung J2 Prime", precio: 12500 },
+  { modelo: "Samsung J2 Core", precio: 11800 },
+  { modelo: "Samsung J4 (2018)", precio: 14200 },
+  { modelo: "Samsung J4 Core", precio: 13500 },
+  { modelo: "Samsung J4 Plus", precio: 15100 },
+  { modelo: "Samsung J5 (2016)", precio: 13900 },
+  { modelo: "Samsung J5 Prime", precio: 14500 },
+  { modelo: "Samsung J5 Pro", precio: 16800 },
+  { modelo: "Samsung J6 (2018)", precio: 17500 },
+  { modelo: "Samsung J6 Plus", precio: 18900 },
+  { modelo: "Samsung J7 (2016)", precio: 16200 },
+  { modelo: "Samsung J7 Prime", precio: 17800 },
+  { modelo: "Samsung J7 Pro", precio: 19500 },
+  { modelo: "Samsung J7 Neo", precio: 15800 },
+  { modelo: "Samsung J8 (2018)", precio: 21000 }
 ];
 
-let dolarBlue = null;
-let imagenBase64 = null;
-let imagenMime = null;
-let detectados = [];
+let dolarBlue = 0;
 
-window.addEventListener('load', () => {
-  const saved = localStorage.getItem('lavie_apikey');
-  if (saved) document.getElementById('api-key-input').value = saved;
-});
-
-const dropZone = document.getElementById('drop-zone');
-dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
-dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
-dropZone.addEventListener('drop', e => {
-  e.preventDefault();
-  dropZone.classList.remove('drag-over');
-  const file = e.dataTransfer.files[0];
-  if (file && file.type.startsWith('image/')) procesarArchivo(file);
-});
-
-function onFileSelected(e) {
-  const file = e.target.files[0];
-  if (file) procesarArchivo(file);
-}
-
-function procesarArchivo(file) {
-  imagenMime = file.type;
-  const reader = new FileReader();
-  reader.onload = ev => {
-    imagenBase64 = ev.target.result.split(',')[1];
-    const preview = document.getElementById('preview-img');
-    preview.src = ev.target.result;
-    preview.style.display = 'block';
-    document.getElementById('drop-text').textContent = '✓ ' + file.name;
-    document.getElementById('btn-analizar').disabled = false;
-    document.getElementById('resultado-ia').style.display = 'none';
-    document.getElementById('btn-agregar').style.display = 'none';
-    setEstadoModal('', '');
-  };
-  reader.readAsDataURL(file);
-}
-
-function abrirModal() {
-  document.getElementById('modal-overlay').classList.add('visible');
-  setEstadoModal('', '');
-  document.getElementById('resultado-ia').style.display = 'none';
-  document.getElementById('btn-agregar').style.display = 'none';
-  document.getElementById('btn-analizar').disabled = true;
-  document.getElementById('preview-img').style.display = 'none';
-  document.getElementById('drop-text').textContent = '🖼️ Hacé clic aquí o arrastrá una imagen';
-  document.getElementById('file-input').value = '';
-  imagenBase64 = null;
-}
-
-function cerrarModal() {
-  document.getElementById('modal-overlay').classList.remove('visible');
-}
-
-async function analizarImagen() {
-  const apiKey = document.getElementById('api-key-input').value.trim();
-  if (!apiKey) { setEstadoModal('err', '✗ Ingresá tu clave API de Anthropic.'); return; }
-  if (!imagenBase64) { setEstadoModal('err', '✗ Seleccioná una imagen.'); return; }
-
-  localStorage.setItem('lavie_apikey', apiKey);
-
-  const btn = document.getElementById('btn-analizar');
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span> Analizando...';
-  setEstadoModal('info', 'Enviando imagen a Claude...');
-  document.getElementById('resultado-ia').style.display = 'none';
-  document.getElementById('btn-agregar').style.display = 'none';
-
+async function obtenerDolar() {
   try {
-    const resp = await fetch('/api/anthropic', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01'
-      },
-      body: JSON.stringify({
-        model: 'claude-opus-4-5',
-        max_tokens: 1024,
-        messages: [{
-          role: 'user',
-          content: [
-            { type: 'image', source: { type: 'base64', media_type: imagenMime, data: imagenBase64 } },
-            { type: 'text', text: `Analizá esta imagen de lista de precios de repuestos para celulares.
-Extraé TODOS los pares modelo-precio visibles.
-Respondé ÚNICAMENTE con un array JSON válido, sin texto extra, sin bloques de código markdown, sin explicaciones.
-Formato exacto: [{"modelo":"nombre","precio":12345},{"modelo":"otro","precio":67890}]
-Los precios deben ser números enteros. Si ves $12.400 escribí 12400. Si ves $9.300 escribí 9300.` }
-          ]
-        }]
-      })
-    });
-
-    if (!resp.ok) {
-      const err = await resp.json().catch(() => ({}));
-      throw new Error(err.error?.message || 'Error HTTP ' + resp.status);
-    }
-
-    const data = await resp.json();
-    const texto = data.content.map(b => b.text || '').join('').trim();
-    const clean = texto.replace(/```json|```/g, '').trim();
-    let parsed;
-    try { parsed = JSON.parse(clean); } catch(e) { throw new Error('La IA no devolvió un formato válido. Intentá con una imagen más clara.'); }
-    if (!Array.isArray(parsed) || parsed.length === 0) throw new Error('No se encontraron productos en la imagen.');
-
-    detectados = parsed.map((p, i) => ({ modelo: String(p.modelo), precio: Number(p.precio), seleccionado: true, id: 'd' + i }));
-    mostrarDetectados();
-    setEstadoModal('ok', `✓ ${detectados.length} productos detectados. Revisá y confirmá.`);
-
-  } catch(err) {
-    setEstadoModal('err', '✗ ' + err.message);
-  } finally {
-    btn.disabled = false;
-    btn.innerHTML = '🔍 Analizar imagen';
-  }
-}
-
-function mostrarDetectados() {
-  const lista = document.getElementById('lista-detectados');
-  lista.innerHTML = detectados.map(p => `
-    <div class="item">
-      <span class="item-check ${p.seleccionado ? 'on' : 'off'}" onclick="toggleDetectado('${p.id}')">
-        ${p.seleccionado ? '☑' : '☐'}
-      </span>
-      <span class="item-modelo">${p.modelo}</span>
-      <span class="item-precio">$${Number(p.precio).toLocaleString('es-AR')}</span>
-    </div>
-  `).join('');
-  document.getElementById('resultado-ia').style.display = 'block';
-  document.getElementById('btn-agregar').style.display = 'flex';
-}
-
-function toggleDetectado(id) {
-  const p = detectados.find(d => d.id === id);
-  if (p) { p.seleccionado = !p.seleccionado; mostrarDetectados(); }
-}
-
-function agregarDetectados() {
-  const sel = detectados.filter(d => d.seleccionado);
-  if (sel.length === 0) { setEstadoModal('err', '✗ Seleccioná al menos un producto.'); return; }
-
-  let agregados = 0, actualizados = 0;
-  sel.forEach(d => {
-    const existe = productos.find(p => p.modelo.toLowerCase() === d.modelo.toLowerCase());
-    if (existe) { existe.precio = d.precio; existe.nueva = true; actualizados++; }
-    else { productos.push({ modelo: d.modelo, precio: d.precio, nueva: true }); agregados++; }
-  });
-
-  document.getElementById('total-modelos').textContent = productos.length;
-  renderTabla();
-  cerrarModal();
-
-  const msgs = [];
-  if (agregados) msgs.push(`${agregados} producto${agregados > 1 ? 's' : ''} agregado${agregados > 1 ? 's' : ''}`);
-  if (actualizados) msgs.push(`${actualizados} actualizado${actualizados > 1 ? 's' : ''}`);
-  const el = document.getElementById('estado-api');
-  el.className = 'status ok';
-  el.textContent = '✓ ' + msgs.join(', ') + ' desde la imagen.';
-
-  setTimeout(() => { productos.forEach(p => p.nueva = false); renderTabla(); }, 4000);
-}
-
-function setEstadoModal(tipo, msg) {
-  const el = document.getElementById('estado-modal');
-  el.className = tipo ? 'status ' + tipo : 'status';
-  el.textContent = msg;
-}
-
-async function fetchDolar() {
-  const btn = document.getElementById('btn-actualizar');
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span> Actualizando...';
-  document.getElementById('dolar-val').innerHTML = '<span class="spinner"></span>';
-
-  try {
-    const resp = await fetch('https://dolarapi.com/v1/dolares/blue');
-    if (!resp.ok) throw new Error('HTTP ' + resp.status);
-    const data = await resp.json();
-    dolarBlue = data.venta;
-    const now = new Date();
-    document.getElementById('dolar-val').textContent = '$' + dolarBlue.toLocaleString('es-AR');
-    document.getElementById('dolar-hora').textContent = 'Actualizado ' + now.toLocaleTimeString('es-AR', {hour:'2-digit', minute:'2-digit'});
-    const el = document.getElementById('estado-api');
-    el.className = 'status ok';
-    el.textContent = '✓ Dólar blue obtenido de dolarapi.com · ' + now.toLocaleDateString('es-AR');
+    const res = await fetch('https://dolarapi.com/v1/dolares/blue');
+    const data = await res.json();
+    dolarBlue = data.compra;
+    document.getElementById('val-dolar').textContent = `$${dolarBlue}`;
     renderTabla();
-  } catch(err) {
-    document.getElementById('dolar-val').textContent = 'Error';
-    document.getElementById('dolar-hora').textContent = 'Sin conexión';
-    const el = document.getElementById('estado-api');
-    el.className = 'status err';
-    el.textContent = '✗ No se pudo conectar a dolarapi.com.';
-  } finally {
-    btn.disabled = false;
-    btn.innerHTML = '🔄 Actualizar dólar';
+  } catch (e) {
+    document.getElementById('val-dolar').textContent = 'Error';
   }
 }
 
 function renderTabla() {
+  const listaBody = document.getElementById('lista-productos');
   const buscar = document.getElementById('buscar').value.toLowerCase();
   const tipo = document.getElementById('filtro-tipo').value;
-  const tbody = document.getElementById('tabla-body');
-  const filtrados = productos.filter(p =>
+
+  const filtrados = productos.filter(p => 
     p.modelo.toLowerCase().includes(buscar) && (tipo === '' || p.modelo.includes(tipo))
   );
-  if (!filtrados.length) {
-    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#555;padding:2rem;">Sin resultados</td></tr>';
-    return;
-  }
-  tbody.innerHTML = filtrados.map(p => {
+
+  document.getElementById('total-modelos').textContent = filtrados.length;
+
+  listaBody.innerHTML = filtrados.map(p => {
     const desc = Math.round(p.precio * 0.95);
     const usd = dolarBlue ? (p.precio / dolarBlue).toFixed(2) : '—';
     const n = p.nueva ? ' nueva' : '';
@@ -457,28 +168,70 @@ function renderTabla() {
   }).join('');
 }
 
-function exportarCSV() {
-  const buscar = document.getElementById('buscar').value.toLowerCase();
-  const tipo = document.getElementById('filtro-tipo').value;
-  const filtrados = productos.filter(p =>
-    p.modelo.toLowerCase().includes(buscar) && (tipo === '' || p.modelo.includes(tipo))
-  );
-  let csv = 'Modelo,Precio ARS,ARS con 5% desc.,USD Blue\n';
-  filtrados.forEach(p => {
-    const desc = Math.round(p.precio * 0.95);
-    const usd = dolarBlue ? (p.precio / dolarBlue).toFixed(2) : '';
-    csv += `"${p.modelo}",${p.precio},${desc},${usd}\n`;
-  });
-  const blob = new Blob(['\uFEFF' + csv], {type:'text/csv;charset=utf-8;'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = 'lavie_modulos_samsung_j.csv';
-  document.body.appendChild(a); a.click();
-  document.body.removeChild(a); URL.revokeObjectURL(url);
+function importarArchivo(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = (event) => {
+    const data = event.target.result;
+    let listaImportada = [];
+
+    try {
+      if (file.name.endsWith('.csv')) {
+        const content = event.target.result;
+        const filas = content.split('\n').slice(1);
+        listaImportada = filas.map(f => {
+          const columnas = f.split(',');
+          return { modelo: columnas[0]?.replace(/"/g, '').trim(), precio: parseInt(columnas[1]) };
+        }).filter(p => p.modelo && !isNaN(p.precio));
+      } else {
+        const workbook = XLSX.read(data, { type: 'binary' });
+        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+        const json = XLSX.utils.sheet_to_json(sheet);
+        listaImportada = json.map(row => ({
+          modelo: row.Modelo || row.modelo || Object.values(row)[0],
+          precio: parseInt(row.Precio || row.precio || Object.values(row)[1])
+        })).filter(p => p.modelo && !isNaN(p.precio));
+      }
+
+      if (listaImportada.length > 0) {
+        listaImportada.forEach(nuevo => {
+          const idx = productos.findIndex(p => p.modelo.toLowerCase() === nuevo.modelo.toLowerCase());
+          if (idx !== -1) {
+            productos[idx].precio = nuevo.precio;
+            productos[idx].nueva = true;
+          } else {
+            productos.push({ ...nuevo, nueva: true });
+          }
+        });
+        renderTabla();
+        alert(`Se cargaron/actualizaron ${listaImportada.length} productos.`);
+        setTimeout(() => { productos.forEach(p => p.nueva = false); renderTabla(); }, 4000);
+      }
+    } catch (err) {
+      alert("Error al procesar el archivo. Asegurate de que tenga columnas 'Modelo' y 'Precio'.");
+    }
+    e.target.value = '';
+  };
+
+  if (file.name.endsWith('.csv')) reader.readAsText(file);
+  else reader.readAsBinaryString(file);
 }
 
-fetchDolar();
-renderTabla();
+function exportarCSV() {
+  let csv = 'Modelo,Precio\\n';
+  productos.forEach(p => csv += `"${p.modelo}",${p.precio}\\n`);
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'stock_lavie.csv';
+  a.click();
+}
+
+obtenerDolar();
 </script>
+
 </body>
 </html>
