@@ -3,133 +3,105 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lavié Smartphones — Módulos Samsung J</title>
+<title>Lavié Smartphones — Gestión de Stock</title>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: system-ui, -apple-system, sans-serif; background: #0f0f13; color: #f0f0f0; min-height: 100vh; padding: 2rem 1rem; }
-  .container { max-width: 900px; margin: 0 auto; }
+  .container { max-width: 950px; margin: 0 auto; }
 
   header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; flex-wrap: wrap; gap: 12px; }
-  .logo { display: flex; align-items: center; gap: 10px; }
-  .logo-icon { width: 36px; height: 36px; background: #cc2255; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; color: #fff; }
-  .logo-text { font-size: 20px; font-weight: 600; color: #fff; }
-  .logo-sub { font-size: 12px; color: #888; margin-top: 1px; }
-
-  .stats { display: flex; gap: 20px; }
-  .stat-card { background: #1a1a20; padding: 12px 20px; border-radius: 12px; border: 1px solid #2a2a35; }
-  .stat-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: #888; margin-bottom: 4px; }
-  .stat-value { font-size: 18px; font-weight: 700; color: #4ade80; }
-
-  .toolbar { background: #1a1a20; padding: 16px; border-radius: 12px; border: 1px solid #2a2a35; margin-bottom: 1.5rem; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
-  input, select, button { background: #0f0f13; border: 1px solid #3a3a45; color: #fff; padding: 10px 14px; border-radius: 8px; font-size: 14px; outline: none; transition: 0.2s; }
-  input:focus, select:focus { border-color: #cc2255; }
-  input#buscar { flex-grow: 1; min-width: 200px; }
+  .logo-text { font-size: 22px; font-weight: 700; color: #fff; }
+  .logo-text span { color: #cc2255; }
   
-  button { cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 6px; }
-  button:hover { background: #22222a; border-color: #888; }
-  .btn-upload { background: #1a2a1a; border-color: #2a4a2a; color: #4ade80; }
-  .btn-upload:hover { background: #223a22; }
-  .btn-export { background: #22222a; color: #aaa; }
+  .stats { display: flex; gap: 15px; }
+  .stat-card { background: #1a1a22; padding: 10px 15px; border-radius: 10px; border: 1px solid #2a2a35; text-align: center; }
+  .stat-label { font-size: 10px; color: #888; text-transform: uppercase; margin-bottom: 2px; }
+  .stat-value { font-size: 16px; font-weight: 700; color: #4ade80; }
 
-  table { width: 100%; border-collapse: collapse; background: #1a1a20; border-radius: 12px; overflow: hidden; border: 1px solid #2a2a35; }
-  th { background: #252530; text-align: left; padding: 14px; font-size: 12px; text-transform: uppercase; color: #888; font-weight: 600; border-bottom: 1px solid #2a2a35; }
-  td { padding: 14px; border-bottom: 1px solid #22222a; font-size: 15px; }
-  tr:last-child td { border-bottom: none; }
-  tr:hover td { background: #21212a; }
-
-  .r { font-weight: 700; color: #fff; }
-  .ars-desc { color: #4ade80; font-weight: 600; }
-  .usd { color: #60a5fa; font-size: 14px; }
+  .toolbar { background: #1a1a22; padding: 15px; border-radius: 12px; border: 1px solid #2a2a35; margin-bottom: 1.5rem; display: flex; gap: 10px; flex-wrap: wrap; }
+  input, select, button { background: #0f0f13; border: 1px solid #3a3a45; color: #fff; padding: 10px; border-radius: 8px; font-size: 13px; outline: none; }
+  input#buscar { flex-grow: 1; }
   
-  .badge-nueva { background: #4ade8022; color: #4ade80; font-size: 10px; padding: 2px 6px; border-radius: 4px; margin-left: 8px; text-transform: uppercase; font-weight: 800; }
-  .nueva { animation: pulse-green 2s infinite; }
-  @keyframes pulse-green { 0% { background: #0000; } 50% { background: #4ade8011; } 100% { background: #0000; } }
+  button { cursor: pointer; font-weight: 600; transition: 0.2s; display: flex; align-items: center; gap: 6px; }
+  .btn-ia { background: #cc2255; border-color: #cc2255; }
+  .btn-excel { background: #1a2a1a; border-color: #2a4a2a; color: #4ade80; }
+  button:hover { opacity: 0.8; }
 
-  @media (max-width: 600px) {
-    header { flex-direction: column; align-items: flex-start; }
-    .toolbar { flex-direction: column; align-items: stretch; }
-    td, th { padding: 10px; font-size: 13px; }
-    .usd { display: block; margin-top: 4px; }
-  }
+  .table-wrap { background: #1a1a22; border-radius: 12px; border: 1px solid #2a2a35; overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; min-width: 600px; }
+  th { text-align: left; padding: 12px; font-size: 11px; color: #888; text-transform: uppercase; border-bottom: 1px solid #2a2a35; }
+  td { padding: 12px; border-bottom: 1px solid #22222a; font-size: 14px; }
+  
+  .ars { font-weight: 700; color: #fff; }
+  .desc { color: #4ade80; font-weight: 600; }
+  .usd { color: #60a5fa; }
+  
+  .btn-wa { background: #25d366; color: white; padding: 5px 10px; border-radius: 6px; text-decoration: none; font-size: 12px; font-weight: 700; }
+
+  /* Modal Estilos rápidos */
+  .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); align-items: center; justify-content: center; z-index: 100; padding: 20px; }
+  .modal-content { background: #1a1a22; padding: 20px; border-radius: 15px; max-width: 500px; width: 100%; border: 1px solid #3a3a45; }
+  .preview-img { width: 100%; max-height: 200px; object-fit: contain; margin: 10px 0; display: none; border-radius: 8px; }
 </style>
 </head>
 <body>
 
 <div class="container">
   <header>
-    <div class="logo">
-      <div class="logo-icon">L</div>
-      <div>
-        <div class="logo-text">Lavié <span style="color:#cc2255">Smartphones</span></div>
-        <div class="logo-sub">Gestión de Stock — Serie J</div>
-      </div>
-    </div>
+    <div class="logo-text">Lavié <span>Smartphones</span></div>
     <div class="stats">
-      <div class="stat-card">
-        <div class="stat-label">Modelos</div>
-        <div class="stat-value" id="total-modelos">0</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Dólar Blue</div>
-        <div class="stat-value" id="val-dolar">Cargando...</div>
-      </div>
+      <div class="stat-card"><div class="stat-label">Dólar Blue</div><div class="stat-value" id="val-dolar">...</div></div>
+      <div class="stat-card"><div class="stat-label">Modelos</div><div class="stat-value" id="total-modelos">0</div></div>
     </div>
   </header>
 
   <div class="toolbar">
-    <input type="text" id="buscar" placeholder="🔍 Buscar modelo..." oninput="renderTabla()" />
-    <select id="filtro-tipo" onchange="renderTabla()">
-      <option value="">Todos los tipos</option>
-      <option value="Prime">Prime</option>
-      <option value="Core">Core</option>
-      <option value="Neo">Neo</option>
-      <option value="Pro">Pro</option>
-      <option value="Plus">Plus</option>
-    </select>
-    
-    <button class="btn-upload" onclick="document.getElementById('upload-stock').click()">
-      📁 Cargar Excel/CSV
-    </button>
+    <input type="text" id="buscar" placeholder="🔍 Buscar modelo o marca..." oninput="renderTabla()" />
+    <button class="btn-ia" onclick="document.getElementById('modal-ia').style.display='flex'">📷 Escanear Lista</button>
+    <button class="btn-excel" onclick="document.getElementById('upload-stock').click()">📁 Subir Excel</button>
     <input type="file" id="upload-stock" accept=".csv, .xlsx, .xls" style="display:none" onchange="importarArchivo(event)" />
-    
-    <button class="btn-export" onclick="exportarCSV()">⬇ Exportar CSV</button>
   </div>
 
-  <table id="tabla-precios">
-    <thead>
-      <tr>
-        <th>Modelo</th>
-        <th>Precio Lista</th>
-        <th>Contado (-5%)</th>
-        <th>Dólar</th>
-      </tr>
-    </thead>
-    <tbody id="lista-productos">
-      </tbody>
-  </table>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Modelo</th>
+          <th>Precio Lista</th>
+          <th>Efectivo (-5%)</th>
+          <th>U$D Blue</th>
+          <th>Acción</th>
+        </tr>
+      </thead>
+      <tbody id="lista-productos"></tbody>
+    </table>
+  </div>
+</div>
+
+<div id="modal-ia" class="modal">
+  <div class="modal-content">
+    <h3>Escanear con IA</h3>
+    <p style="font-size: 12px; color: #888; margin: 10px 0;">Subí una foto de tu lista. Los nuevos modelos se sumarán a la tabla actual.</p>
+    <input type="password" id="api-key" placeholder="Pegá tu Clave API de Anthropic" style="width:100%; margin-bottom:10px;">
+    <input type="file" id="foto-ia" accept="image/*" onchange="previsualizar(event)">
+    <img id="img-preview" class="preview-img">
+    <div style="display:flex; gap:10px; margin-top:15px;">
+      <button onclick="document.getElementById('modal-ia').style.display='none'" style="flex:1">Cancelar</button>
+      <button class="btn-ia" id="btn-procesar" onclick="procesarImagen()" style="flex:1; justify-content:center;">Analizar y Sumar</button>
+    </div>
+  </div>
 </div>
 
 <script>
+// Base de datos inicial (se irá llenando con fotos o excels)
 let productos = [
-  { modelo: "Samsung J2 Prime", precio: 12500 },
-  { modelo: "Samsung J2 Core", precio: 11800 },
-  { modelo: "Samsung J4 (2018)", precio: 14200 },
-  { modelo: "Samsung J4 Core", precio: 13500 },
-  { modelo: "Samsung J4 Plus", precio: 15100 },
-  { modelo: "Samsung J5 (2016)", precio: 13900 },
-  { modelo: "Samsung J5 Prime", precio: 14500 },
-  { modelo: "Samsung J5 Pro", precio: 16800 },
-  { modelo: "Samsung J6 (2018)", precio: 17500 },
-  { modelo: "Samsung J6 Plus", precio: 18900 },
-  { modelo: "Samsung J7 (2016)", precio: 16200 },
   { modelo: "Samsung J7 Prime", precio: 17800 },
-  { modelo: "Samsung J7 Pro", precio: 19500 },
-  { modelo: "Samsung J7 Neo", precio: 15800 },
-  { modelo: "Samsung J8 (2018)", precio: 21000 }
+  { modelo: "Samsung J2 Core", precio: 11500 }
 ];
 
 let dolarBlue = 0;
+const MI_TELEFONO = "5493624000000"; // <-- CAMBIÁ ESTO POR TU WHATSAPP REAL
 
 async function obtenerDolar() {
   try {
@@ -138,100 +110,110 @@ async function obtenerDolar() {
     dolarBlue = data.compra;
     document.getElementById('val-dolar').textContent = `$${dolarBlue}`;
     renderTabla();
-  } catch (e) {
-    document.getElementById('val-dolar').textContent = 'Error';
-  }
+  } catch(e) { document.getElementById('val-dolar').textContent = 'Error'; }
 }
 
 function renderTabla() {
-  const listaBody = document.getElementById('lista-productos');
-  const buscar = document.getElementById('buscar').value.toLowerCase();
-  const tipo = document.getElementById('filtro-tipo').value;
+  const query = document.getElementById('buscar').value.toLowerCase();
+  const filtered = productos.filter(p => p.modelo.toLowerCase().includes(query));
+  document.getElementById('total-modelos').textContent = filtered.length;
 
-  const filtrados = productos.filter(p => 
-    p.modelo.toLowerCase().includes(buscar) && (tipo === '' || p.modelo.includes(tipo))
-  );
-
-  document.getElementById('total-modelos').textContent = filtrados.length;
-
-  listaBody.innerHTML = filtrados.map(p => {
-    const desc = Math.round(p.precio * 0.95);
+  document.getElementById('lista-productos').innerHTML = filtered.map(p => {
+    const efectivo = Math.round(p.precio * 0.95);
     const usd = dolarBlue ? (p.precio / dolarBlue).toFixed(2) : '—';
-    const n = p.nueva ? ' nueva' : '';
-    const badge = p.nueva ? '<span class="badge-nueva">✨ nuevo</span>' : '';
+    const waLink = `https://wa.me/${MI_TELEFONO}?text=Hola! Tenés stock del módulo ${encodeURIComponent(p.modelo)}?`;
+    
     return `<tr>
-      <td class="${n}">${p.modelo}${badge}</td>
-      <td class="r${n}">$${p.precio.toLocaleString('es-AR')}</td>
-      <td class="ars-desc${n}">$${desc.toLocaleString('es-AR')}</td>
-      <td class="usd${n}">${usd !== '—' ? 'U$D ' + usd : '—'}</td>
+      <td>${p.modelo}</td>
+      <td class="ars">$${p.precio.toLocaleString('es-AR')}</td>
+      <td class="desc">$${efectivo.toLocaleString('es-AR')}</td>
+      <td class="usd">U$D ${usd}</td>
+      <td><a href="${waLink}" target="_blank" class="btn-wa">Consultar</a></td>
     </tr>`;
   }).join('');
 }
 
-function importarArchivo(e) {
-  const file = e.target.files[0];
-  if (!file) return;
-
+// Lógica para ir SUMANDO imágenes
+function previsualizar(e) {
   const reader = new FileReader();
-  reader.onload = (event) => {
-    const data = event.target.result;
-    let listaImportada = [];
-
-    try {
-      if (file.name.endsWith('.csv')) {
-        const content = event.target.result;
-        const filas = content.split('\n').slice(1);
-        listaImportada = filas.map(f => {
-          const columnas = f.split(',');
-          return { modelo: columnas[0]?.replace(/"/g, '').trim(), precio: parseInt(columnas[1]) };
-        }).filter(p => p.modelo && !isNaN(p.precio));
-      } else {
-        const workbook = XLSX.read(data, { type: 'binary' });
-        const sheet = workbook.Sheets[workbook.SheetNames[0]];
-        const json = XLSX.utils.sheet_to_json(sheet);
-        listaImportada = json.map(row => ({
-          modelo: row.Modelo || row.modelo || Object.values(row)[0],
-          precio: parseInt(row.Precio || row.precio || Object.values(row)[1])
-        })).filter(p => p.modelo && !isNaN(p.precio));
-      }
-
-      if (listaImportada.length > 0) {
-        listaImportada.forEach(nuevo => {
-          const idx = productos.findIndex(p => p.modelo.toLowerCase() === nuevo.modelo.toLowerCase());
-          if (idx !== -1) {
-            productos[idx].precio = nuevo.precio;
-            productos[idx].nueva = true;
-          } else {
-            productos.push({ ...nuevo, nueva: true });
-          }
-        });
-        renderTabla();
-        alert(`Se cargaron/actualizaron ${listaImportada.length} productos.`);
-        setTimeout(() => { productos.forEach(p => p.nueva = false); renderTabla(); }, 4000);
-      }
-    } catch (err) {
-      alert("Error al procesar el archivo. Asegurate de que tenga columnas 'Modelo' y 'Precio'.");
-    }
-    e.target.value = '';
+  reader.onload = () => {
+    const img = document.getElementById('img-preview');
+    img.src = reader.result;
+    img.style.display = 'block';
   };
-
-  if (file.name.endsWith('.csv')) reader.readAsText(file);
-  else reader.readAsBinaryString(file);
+  reader.readAsDataURL(e.target.files[0]);
 }
 
-function exportarCSV() {
-  let csv = 'Modelo,Precio\\n';
-  productos.forEach(p => csv += `"${p.modelo}",${p.precio}\\n`);
-  const blob = new Blob([csv], { type: 'text/csv' });
-  const url = window.URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'stock_lavie.csv';
-  a.click();
+async function procesarImagen() {
+  const key = document.getElementById('api-key').value;
+  const fileInput = document.getElementById('foto-ia');
+  if(!key || !fileInput.files[0]) return alert("Falta la clave o la foto");
+
+  const btn = document.getElementById('btn-procesar');
+  btn.innerText = "⏳ Analizando...";
+  btn.disabled = true;
+
+  // Convertir imagen a Base64
+  const base64 = await toBase64(fileInput.files[0]);
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'x-api-key': key, 'anthropic-version': '2023-06-01', 'content-type': 'application/json', 'anthropic-dangerous-direct-browser-access': 'true' },
+      body: JSON.stringify({
+        model: "claude-3-haiku-20240307", // Modelo rápido y económico
+        max_tokens: 1000,
+        messages: [{ role: "user", content: [
+          { type: "image", source: { type: "base64", media_type: fileInput.files[0].type, data: base64.split(',')[1] } },
+          { type: "text", text: "Extrae los modelos de celulares y sus precios. Responde SOLO un array JSON: [{'modelo': 'nombre', 'precio': 12300}]. Si el modelo ya existe, extraer el precio más nuevo." }
+        ]}]
+      })
+    });
+
+    const data = await resp.json();
+    const nuevos = JSON.parse(data.content[0].text);
+
+    // INTEGRACIÓN: Sumar sin duplicar
+    nuevos.forEach(n => {
+      const idx = productos.findIndex(p => p.modelo.toLowerCase() === n.modelo.toLowerCase());
+      if(idx !== -1) productos[idx].precio = n.precio; // Actualiza
+      else productos.push(n); // Agrega nuevo
+    });
+
+    renderTabla();
+    alert("¡Imagen procesada! Los datos se sumaron a la lista.");
+    document.getElementById('modal-ia').style.display='none';
+  } catch(e) { alert("Error con la IA. Verificá tu clave."); }
+  
+  btn.innerText = "Analizar y Sumar";
+  btn.disabled = false;
+}
+
+const toBase64 = file => new Promise((res, rej) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => res(reader.result);
+});
+
+// Importar desde Excel
+function importarArchivo(e) {
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    const wb = XLSX.read(ev.target.result, {type: 'binary'});
+    const data = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
+    data.forEach(row => {
+      const mod = row.Modelo || Object.values(row)[0];
+      const pre = row.Precio || Object.values(row)[1];
+      const idx = productos.findIndex(p => p.modelo.toLowerCase() === String(mod).toLowerCase());
+      if(idx !== -1) productos[idx].precio = parseInt(pre);
+      else productos.push({ modelo: mod, precio: parseInt(pre) });
+    });
+    renderTabla();
+  };
+  reader.readAsBinaryString(e.target.files[0]);
 }
 
 obtenerDolar();
 </script>
-
 </body>
 </html>
