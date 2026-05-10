@@ -185,6 +185,96 @@
     outline: none; font-family: inherit; text-align: right;
   }
   .precio-inline-input:focus { border-color: #ff3377; box-shadow: 0 0 0 2px rgba(204,34,85,0.2); }
+
+  /* Scroll hint en tabla mobile */
+  .scroll-hint {
+    display: none;
+    text-align: center;
+    font-size: 11px;
+    color: #555;
+    padding: 4px;
+    background: #13131a;
+    border-bottom: 1px solid #2a2a35;
+  }
+  @media (max-width: 768px) {
+    .scroll-hint { display: block; }
+  }
+
+  /* ── RESPONSIVE ─────────────────────────────────────────────────────────── */
+
+  /* Tablet (≤768px) */
+  @media (max-width: 768px) {
+    body { padding: 1rem 0.75rem; }
+
+    header { gap: 8px; }
+    .logo-text { font-size: 17px; }
+
+    /* Header actions: wrap más ordenado */
+    header > div { gap: 6px; }
+    .admin-tools { gap: 6px; }
+    .admin-tools button { font-size: 12px; padding: 6px 10px; }
+
+    /* Cards: 2 columnas en tablet */
+    .cards { grid-template-columns: repeat(2, 1fr); }
+
+    /* Toolbar */
+    .toolbar { flex-direction: column; align-items: stretch; gap: 8px; }
+    .toolbar input[type="text"] { width: 100%; }
+    .toolbar select { width: 100%; }
+    .btn-export { margin-left: 0; width: 100%; justify-content: center; }
+    #btn-export-toolbar { margin-left: 0 !important; width: 100%; justify-content: center; }
+
+    /* Tabla: scroll horizontal con columnas mínimas definidas */
+    .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 10px; }
+    table { min-width: 480px; }
+    th, td { padding: 8px 10px; font-size: 12px; }
+  }
+
+  /* Mobile (≤480px) */
+  @media (max-width: 480px) {
+    body { padding: 0.75rem 0.5rem; }
+
+    /* Header: logo arriba, acciones abajo */
+    header { flex-direction: column; align-items: flex-start; gap: 10px; }
+    header > div { width: 100%; flex-wrap: wrap; }
+
+    /* Botones admin en fila completa */
+    .admin-tools { width: 100%; }
+    .admin-tools button { flex: 1; min-width: 0; font-size: 11px; padding: 7px 6px; justify-content: center; }
+
+    /* Botones login/actualizar */
+    #btn-admin, #btn-actualizar { font-size: 12px; padding: 6px 10px; }
+
+    /* Cards: todas en fila de 3 pequeñas, o 1 columna si muy chico */
+    .cards { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .card { padding: 0.7rem 0.8rem; border-radius: 10px; }
+    .card-value { font-size: 17px; }
+    .card-label { font-size: 10px; }
+    .card-sub { font-size: 10px; }
+
+    /* Toolbar */
+    .toolbar { gap: 7px; }
+
+    /* Tabla mobile: columna ARS principal, las demás compactas */
+    table { min-width: 420px; font-size: 12px; }
+    th, td { padding: 7px 8px; }
+
+    /* Ocultar columna USD en pantallas muy chicas (queda el ARS y el desc.) */
+    th:last-child, td:last-child { display: none; }
+
+    /* Modales ocupan toda la pantalla */
+    .modal, .modal-import { border-radius: 12px 12px 0 0; max-height: 92vh; }
+    .modal-overlay, .login-overlay { align-items: flex-end; padding: 0; }
+
+    /* Login box full width */
+    .login-box { border-radius: 16px 16px 0 0; max-width: 100%; padding: 1.5rem 1.25rem; }
+  }
+
+  /* Muy chico (≤360px): cards en 1 columna */
+  @media (max-width: 360px) {
+    .cards { grid-template-columns: 1fr 1fr; }
+    .admin-tools button span, .admin-tools button { font-size: 11px; }
+  }
 </style>
 </head>
 <body>
@@ -244,6 +334,7 @@
   </div>
 
   <div class="table-wrap">
+    <div class="scroll-hint" id="scroll-hint">← deslizá para ver más →</div>
     <table>
       <thead>
         <tr>
@@ -2208,6 +2299,15 @@ function editarDescuento(btn) {
 
 
 renderTabla();
+
+// Ocultar hint de scroll al primer deslizamiento en mobile
+const tableWrap = document.querySelector('.table-wrap');
+if (tableWrap) {
+  tableWrap.addEventListener('scroll', () => {
+    const hint = document.getElementById('scroll-hint');
+    if (hint) hint.style.display = 'none';
+  }, { once: true });
+}
 </script>
 </body>
 </html>
