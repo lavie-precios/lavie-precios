@@ -169,6 +169,15 @@
   }
   .btn-editar-precio:hover { color: #cc2255; background: #2a1020; border: none; }
   body.admin-activo .btn-editar-precio { display: inline-flex; align-items: center; }
+  .btn-eliminar-modelo {
+    display: none;
+    background: none; border: none; color: #555; font-size: 12px;
+    padding: 2px 4px; cursor: pointer; border-radius: 4px;
+    margin-left: 6px; transition: color 0.15s, background 0.15s;
+    vertical-align: middle; line-height: 1;
+  }
+  .btn-eliminar-modelo:hover { color: #f87171; background: #2a1010; border: none; }
+  body.admin-activo .btn-eliminar-modelo { display: inline-flex; align-items: center; }
   .precio-editable { display: inline-block; }
   .precio-inline-input {
     background: #0f0f13; border: 1px solid #cc2255; color: #f0f0f0;
@@ -1987,8 +1996,9 @@ function renderTabla() {
     const i = idx(p.modelo);
     const btnARS = `<button class="btn-editar-precio" title="Editar precio ARS" onclick="editarPrecioARS(${i}, this)">✏️</button>`;
     const btnUSD = dolarBlue ? `<button class="btn-editar-precio" title="Editar precio en USD (convierte a ARS)" onclick="editarPrecioUSD(${i}, this)">✏️</button>` : '';
+    const btnEliminar = `<button class="btn-eliminar-modelo" title="Eliminar modelo" onclick="eliminarModelo(${i})">🗑️</button>`;
     return `<tr>
-      <td class="${n}">${p.modelo}${badge}</td>
+      <td class="${n}">${p.modelo}${badge}${btnEliminar}</td>
       <td class="r${n}"><span class="precio-editable">$${p.precio.toLocaleString('es-AR')}</span>${btnARS}</td>
       <td class="ars-desc${n}">$${desc.toLocaleString('es-AR')}</td>
       <td class="usd${n}">${usd!=='—'?`<span class="precio-editable">U$D ${usd}</span>${btnUSD}`:'—'}</td>
@@ -2160,7 +2170,15 @@ function editarPrecioUSD(idx, btn) {
   input.addEventListener('blur', confirmar);
 }
 
-function editarDescuento(btn) {
+function eliminarModelo(idx) {
+  const modelo = productos[idx].modelo;
+  if (!confirm(`¿Eliminár "${modelo}" del catálogo?`)) return;
+  productos.splice(idx, 1);
+  document.getElementById('total-modelos').textContent = productos.length;
+  renderTabla();
+}
+
+
   const span = document.getElementById('descuento-val');
   span.style.display = 'none';
   btn.style.display = 'none';
