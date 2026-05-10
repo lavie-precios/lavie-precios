@@ -1997,11 +1997,12 @@ function renderTabla() {
     const btnARS = `<button class="btn-editar-precio" title="Editar precio ARS" onclick="editarPrecioARS(${i}, this)">✏️</button>`;
     const btnUSD = dolarBlue ? `<button class="btn-editar-precio" title="Editar precio en USD (convierte a ARS)" onclick="editarPrecioUSD(${i}, this)">✏️</button>` : '';
     const btnEliminar = `<button class="btn-eliminar-modelo" title="Eliminar modelo" onclick="eliminarModelo(${i})">🗑️</button>`;
+    const celdaUSD = usd !== '—' ? `<span class="precio-editable">U$D ${usd}</span>${btnUSD}` : '—';
     return `<tr>
       <td class="${n}">${p.modelo}${badge}${btnEliminar}</td>
       <td class="r${n}"><span class="precio-editable">$${p.precio.toLocaleString('es-AR')}</span>${btnARS}</td>
       <td class="ars-desc${n}">$${desc.toLocaleString('es-AR')}</td>
-      <td class="usd${n}">${usd!=='—'?`<span class="precio-editable">U$D ${usd}</span>${btnUSD}`:'—'}</td>
+      <td class="usd${n}">${celdaUSD}</td>
     </tr>`;
   }).join('');
 }
@@ -2179,14 +2180,8 @@ function eliminarModelo(idx) {
 }
 
 
+function editarDescuento(btn) {
   const span = document.getElementById('descuento-val');
-  span.style.display = 'none';
-  btn.style.display = 'none';
-
-  const input = document.createElement('input');
-  input.type = 'number';
-  input.className = 'precio-inline-input';
-  input.value = descuentoPct;
   input.min = 0; input.max = 99; input.step = 1;
   input.style.width = '60px';
   btn.parentNode.insertBefore(input, span);
