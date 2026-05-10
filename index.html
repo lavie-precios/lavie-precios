@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lavié Smartphones — Módulos Samsung J</title>
+<title>Lavié Smartphones — Repuestos</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: system-ui, -apple-system, sans-serif; background: #0f0f13; color: #f0f0f0; min-height: 100vh; padding: 2rem 1rem; }
@@ -212,7 +212,7 @@
     </div>
     <div class="card">
       <div class="card-label">Descuento en efectivo</div>
-      <div class="card-value">5%</div>
+      <div class="card-value"><span id="descuento-val">5</span>%<button class="btn-editar-precio" title="Editar descuento" onclick="editarDescuento(this)">✏️</button></div>
       <div class="card-sub">sobre precio lista</div>
     </div>
     <div class="card">
@@ -1981,7 +1981,7 @@ function renderTabla() {
   if (!filtrados.length) { tbody.innerHTML='<tr><td colspan="4" style="text-align:center;color:#555;padding:2rem;">Sin resultados</td></tr>'; return; }
   const idx = (modelo) => productos.findIndex(p => p.modelo === modelo);
   tbody.innerHTML=filtrados.map(p=>{
-    const desc=Math.round(p.precio*0.95);
+    const desc=Math.round(p.precio*(1 - descuentoPct/100));
     const usd=dolarBlue?(p.precio/dolarBlue).toFixed(2):'—';
     const n=p.nueva?' nueva':''; const badge=p.nueva?'<span class="badge-nueva">✨ nuevo</span>':'';
     const i = idx(p.modelo);
@@ -2001,9 +2001,9 @@ function exportarCSV() {
   const buscar=document.getElementById('buscar').value.toLowerCase();
   const tipo=document.getElementById('filtro-tipo').value;
   const filtrados=productos.filter(p=>p.modelo.toLowerCase().includes(buscar)&&(tipo===''||p.modelo.includes(tipo)));
-  let csv='Modelo,Precio ARS,ARS con 5% desc.,USD Blue\n';
+  let csv=`Modelo,Precio ARS,ARS con ${descuentoPct}% desc.,USD Blue\n`;
   filtrados.forEach(p=>{
-    const desc=Math.round(p.precio*0.95);
+    const desc=Math.round(p.precio*(1 - descuentoPct/100));
     const usd=dolarBlue?(p.precio/dolarBlue).toFixed(2):'';
     csv+=`"${p.modelo}",${p.precio},${desc},${usd}\n`;
   });
@@ -2021,6 +2021,7 @@ const ADMIN_USER = 'lavie';
 const ADMIN_PASS = 'lavie2025*';
 
 let adminActivo = false;
+let descuentoPct = 5; // % descuento en efectivo
 
 function toggleAdmin() {
   if (adminActivo) {
@@ -2151,7 +2152,40 @@ function editarPrecioUSD(idx, btn) {
   input.addEventListener('blur', confirmar);
 }
 
-fetchDolar();
+function editarDescuento(btn) {
+  const span = document.getElementById('descuento-val');
+  span.style.display = 'none';
+  btn.style.display = 'none';
+
+  const input = document.createElement('input');
+  input.type = 'number';
+  input.className = 'precio-inline-input';
+  input.value = descuentoPct;
+  input.min = 0; input.max = 99; input.step = 1;
+  input.style.width = '60px';
+  btn.parentNode.insertBefore(input, span);
+  input.focus(); input.select();
+
+  const confirmar = () => {
+    const nuevo = parseFloat(input.value);
+    if (!isNaN(nuevo) && nuevo >= 0 && nuevo < 100) {
+      descuentoPct = nuevo;
+    }
+    span.textContent = descuentoPct;
+    span.style.display = '';
+    btn.style.display = '';
+    input.remove();
+    renderTabla();
+  };
+
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter') confirmar();
+    if (e.key === 'Escape') { span.style.display=''; btn.style.display=''; input.remove(); }
+  });
+  input.addEventListener('blur', confirmar);
+}
+
+
 renderTabla();
 </script>
 </body>
