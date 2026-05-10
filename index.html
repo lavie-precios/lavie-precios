@@ -2018,8 +2018,8 @@ function exportarCSV() {
 // ── SISTEMA DE LOGIN ADMIN ───────────────────────────────────────────────────
 // Las credenciales están almacenadas como hashes SHA-256 (nunca en texto plano).
 // Para cambiarlas: ejecutá en consola -> sha256('nuevo_valor') y reemplazá el hash.
-const ADMIN_USER_HASH = 'f24ec5cb769f03e59c6e0bff0e00b557e3b3b3fc35dc8e20ddc1a5400a0a64e2'; // 'lavie'
-const ADMIN_PASS_HASH = '955e2036d5bc8058db16f98a6984dba5dfa6c7c09de18f9a19bd0b0f3e6db2be'; // 'lavie2025'
+const ADMIN_USER_HASH = '1d6287715ae32c243ea9175fa76f07fa40c7a33fac61297d78a9de82c5982033'; // 'lavie'
+const ADMIN_PASS_HASH = 'bb8b0b7113866618b0d43118c140ad8292af62c6c9a1c1929f84845fc5b9cf66'; // 'lavie2025'
 
 async function sha256(text) {
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
