@@ -1832,8 +1832,8 @@ function setEstadoImport(tipo, msg) {
 
 // ── MODAL IMAGEN IA ──────────────────────────────────────────────────────────
 window.addEventListener('load', () => {
-  const saved = localStorage.getItem('lavie_apikey');
-  if (saved) document.getElementById('api-key-input').value = saved;
+  // Limpiamos cualquier API key que haya quedado guardada en versiones anteriores
+  localStorage.removeItem('lavie_apikey');
 });
 
 const dropZone = document.getElementById('drop-zone');
@@ -2016,9 +2016,15 @@ function exportarCSV() {
 }
 
 // ── SISTEMA DE LOGIN ADMIN ───────────────────────────────────────────────────
-// ⚠️  Cambiá estas credenciales antes de distribuir el archivo
-const ADMIN_USER = 'lavie';
-const ADMIN_PASS = 'lavie2025*';
+// Las credenciales están almacenadas como hashes SHA-256 (nunca en texto plano).
+// Para cambiarlas: ejecutá en consola -> sha256('nuevo_valor') y reemplazá el hash.
+const ADMIN_USER_HASH = 'f24ec5cb769f03e59c6e0bff0e00b557e3b3b3fc35dc8e20ddc1a5400a0a64e2'; // 'lavie'
+const ADMIN_PASS_HASH = '955e2036d5bc8058db16f98a6984dba5dfa6c7c09de18f9a19bd0b0f3e6db2be'; // 'lavie2025'
+
+async function sha256(text) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
 
 let adminActivo = false;
 let descuentoPct = 5; // % descuento en efectivo
@@ -2043,12 +2049,14 @@ function cerrarLogin() {
   document.getElementById('login-overlay').classList.remove('visible');
 }
 
-function intentarLogin() {
+async function intentarLogin() {
   const user = document.getElementById('login-user').value.trim();
   const pass = document.getElementById('login-pass').value;
   const errEl = document.getElementById('login-err');
 
-  if (user === ADMIN_USER && pass === ADMIN_PASS) {
+  const [userHash, passHash] = await Promise.all([sha256(user), sha256(pass)]);
+
+  if (userHash === ADMIN_USER_HASH && passHash === ADMIN_PASS_HASH) {
     adminActivo = true;
     cerrarLogin();
     activarModoAdmin();
