@@ -1934,6 +1934,8 @@ function setEstadoImport(tipo, msg) {
 window.addEventListener('load', () => {
   // Limpiamos cualquier API key que haya quedado guardada en versiones anteriores
   localStorage.removeItem('lavie_apikey');
+  // Cargamos el dólar automáticamente al abrir la página
+  fetchDolar();
 });
 
 const dropZone = document.getElementById('drop-zone');
