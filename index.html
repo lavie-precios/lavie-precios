@@ -158,6 +158,24 @@
   .login-cancel:hover { color: #888; }
 
   .badge-admin { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; background: #1a1022; color: #f0a0c0; border: 1px solid #cc2255; border-radius: 20px; padding: 2px 9px; }
+
+  /* Edición inline de precios */
+  .btn-editar-precio {
+    display: none;
+    background: none; border: none; color: #555; font-size: 12px;
+    padding: 2px 4px; cursor: pointer; border-radius: 4px;
+    margin-left: 6px; transition: color 0.15s, background 0.15s;
+    vertical-align: middle; line-height: 1;
+  }
+  .btn-editar-precio:hover { color: #cc2255; background: #2a1020; border: none; }
+  body.admin-activo .btn-editar-precio { display: inline-flex; align-items: center; }
+  .precio-editable { display: inline-block; }
+  .precio-inline-input {
+    background: #0f0f13; border: 1px solid #cc2255; color: #f0f0f0;
+    border-radius: 6px; padding: 2px 7px; font-size: 13px; width: 90px;
+    outline: none; font-family: inherit; text-align: right;
+  }
+  .precio-inline-input:focus { border-color: #ff3377; box-shadow: 0 0 0 2px rgba(204,34,85,0.2); }
 </style>
 </head>
 <body>
@@ -1961,11 +1979,20 @@ function renderTabla() {
   const tbody=document.getElementById('tabla-body');
   const filtrados=productos.filter(p=>p.modelo.toLowerCase().includes(buscar)&&(tipo===''||p.modelo.includes(tipo)));
   if (!filtrados.length) { tbody.innerHTML='<tr><td colspan="4" style="text-align:center;color:#555;padding:2rem;">Sin resultados</td></tr>'; return; }
+  const idx = (modelo) => productos.findIndex(p => p.modelo === modelo);
   tbody.innerHTML=filtrados.map(p=>{
     const desc=Math.round(p.precio*0.95);
     const usd=dolarBlue?(p.precio/dolarBlue).toFixed(2):'—';
     const n=p.nueva?' nueva':''; const badge=p.nueva?'<span class="badge-nueva">✨ nuevo</span>':'';
-    return `<tr><td class="${n}">${p.modelo}${badge}</td><td class="r${n}">$${p.precio.toLocaleString('es-AR')}</td><td class="ars-desc${n}">$${desc.toLocaleString('es-AR')}</td><td class="usd${n}">${usd!=='—'?'U$D '+usd:'—'}</td></tr>`;
+    const i = idx(p.modelo);
+    const btnARS = `<button class="btn-editar-precio" title="Editar precio ARS" onclick="editarPrecioARS(${i}, this)">✏️</button>`;
+    const btnUSD = dolarBlue ? `<button class="btn-editar-precio" title="Editar precio en USD (convierte a ARS)" onclick="editarPrecioUSD(${i}, this)">✏️</button>` : '';
+    return `<tr>
+      <td class="${n}">${p.modelo}${badge}</td>
+      <td class="r${n}"><span class="precio-editable">$${p.precio.toLocaleString('es-AR')}</span>${btnARS}</td>
+      <td class="ars-desc${n}">$${desc.toLocaleString('es-AR')}</td>
+      <td class="usd${n}">${usd!=='—'?`<span class="precio-editable">U$D ${usd}</span>${btnUSD}`:'—'}</td>
+    </tr>`;
   }).join('');
 }
 
@@ -1991,7 +2018,7 @@ function exportarCSV() {
 // ── SISTEMA DE LOGIN ADMIN ───────────────────────────────────────────────────
 // ⚠️  Cambiá estas credenciales antes de distribuir el archivo
 const ADMIN_USER = 'lavie';
-const ADMIN_PASS = 'Belen';
+const ADMIN_PASS = 'lavie2025*';
 
 let adminActivo = false;
 
@@ -2044,6 +2071,7 @@ function activarModoAdmin() {
   const btnAdmin = document.getElementById('btn-admin');
   btnAdmin.textContent = '🔓 Cerrar sesión';
   btnAdmin.classList.add('logged');
+  document.body.classList.add('admin-activo');
 }
 
 function cerrarSesion() {
@@ -2054,6 +2082,73 @@ function cerrarSesion() {
   const btnAdmin = document.getElementById('btn-admin');
   btnAdmin.textContent = '🔒 Admin';
   btnAdmin.classList.remove('logged');
+  document.body.classList.remove('admin-activo');
+}
+
+// ── EDICIÓN INLINE DE PRECIOS ─────────────────────────────────────────────────
+function editarPrecioARS(idx, btn) {
+  const td = btn.closest('td');
+  const span = td.querySelector('.precio-editable');
+  const valorActual = productos[idx].precio;
+
+  span.style.display = 'none';
+  btn.style.display = 'none';
+
+  const input = document.createElement('input');
+  input.type = 'number';
+  input.className = 'precio-inline-input';
+  input.value = valorActual;
+  input.min = 0;
+  td.insertBefore(input, span);
+  input.focus();
+  input.select();
+
+  const confirmar = () => {
+    const nuevo = parseInt(input.value, 10);
+    if (!isNaN(nuevo) && nuevo > 0) {
+      productos[idx].precio = nuevo;
+    }
+    renderTabla();
+  };
+
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter') confirmar();
+    if (e.key === 'Escape') renderTabla();
+  });
+  input.addEventListener('blur', confirmar);
+}
+
+function editarPrecioUSD(idx, btn) {
+  const td = btn.closest('td');
+  const span = td.querySelector('.precio-editable');
+  const valorUSD = dolarBlue ? (productos[idx].precio / dolarBlue).toFixed(2) : '';
+
+  span.style.display = 'none';
+  btn.style.display = 'none';
+
+  const input = document.createElement('input');
+  input.type = 'number';
+  input.className = 'precio-inline-input';
+  input.value = valorUSD;
+  input.min = 0;
+  input.step = '0.01';
+  td.insertBefore(input, span);
+  input.focus();
+  input.select();
+
+  const confirmar = () => {
+    const nuevoUSD = parseFloat(input.value);
+    if (!isNaN(nuevoUSD) && nuevoUSD > 0 && dolarBlue) {
+      productos[idx].precio = Math.round(nuevoUSD * dolarBlue);
+    }
+    renderTabla();
+  };
+
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter') confirmar();
+    if (e.key === 'Escape') renderTabla();
+  });
+  input.addEventListener('blur', confirmar);
 }
 
 fetchDolar();
