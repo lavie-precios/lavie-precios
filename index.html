@@ -333,6 +333,21 @@
   /* Botón quitar duplicados */
   .btn-dedup { background: #1a1a10; border-color: #a0a020; color: #d0d060; }
   .btn-dedup:hover { background: #2a2a15; border-color: #d0d060; }
+  /* Botón restaurar original */
+  .btn-reset { background: #1a1010; border-color: #804040; color: #c08080; }
+  .btn-reset:hover { background: #2a1515; border-color: #c06060; color: #f0a0a0; }
+  /* Botón deshacer */
+  .btn-deshacer { background: #101a1a; border-color: #408080; color: #80c0c0; }
+  .btn-deshacer:hover:not(:disabled) { background: #152525; border-color: #60b0b0; color: #a0e0e0; }
+  .btn-deshacer:disabled { opacity: 0.35; cursor: not-allowed; }
+  /* Indicador de guardado */
+  .storage-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 11px; color: #4ade80; background: #0e1a10;
+    border: 1px solid #2a4a2a; border-radius: 20px; padding: 2px 9px;
+    opacity: 0; transition: opacity 0.4s;
+  }
+  .storage-badge.visible { opacity: 1; }
 </style>
 </head>
 <body>
@@ -344,7 +359,7 @@
       <div class="logo-icon">L</div>
       <div>
         <div class="logo-text">Lavié Smartphones</div>
-        <div class="logo-sub">Catálogo de repuestos · 1280 productos</div>
+        <div class="logo-sub">Catálogo de repuestos · <span id="logo-total-modelos">1280</span> productos</div>
       </div>
     </div>
     <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
@@ -354,9 +369,13 @@
         <button class="btn-imagen" onclick="abrirModal()">📷 Cargar imagen IA</button>
         <button onclick="exportarCSV()">⬇ Exportar CSV</button>
         <button class="btn-dedup" onclick="quitarDuplicados()">🧹 Quitar duplicados</button>
+        <button class="btn-deshacer" id="btn-deshacer" onclick="deshacerCambio()" disabled>↩ Deshacer</button>
+        <button class="btn-reset" onclick="resetearCatalogo()" title="Restaurar catálogo original">🔄 Restaurar original</button>
       </div>
       <!-- Badge sesión activa -->
       <span class="badge-admin" id="badge-admin" style="display:none;">🔑 Admin</span>
+      <!-- Badge guardado -->
+      <span class="storage-badge" id="badge-guardado">💾 Guardado</span>
       <!-- Botón login/logout -->
       <button class="btn-admin" id="btn-admin" onclick="toggleAdmin()">🔒 Admin</button>
       <button onclick="fetchDolar()" id="btn-actualizar">🔄 Actualizar dólar</button>
@@ -524,7 +543,7 @@
 </script>
 
 <script>
-let productos = [
+const PRODUCTOS_ORIGINALES = [
   {modelo:"J1 Ace HD",precio:11400,nueva:false},
   {modelo:"J1 2016 HD",precio:9300,nueva:false},
   {modelo:"J2 Core",precio:12400,nueva:false},
@@ -1807,6 +1826,98 @@ let productos = [
   {modelo:"ZTE V60 Desing Wuzip Gold",precio:21400,nueva:false},
 ];
 
+// ── PERSISTENCIA LOCAL ────────────────────────────────────────────────────────
+const STORAGE_KEY = 'lavie_catalogo_productos';
+const STORAGE_DESC_KEY = 'lavie_descuento';
+
+function actualizarContadorModelos() {
+  const n = productos.length;
+  document.getElementById('total-modelos').textContent = n;
+  document.getElementById('logo-total-modelos').textContent = n;
+}
+
+// ── SISTEMA DE DESHACER ───────────────────────────────────────────────────────
+const MAX_HISTORIAL = 20;
+let historialCambios = []; // stack de snapshots anteriores
+
+function tomarSnapshot() {
+  // Guarda copia profunda del estado actual ANTES de modificar
+  const snap = productos.map(({ modelo, precio }) => ({ modelo, precio }));
+  historialCambios.push(snap);
+  if (historialCambios.length > MAX_HISTORIAL) historialCambios.shift();
+  actualizarBtnDeshacer();
+}
+
+function deshacerCambio() {
+  if (!historialCambios.length) return;
+  const snap = historialCambios.pop();
+  productos = snap.map(p => ({ ...p, nueva: false }));
+  actualizarContadorModelos();
+  guardarCatalogo();
+  renderTabla();
+  actualizarBtnDeshacer();
+  const el = document.getElementById('estado-api');
+  el.className = 'status info';
+  el.textContent = '↩ Cambio deshecho. Historial restante: ' + historialCambios.length + ' paso' + (historialCambios.length !== 1 ? 's' : '') + '.';
+}
+
+function actualizarBtnDeshacer() {
+  const btn = document.getElementById('btn-deshacer');
+  if (!btn) return;
+  btn.disabled = historialCambios.length === 0;
+  btn.title = historialCambios.length
+    ? `Deshacer (${historialCambios.length} paso${historialCambios.length !== 1 ? 's' : ''} disponible${historialCambios.length !== 1 ? 's' : ''})`
+    : 'Sin cambios para deshacer';
+}
+
+function guardarCatalogo() {
+  try {
+    const datos = productos.map(({ modelo, precio }) => ({ modelo, precio }));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(datos));
+    // Mostrar badge de guardado brevemente
+    const badge = document.getElementById('badge-guardado');
+    if (badge) {
+      badge.classList.add('visible');
+      clearTimeout(badge._timer);
+      badge._timer = setTimeout(() => badge.classList.remove('visible'), 2000);
+    }
+  } catch(e) {
+    console.warn('No se pudo guardar en localStorage:', e);
+  }
+}
+
+function cargarCatalogo() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const datos = JSON.parse(raw);
+      if (Array.isArray(datos) && datos.length > 0) {
+        return datos.map(d => ({ modelo: d.modelo, precio: d.precio, nueva: false }));
+      }
+    }
+  } catch(e) {
+    console.warn('Error al leer localStorage:', e);
+  }
+  return null;
+}
+
+function resetearCatalogo() {
+  if (!confirm('¿Restaurar el catálogo original? Se perderán todos los cambios guardados (precios editados, duplicados eliminados, productos importados).')) return;
+  localStorage.removeItem(STORAGE_KEY);
+  productos = PRODUCTOS_ORIGINALES.map(p => ({ ...p, nueva: false }));
+  actualizarContadorModelos();
+  renderTabla();
+  const el = document.getElementById('estado-api');
+  el.className = 'status info';
+  el.textContent = 'ℹ Catálogo restaurado al estado original.';
+}
+
+// Cargar datos: primero intentar desde localStorage, si no hay usar los originales
+let catalogoGuardado = cargarCatalogo();
+let productos = catalogoGuardado
+  ? catalogoGuardado
+  : PRODUCTOS_ORIGINALES.map(p => ({ ...p, nueva: false }));
+
 let dolarBlue = null;
 let imagenBase64 = null;
 let imagenMime = null;
@@ -1974,9 +2085,11 @@ function confirmarImport() {
 
   let agregados = 0, actualizados = 0;
   if (modoImport === 'reemplazar') {
+    tomarSnapshot();
     productos = nuevos.map(p => ({ ...p, nueva: true }));
     agregados = nuevos.length;
   } else {
+    tomarSnapshot();
     nuevos.forEach(d => {
       const existe = productos.find(p => p.modelo.toLowerCase() === d.modelo.toLowerCase());
       if (existe) { existe.precio = d.precio; existe.nueva = true; actualizados++; }
@@ -1984,7 +2097,8 @@ function confirmarImport() {
     });
   }
 
-  document.getElementById('total-modelos').textContent = productos.length;
+  actualizarContadorModelos();
+  guardarCatalogo();
   renderTabla();
   cerrarModalImport();
 
@@ -2007,6 +2121,15 @@ function setEstadoImport(tipo, msg) {
 window.addEventListener('load', () => {
   // Limpiamos cualquier API key que haya quedado guardada en versiones anteriores
   localStorage.removeItem('lavie_apikey');
+  // Actualizar contador de modelos con los datos reales (guardados o por defecto)
+  actualizarContadorModelos();
+  actualizarBtnDeshacer();
+  // Mostrar si los datos vienen del storage
+  if (catalogoGuardado) {
+    const el = document.getElementById('estado-api');
+    el.className = 'status ok';
+    el.textContent = '💾 Catálogo restaurado desde guardado local (' + productos.length + ' productos).';
+  }
   // Cargamos el dólar automáticamente al abrir la página
   fetchDolar();
 });
@@ -2108,11 +2231,13 @@ function agregarDetectados() {
   const sel = detectados.filter(d=>d.seleccionado);
   if (!sel.length) { setEstadoModal('err','✗ Seleccioná al menos un producto.'); return; }
   let ag=0, ac=0;
+  tomarSnapshot();
   sel.forEach(d => {
     const e = productos.find(p=>p.modelo.toLowerCase()===d.modelo.toLowerCase());
     if (e) { e.precio=d.precio; e.nueva=true; ac++; } else { productos.push({modelo:d.modelo,precio:d.precio,nueva:true}); ag++; }
   });
-  document.getElementById('total-modelos').textContent = productos.length;
+  actualizarContadorModelos();
+  guardarCatalogo();
   renderTabla(); cerrarModal();
   const msgs=[]; if(ag) msgs.push(`${ag} agregado${ag>1?'s':''}`); if(ac) msgs.push(`${ac} actualizado${ac>1?'s':''}`);
   const el=document.getElementById('estado-api'); el.className='status ok'; el.textContent='✓ '+msgs.join(', ')+' desde imagen.';
@@ -2171,6 +2296,7 @@ function cambiarSeccion(sec, btn) {
 // ── QUITAR DUPLICADOS ─────────────────────────────────────────────────────────
 function quitarDuplicados() {
   const antes = productos.length;
+  tomarSnapshot();
   const vistos = new Map();
   productos.forEach(p => {
     const key = p.modelo.trim().toLowerCase();
@@ -2179,7 +2305,8 @@ function quitarDuplicados() {
   });
   productos = Array.from(vistos.values());
   const eliminados = antes - productos.length;
-  document.getElementById('total-modelos').textContent = productos.length;
+  actualizarContadorModelos();
+  guardarCatalogo();
   renderTabla();
   const el = document.getElementById('estado-api');
   el.className = 'status ' + (eliminados > 0 ? 'ok' : 'info');
@@ -2247,7 +2374,20 @@ async function sha256(text) {
 }
 
 let adminActivo = false;
-let descuentoPct = 5; // % descuento en efectivo
+let descuentoPct = (() => {
+  try {
+    const d = localStorage.getItem(STORAGE_DESC_KEY);
+    return d !== null ? parseFloat(d) : 5;
+  } catch(e) { return 5; }
+})(); // % descuento en efectivo
+
+// Sincronizar el display del descuento con el valor cargado
+document.addEventListener('DOMContentLoaded', () => {
+  const span = document.getElementById('descuento-val');
+  if (span) span.textContent = descuentoPct;
+  const th = document.querySelector('thead th:nth-child(3)');
+  if (th) th.innerHTML = `Con ${descuentoPct}% desc. <span class="badge-desc">efectivo</span>`;
+});
 
 function toggleAdmin() {
   if (adminActivo) {
@@ -2335,7 +2475,9 @@ function editarPrecioARS(idx, btn) {
   const confirmar = () => {
     const nuevo = parseInt(input.value, 10);
     if (!isNaN(nuevo) && nuevo > 0) {
+      tomarSnapshot();
       productos[idx].precio = nuevo;
+      guardarCatalogo();
     }
     renderTabla();
   };
@@ -2368,7 +2510,9 @@ function editarPrecioUSD(idx, btn) {
   const confirmar = () => {
     const nuevoUSD = parseFloat(input.value);
     if (!isNaN(nuevoUSD) && nuevoUSD > 0 && dolarBlue) {
+      tomarSnapshot();
       productos[idx].precio = Math.round(nuevoUSD * dolarBlue);
+      guardarCatalogo();
     }
     renderTabla();
   };
@@ -2383,8 +2527,10 @@ function editarPrecioUSD(idx, btn) {
 function eliminarModelo(idx) {
   const modelo = productos[idx].modelo;
   if (!confirm(`¿Eliminár "${modelo}" del catálogo?`)) return;
+  tomarSnapshot();
   productos.splice(idx, 1);
-  document.getElementById('total-modelos').textContent = productos.length;
+  actualizarContadorModelos();
+  guardarCatalogo();
   renderTabla();
 }
 
@@ -2400,6 +2546,7 @@ function editarDescuento(btn) {
     const nuevo = parseFloat(input.value);
     if (!isNaN(nuevo) && nuevo >= 0 && nuevo < 100) {
       descuentoPct = nuevo;
+      try { localStorage.setItem(STORAGE_DESC_KEY, descuentoPct); } catch(e) {}
     }
     span.textContent = descuentoPct;
     span.style.display = '';
