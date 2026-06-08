@@ -370,6 +370,25 @@
   }
   .storage-badge.visible { opacity: 1; }
 
+  /* ── WHATSAPP ────────────────────────────────────────────────────────────── */
+  .btn-wa {
+    display: inline-flex; align-items: center; justify-content: center;
+    background: #0e2a15; border: 1px solid #25d366; color: #25d366;
+    border-radius: 6px; padding: 2px 7px; font-size: 13px; cursor: pointer;
+    text-decoration: none; line-height: 1; transition: all 0.15s;
+    vertical-align: middle; margin-left: 4px;
+  }
+  .btn-wa:hover { background: #163d20; border-color: #4ade80; color: #4ade80; }
+
+  .acc-card-wa {
+    display: block; width: calc(100% - 1.5rem); margin: 0 0.75rem 0.75rem;
+    text-align: center; padding: 7px; border-radius: 8px;
+    background: #0e2a15; border: 1px solid #25d366; color: #25d366;
+    font-size: 12px; font-weight: 600; text-decoration: none; cursor: pointer;
+    transition: all 0.15s;
+  }
+  .acc-card-wa:hover { background: #163d20; color: #4ade80; border-color: #4ade80; }
+
   /* ── GOOGLE SHEETS SYNC ─────────────────────────────────────────────────── */
   .btn-sheets { background: #0e1f0e; border: 1px solid #2a6a2a; color: #6ade80; border-radius: 8px; padding: 6px 14px; font-size: 12px; cursor: pointer; font-family: inherit; transition: all 0.15s; display: inline-flex; align-items: center; gap: 6px; }
   .btn-sheets:hover { background: #152a15; border-color: #4ade80; }
@@ -2388,6 +2407,15 @@ function quitarDuplicados() {
     : 'ℹ No se encontraron duplicados.';
 }
 
+// ── WHATSAPP ─────────────────────────────────────────────────────────────────
+const WA_NUMERO = '5493624371449';
+const WA_MENSAJE_BASE = 'Hola, gracias por comunicarse con Lavie! Déjanos tu consulta y te respondemos a la brevedad...';
+
+function waLink(modelo, precio) {
+  const msg = WA_MENSAJE_BASE + (modelo ? `\n\nProducto consultado: *${modelo}*` + (precio ? ` — $${Number(precio).toLocaleString('es-AR')}` : '') : '');
+  return `https://wa.me/${WA_NUMERO}?text=${encodeURIComponent(msg)}`;
+}
+
 // ── TABLA ────────────────────────────────────────────────────────────────────
 function renderTabla() {
   const buscar=document.getElementById('buscar').value.toLowerCase();
@@ -2404,10 +2432,11 @@ function renderTabla() {
     const i = idx(p.modelo);
     const btnARS = `<button class="btn-editar-precio" title="Editar precio ARS" onclick="editarPrecioARS(${i}, this)">✏️</button>`;
     const btnUSD = dolarBlue ? `<button class="btn-editar-precio" title="Editar precio en USD (convierte a ARS)" onclick="editarPrecioUSD(${i}, this)">✏️</button>` : '';
-    const btnEliminar = `<button class="btn-eliminar-modelo" title="Eliminar modelo" onclick="eliminarModelo(${i})">🗑️</button>`;
+    const btnEliminar = adminActivo ? `<button class="btn-eliminar-modelo" title="Eliminar modelo" onclick="eliminarModelo(${i})">🗑️</button>` : '';
+    const btnWA = `<a class="btn-wa" href="${waLink(p.modelo, p.precio)}" target="_blank" title="Consultar por WhatsApp">💬</a>`;
     const celdaUSD = usd !== '—' ? `<span class="precio-editable">U$D ${usd}</span>${btnUSD}` : '—';
     return `<tr>
-      <td class="${n}">${p.modelo}${badge}${btnEliminar}</td>
+      <td class="${n}">${p.modelo}${badge}${btnEliminar}${btnWA}</td>
       <td class="r${n}"><span class="precio-editable">$${p.precio.toLocaleString('es-AR')}</span>${btnARS}</td>
       <td class="ars-desc${n}">$${desc.toLocaleString('es-AR')}</td>
       <td class="usd${n}">${celdaUSD}</td>
@@ -2910,6 +2939,7 @@ function renderAccesorios() {
         <div class="acc-card-precio">$${Number(a.precio).toLocaleString('es-AR')}</div>
         ${usd}${stock}
       </div>
+      <a class="acc-card-wa" href="${waLink(a.nombre, a.precio)}" target="_blank">💬 Consultar por WhatsApp</a>
       <div class="acc-card-admin">
         <button onclick="editarAccesorio(${i})" title="Editar">✏️</button>
         <button onclick="eliminarAccesorio(${i})" title="Eliminar">🗑️</button>
