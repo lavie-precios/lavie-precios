@@ -2863,6 +2863,8 @@ window.addEventListener('load', () => {
     const el = document.getElementById('estado-api');
     if (el) { el.className = 'status info'; el.textContent = '🔄 Sincronizando con Google Sheets...'; }
     sincronizarSheets(false);
+    // Auto-sync cada 5 minutos
+    setInterval(() => sincronizarSheets(false), 5 * 60 * 1000);
   }
 });
 
