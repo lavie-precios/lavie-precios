@@ -369,11 +369,137 @@
     opacity: 0; transition: opacity 0.4s;
   }
   .storage-badge.visible { opacity: 1; }
+
+  /* ── GOOGLE SHEETS SYNC ─────────────────────────────────────────────────── */
+  .btn-sheets { background: #0e1f0e; border: 1px solid #2a6a2a; color: #6ade80; border-radius: 8px; padding: 6px 14px; font-size: 12px; cursor: pointer; font-family: inherit; transition: all 0.15s; display: inline-flex; align-items: center; gap: 6px; }
+  .btn-sheets:hover { background: #152a15; border-color: #4ade80; }
+  .btn-sheets:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-sheets.syncing { border-color: #60a5fa; color: #60a5fa; background: #0e1525; }
+
+  .sheets-modal { background: #1a1a22; border: 1px solid #2a2a35; border-radius: 16px; padding: 1.5rem; width: 100%; max-width: 540px; max-height: 90vh; overflow-y: auto; }
+  .sheets-modal h3 { font-size: 16px; font-weight: 600; color: #fff; margin-bottom: 0.3rem; }
+  .sheets-modal p { font-size: 13px; color: #888; margin-bottom: 1rem; line-height: 1.5; }
+  .sheets-input-row { margin-bottom: 0.8rem; }
+  .sheets-input-row label { display: block; font-size: 12px; color: #888; margin-bottom: 4px; }
+  .sheets-input-row input { width: 100%; background: #0f0f13; border: 1px solid #2a2a35; color: #f0f0f0; border-radius: 8px; padding: 8px 12px; font-size: 12px; font-family: monospace; outline: none; transition: border-color 0.15s; }
+  .sheets-input-row input:focus { border-color: #4ade80; }
+  .sheets-input-row input::placeholder { color: #444; font-family: system-ui; }
+  .sheets-hint { font-size: 11px; color: #555; margin-top: 3px; line-height: 1.5; }
+  .sheets-hint a { color: #60a5fa; }
+  .sheets-steps { background: #0f0f13; border: 1px solid #2a2a35; border-radius: 10px; padding: 0.9rem 1rem; margin-bottom: 1rem; }
+  .sheets-steps p { font-size: 12px; color: #888; margin: 0 0 6px 0; font-weight: 500; }
+  .sheets-steps ol { margin: 0; padding-left: 1.2rem; }
+  .sheets-steps li { font-size: 12px; color: #666; margin-bottom: 4px; line-height: 1.5; }
+  .sheets-steps li strong { color: #aaa; }
+  .sheets-sync-log { margin-top: 0.8rem; background: #0a0a0f; border: 1px solid #2a2a35; border-radius: 8px; padding: 0.7rem 1rem; font-size: 12px; color: #666; display: none; max-height: 120px; overflow-y: auto; }
+  .sheets-sync-log.visible { display: block; }
+  .sheets-sync-log .log-ok { color: #4ade80; }
+  .sheets-sync-log .log-err { color: #f87171; }
+  .sheets-sync-log .log-info { color: #60a5fa; }
+
+  /* ── ACCESORIOS ──────────────────────────────────────────────────────────── */
+  .acc-toolbar { margin-bottom: 1rem; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .btn-acc-nuevo { background: #1a1a30; border: 1px solid #7c5cbf; color: #c4a8f0; border-radius: 8px; padding: 7px 16px; font-size: 13px; cursor: pointer; font-family: inherit; transition: all 0.15s; }
+  .btn-acc-nuevo:hover { background: #251a40; border-color: #a07ae0; color: #e0d0ff; }
+
+  .acc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 0.5rem;
+  }
+  @media (max-width: 600px) { .acc-grid { grid-template-columns: repeat(2, 1fr); gap: 0.7rem; } }
+  @media (max-width: 360px) { .acc-grid { grid-template-columns: 1fr; } }
+
+  .acc-card {
+    background: #1a1a22;
+    border: 1px solid #2a2a38;
+    border-radius: 14px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.15s, border-color 0.15s;
+    position: relative;
+  }
+  .acc-card:hover { transform: translateY(-2px); border-color: #7c5cbf; }
+
+  .acc-card-img {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    background: #13131a;
+    display: block;
+  }
+  .acc-card-img-placeholder {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    background: #13131a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    color: #333;
+  }
+  .acc-card-body {
+    padding: 0.75rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .acc-card-nombre { font-size: 13px; font-weight: 500; color: #e8e8f0; line-height: 1.35; }
+  .acc-card-precio { font-size: 15px; font-weight: 700; color: #c4a8f0; margin-top: 2px; }
+  .acc-card-usd { font-size: 11px; color: #60a5fa; }
+  .acc-card-stock { font-size: 11px; color: #4ade80; margin-top: 2px; }
+  .acc-card-stock.sin { color: #f87171; }
+
+  .acc-card-admin {
+    display: none;
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    gap: 4px;
+  }
+  .acc-card-admin button {
+    background: rgba(15,15,20,0.85);
+    border: 1px solid #444;
+    border-radius: 6px;
+    color: #ccc;
+    font-size: 13px;
+    cursor: pointer;
+    padding: 3px 6px;
+    line-height: 1;
+  }
+  .acc-card-admin button:hover { border-color: #cc2255; color: #f0a0c0; }
+  .admin-mode .acc-card-admin { display: flex; }
+  .admin-mode .acc-card:hover .acc-card-admin { display: flex; }
+
+  .acc-empty { color: #555; font-size: 13px; grid-column: 1/-1; text-align: center; padding: 3rem 0; }
+
+  /* Logo imagen centrada */
+  .logo-img-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1.2rem 0 0.8rem 0;
+  }
+  .logo-img-header img {
+    max-width: 280px;
+    width: 100%;
+    height: auto;
+    border-radius: 12px;
+  }
+  @media (max-width: 600px) {
+    .logo-img-header img { max-width: 200px; }
+  }
 </style>
 </head>
 <body>
 
-<div class="container">
+<div class="logo-img-header">
+    <img src="data:image/jpeg;base64,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" alt="Lavié Smartphones" />
+  </div>
+  <div class="container">
 
   <header>
     <div class="logo">
@@ -388,6 +514,7 @@
       <div class="admin-tools" id="admin-tools" style="display:none;">
         <button class="btn-import" onclick="abrirModalImport()">📂 Importar CSV / XLS</button>
         <button onclick="exportarCSV()">⬇ Exportar CSV</button>
+        <button class="btn-sheets" onclick="abrirModalSheets()">🔄 Sincronizar Sheets</button>
         <button class="btn-dedup" onclick="quitarDuplicados()">🧹 Quitar duplicados</button>
         <button class="btn-deshacer" id="btn-deshacer" onclick="deshacerCambio()" disabled>↩ Deshacer</button>
         <button class="btn-reset" onclick="resetearCatalogo()" title="Restaurar catálogo original">🔄 Restaurar original</button>
@@ -439,25 +566,85 @@
     <button class="tab-btn" onclick="cambiarSeccion('baterias', this)">🔋 Baterías</button>
     <button class="tab-btn" onclick="cambiarSeccion('flex', this)">⚡ Flex de Carga</button>
     <button class="tab-btn" onclick="cambiarSeccion('camaras', this)">📷 Cámaras</button>
+    <button class="tab-btn" onclick="cambiarSeccion('accesorios', this)">🛍️ Accesorios</button>
   </div>
   <p class="section-label" id="section-label">Pantallas y displays</p>
 
-  <div class="table-wrap">
-    <div class="scroll-hint" id="scroll-hint">← deslizá para ver más →</div>
-    <table>
-      <thead>
-        <tr>
-          <th>Modelo</th>
-          <th class="r">Precio ARS</th>
-          <th class="r">Con 5% desc. <span class="badge-desc">efectivo</span></th>
-          <th class="r">USD blue</th>
-        </tr>
-      </thead>
-      <tbody id="tabla-body"></tbody>
-    </table>
+  <!-- Tabla principal (pantallas/baterias/flex/camaras) -->
+  <div id="seccion-tabla">
+    <div class="table-wrap">
+      <div class="scroll-hint" id="scroll-hint">← deslizá para ver más →</div>
+      <table>
+        <thead>
+          <tr>
+            <th>Modelo</th>
+            <th class="r">Precio ARS</th>
+            <th class="r">Con 5% desc. <span class="badge-desc">efectivo</span></th>
+            <th class="r">USD blue</th>
+          </tr>
+        </thead>
+        <tbody id="tabla-body"></tbody>
+      </table>
+    </div>
   </div>
+
+  <!-- Sección Accesorios (grilla de tarjetas) -->
+  <div id="seccion-accesorios" style="display:none;">
+    <div class="acc-toolbar" id="acc-toolbar-admin" style="display:none;">
+      <button class="btn-acc-nuevo" onclick="abrirModalAccesorio()">➕ Agregar accesorio</button>
+    </div>
+    <div class="acc-grid" id="acc-grid">
+      <div class="acc-empty" id="acc-empty">No hay accesorios cargados todavía.</div>
+    </div>
+  </div>
+
   <p class="status" id="estado-api"></p>
 
+</div>
+
+<!-- MODAL ACCESORIO -->
+<div class="modal-overlay" id="modal-acc-overlay">
+  <div class="modal" style="max-width:480px;">
+    <h3 id="modal-acc-titulo">➕ Nuevo accesorio</h3>
+    <p class="modal-desc">Completá los datos del accesorio. La imagen es opcional.</p>
+
+    <div style="margin-bottom:0.8rem;">
+      <label style="font-size:12px;color:#888;display:block;margin-bottom:4px;">Nombre *</label>
+      <input type="text" id="acc-nombre" placeholder="Ej: Funda Samsung A54 transparente" style="width:100%;background:#0f0f13;border:1px solid #2a2a35;color:#f0f0f0;border-radius:8px;padding:8px 12px;font-size:13px;outline:none;font-family:inherit;" />
+    </div>
+
+    <div style="margin-bottom:0.8rem;">
+      <label style="font-size:12px;color:#888;display:block;margin-bottom:4px;">Precio ARS *</label>
+      <input type="number" id="acc-precio" placeholder="Ej: 15000" min="0" style="width:100%;background:#0f0f13;border:1px solid #2a2a35;color:#f0f0f0;border-radius:8px;padding:8px 12px;font-size:13px;outline:none;font-family:inherit;" />
+    </div>
+
+    <div style="margin-bottom:0.8rem;">
+      <label style="font-size:12px;color:#888;display:block;margin-bottom:4px;">Stock</label>
+      <input type="number" id="acc-stock" placeholder="Ej: 10" min="0" style="width:100%;background:#0f0f13;border:1px solid #2a2a35;color:#f0f0f0;border-radius:8px;padding:8px 12px;font-size:13px;outline:none;font-family:inherit;" />
+    </div>
+
+    <div style="margin-bottom:0.8rem;">
+      <label style="font-size:12px;color:#888;display:block;margin-bottom:4px;">Imagen — URL</label>
+      <input type="url" id="acc-img-url" placeholder="https://..." style="width:100%;background:#0f0f13;border:1px solid #2a2a35;color:#f0f0f0;border-radius:8px;padding:8px 12px;font-size:13px;outline:none;font-family:inherit;" oninput="previsualizarImgUrl()" />
+    </div>
+
+    <div style="margin-bottom:0.8rem;">
+      <label style="font-size:12px;color:#888;display:block;margin-bottom:4px;">Imagen — subir desde PC</label>
+      <div class="drop-zone" id="acc-drop" onclick="document.getElementById('acc-file').click()">
+        <input type="file" id="acc-file" accept="image/*" onchange="onAccFile(event)" />
+        📁 Clic aquí o arrastrá una imagen
+        <div style="font-size:11px;color:#555;margin-top:3px;">JPG, PNG, WEBP, GIF</div>
+      </div>
+      <img id="acc-preview" class="preview-img" />
+    </div>
+
+    <p class="status" id="estado-acc" style="margin-top:6px;"></p>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="cerrarModalAccesorio()">Cancelar</button>
+      <button class="btn-primary" onclick="guardarAccesorio()">💾 Guardar</button>
+    </div>
+  </div>
 </div>
 
 
@@ -2152,6 +2339,7 @@ const SECCIONES = {
   baterias:  { label: 'Baterías',             test: p => esBateria(p) },
   flex:      { label: 'Flex de carga',         test: p => esFlex(p) },
   camaras:   { label: 'Cámaras traseras',      test: p => esCamara(p) },
+  accesorios:{ label: 'Accesorios' },
 };
 function esBateria(p) { return /bater[ií]a/i.test(p.modelo); }
 function esFlex(p)    { return /flex de carga/i.test(p.modelo); }
@@ -2163,7 +2351,19 @@ function cambiarSeccion(sec, btn) {
   btn.classList.add('active');
   const sl = document.getElementById('section-label');
   if (sl) sl.textContent = SECCIONES[sec] ? SECCIONES[sec].label : '';
-  renderTabla();
+
+  const esAcc = sec === 'accesorios';
+  document.getElementById('seccion-tabla').style.display = esAcc ? 'none' : '';
+  document.getElementById('seccion-accesorios').style.display = esAcc ? '' : 'none';
+
+  // Mostrar toolbar admin de accesorios solo si está logueado
+  const accAdmin = document.getElementById('acc-toolbar-admin');
+  if (accAdmin) accAdmin.style.display = (esAcc && adminActivo) ? 'flex' : 'none';
+
+  // Ocultar/mostrar barra de búsqueda y filtros en accesorios
+  document.getElementById('buscar').closest('.toolbar').style.display = esAcc ? 'none' : '';
+
+  if (esAcc) renderAccesorios(); else renderTabla();
 }
 
 // ── QUITAR DUPLICADOS ─────────────────────────────────────────────────────────
@@ -2314,6 +2514,11 @@ function activarModoAdmin() {
   btnAdmin.textContent = '🔓 Cerrar sesión';
   btnAdmin.classList.add('logged');
   document.body.classList.add('admin-activo');
+  // Accesorios
+  if (seccionActual === 'accesorios') {
+    document.getElementById('acc-toolbar-admin').style.display = 'flex';
+    renderAccesorios();
+  }
 }
 
 function cerrarSesion() {
@@ -2325,6 +2530,9 @@ function cerrarSesion() {
   btnAdmin.textContent = '🔒 Admin';
   btnAdmin.classList.remove('logged');
   document.body.classList.remove('admin-activo');
+  // Accesorios
+  document.getElementById('acc-toolbar-admin').style.display = 'none';
+  if (seccionActual === 'accesorios') renderAccesorios();
 }
 
 // ── EDICIÓN INLINE DE PRECIOS ─────────────────────────────────────────────────
@@ -2436,6 +2644,391 @@ function editarDescuento(btn) {
 }
 
 
+// ── GOOGLE SHEETS SYNC ───────────────────────────────────────────────────────
+const STORAGE_SHEETS_KEY = 'lavie_sheets_urls_v1';
+
+function cargarURLsSheets() {
+  try { const r = localStorage.getItem(STORAGE_SHEETS_KEY); if (r) return JSON.parse(r); } catch(e) {}
+  return { catalogo: '', accesorios: '' };
+}
+function guardarURLsSheets() {
+  const urlCat = document.getElementById('sheets-url-catalogo').value.trim();
+  const urlAcc = document.getElementById('sheets-url-accesorios').value.trim();
+  try { localStorage.setItem(STORAGE_SHEETS_KEY, JSON.stringify({ catalogo: urlCat, accesorios: urlAcc })); } catch(e) {}
+  const el = document.getElementById('estado-sheets');
+  el.className = 'status ok'; el.textContent = '✓ URLs guardadas correctamente.';
+}
+
+function abrirModalSheets() {
+  const urls = cargarURLsSheets();
+  document.getElementById('sheets-url-catalogo').value = urls.catalogo || '';
+  document.getElementById('sheets-url-accesorios').value = urls.accesorios || '';
+  document.getElementById('estado-sheets').textContent = '';
+  document.getElementById('sheets-log').className = 'sheets-sync-log';
+  document.getElementById('sheets-log').innerHTML = '';
+  document.getElementById('modal-sheets-overlay').classList.add('visible');
+}
+function cerrarModalSheets() {
+  document.getElementById('modal-sheets-overlay').classList.remove('visible');
+}
+
+function sheetLog(msg, tipo) {
+  const log = document.getElementById('sheets-log');
+  log.className = 'sheets-sync-log visible';
+  const line = document.createElement('div');
+  line.className = tipo ? 'log-' + tipo : '';
+  line.textContent = msg;
+  log.appendChild(line);
+  log.scrollTop = log.scrollHeight;
+}
+
+// Detecta automáticamente qué columna es modelo/nombre y cuál es precio
+function detectarColumnas(headers, tipo) {
+  const h = headers.map(x => String(x).toLowerCase().trim());
+  let colNombre = -1, colPrecio = -1, colStock = -1, colImagen = -1;
+
+  if (tipo === 'catalogo') {
+    const modelos = ['modelo','product','producto','nombre','name','descripcion','item'];
+    colNombre = h.findIndex(x => modelos.some(k => x.includes(k)));
+    if (colNombre === -1) colNombre = 0;
+  } else {
+    const nombres = ['nombre','name','producto','product','descripcion','item','accesorio'];
+    colNombre = h.findIndex(x => nombres.some(k => x.includes(k)));
+    if (colNombre === -1) colNombre = 0;
+    const stocks = ['stock','cantidad','qty','quantity','disponible'];
+    colStock = h.findIndex(x => stocks.some(k => x.includes(k)));
+    const imgs = ['imagen','image','img','foto','photo','url','link'];
+    colImagen = h.findIndex(x => imgs.some(k => x.includes(k)));
+  }
+
+  const precios = ['precio','price','ars','costo','valor','monto'];
+  colPrecio = h.findIndex(x => precios.some(k => x.includes(k)));
+  if (colPrecio === -1) colPrecio = 1;
+
+  return { colNombre, colPrecio, colStock, colImagen };
+}
+
+function parsearCSVSheets(text) {
+  const lines = text.split(/\r?\n/).filter(l => l.trim());
+  if (lines.length < 2) return { headers: [], rows: [] };
+  const parse = line => {
+    const res = []; let cur = '', inQ = false;
+    for (let i = 0; i < line.length; i++) {
+      const c = line[i];
+      if (c === '"') { inQ = !inQ; }
+      else if (c === ',' && !inQ) { res.push(cur.trim()); cur = ''; }
+      else cur += c;
+    }
+    res.push(cur.trim());
+    return res;
+  };
+  const headers = parse(lines[0]);
+  const rows = lines.slice(1).map(parse);
+  return { headers, rows };
+}
+
+async function sincronizarSheets(mostrarLog) {
+  const urls = cargarURLsSheets();
+  // Si se llama desde el modal, leer los inputs también
+  const urlCatInput = document.getElementById('sheets-url-catalogo');
+  const urlAccInput = document.getElementById('sheets-url-accesorios');
+  if (urlCatInput) urls.catalogo = urlCatInput.value.trim() || urls.catalogo;
+  if (urlAccInput) urls.accesorios = urlAccInput.value.trim() || urls.accesorios;
+
+  if (!urls.catalogo && !urls.accesorios) {
+    if (mostrarLog) {
+      const el = document.getElementById('estado-sheets');
+      el.className = 'status err'; el.textContent = '✗ No hay URLs configuradas. Ingresá al menos una.';
+    }
+    return;
+  }
+
+  const btnSync = document.getElementById('btn-sync-now');
+  if (btnSync) { btnSync.disabled = true; btnSync.textContent = '⏳ Sincronizando...'; }
+
+  const logEl = document.getElementById('sheets-log');
+  if (mostrarLog && logEl) { logEl.className = 'sheets-sync-log visible'; logEl.innerHTML = ''; }
+
+  let totalCat = 0, totalAcc = 0, errores = 0;
+
+  // ── Sincronizar catálogo principal ─────────────────────────────────────────
+  if (urls.catalogo) {
+    if (mostrarLog) sheetLog('📋 Leyendo hoja de catálogo...', 'info');
+    try {
+      const resp = await fetch(urls.catalogo);
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      const text = await resp.text();
+      const { headers, rows } = parsearCSVSheets(text);
+      if (!headers.length || !rows.length) throw new Error('La hoja está vacía o no tiene datos.');
+
+      const { colNombre, colPrecio } = detectarColumnas(headers, 'catalogo');
+      if (mostrarLog) sheetLog(`   Columnas detectadas: "${headers[colNombre]}" → Modelo | "${headers[colPrecio]}" → Precio`, '');
+
+      let agr = 0, act = 0;
+      rows.forEach(row => {
+        const modelo = String(row[colNombre] || '').trim();
+        const precio = parseFloat(String(row[colPrecio] || '').replace(/[^0-9.,]/g, '').replace(',', '.'));
+        if (!modelo || isNaN(precio) || precio <= 0) return;
+        const existe = productos.find(p => p.modelo.toLowerCase() === modelo.toLowerCase());
+        if (existe) { if (existe.precio !== precio) { existe.precio = precio; act++; } }
+        else { productos.push({ modelo, precio, nueva: true }); agr++; }
+      });
+      totalCat = agr + act;
+      guardarCatalogo();
+      actualizarContadorModelos();
+      renderTabla();
+      if (mostrarLog) sheetLog(`   ✓ ${agr} agregados, ${act} actualizados en catálogo.`, 'ok');
+    } catch(e) {
+      errores++;
+      if (mostrarLog) sheetLog('   ✗ Error catálogo: ' + e.message, 'err');
+    }
+  }
+
+  // ── Sincronizar accesorios ──────────────────────────────────────────────────
+  if (urls.accesorios) {
+    if (mostrarLog) sheetLog('🛍️ Leyendo hoja de accesorios...', 'info');
+    try {
+      const resp = await fetch(urls.accesorios);
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      const text = await resp.text();
+      const { headers, rows } = parsearCSVSheets(text);
+      if (!headers.length || !rows.length) throw new Error('La hoja está vacía o no tiene datos.');
+
+      const { colNombre, colPrecio, colStock, colImagen } = detectarColumnas(headers, 'accesorios');
+      if (mostrarLog) {
+        let det = `   Columnas: "${headers[colNombre]}" → Nombre | "${headers[colPrecio]}" → Precio`;
+        if (colStock >= 0) det += ` | "${headers[colStock]}" → Stock`;
+        if (colImagen >= 0) det += ` | "${headers[colImagen]}" → Imagen`;
+        sheetLog(det, '');
+      }
+
+      let agr = 0, act = 0;
+      rows.forEach(row => {
+        const nombre = String(row[colNombre] || '').trim();
+        const precio = parseFloat(String(row[colPrecio] || '').replace(/[^0-9.,]/g, '').replace(',', '.'));
+        if (!nombre || isNaN(precio) || precio <= 0) return;
+        const stockRaw = colStock >= 0 ? String(row[colStock] || '').trim() : '';
+        const stock = stockRaw !== '' ? parseInt(stockRaw) : '';
+        const imagen = colImagen >= 0 ? String(row[colImagen] || '').trim() : null;
+
+        const existe = accesorios.find(a => a.nombre.toLowerCase() === nombre.toLowerCase());
+        if (existe) {
+          existe.precio = precio;
+          if (stockRaw !== '') existe.stock = stock;
+          if (imagen) existe.imagen = imagen;
+          act++;
+        } else {
+          accesorios.push({ nombre, precio, stock, imagen: imagen || null });
+          agr++;
+        }
+      });
+      totalAcc = agr + act;
+      guardarAccesorios();
+      if (seccionActual === 'accesorios') renderAccesorios();
+      if (mostrarLog) sheetLog(`   ✓ ${agr} agregados, ${act} actualizados en accesorios.`, 'ok');
+    } catch(e) {
+      errores++;
+      if (mostrarLog) sheetLog('   ✗ Error accesorios: ' + e.message, 'err');
+    }
+  }
+
+  if (btnSync) { btnSync.disabled = false; btnSync.textContent = '🔄 Sincronizar ahora'; }
+
+  // Estado final
+  const resumen = [];
+  if (totalCat) resumen.push(totalCat + ' productos en catálogo');
+  if (totalAcc) resumen.push(totalAcc + ' accesorios');
+  const elEstado = document.getElementById('estado-sheets') || document.getElementById('estado-api');
+  if (elEstado && mostrarLog) {
+    elEstado.className = errores ? 'status err' : 'status ok';
+    elEstado.textContent = errores
+      ? '✗ Sincronización con errores. Revisá el log.'
+      : '✓ Sheets sincronizado: ' + (resumen.join(', ') || 'sin cambios') + '.';
+  }
+
+  // Actualizar el estado general de la página también
+  if (!mostrarLog && (totalCat || totalAcc) && !errores) {
+    const el = document.getElementById('estado-api');
+    if (el) { el.className = 'status ok'; el.textContent = '✓ Datos sincronizados desde Google Sheets.'; }
+  }
+
+  // Ocultar badge "nueva" después de 5 seg
+  if (totalCat) setTimeout(() => { productos.forEach(p => p.nueva = false); renderTabla(); }, 5000);
+}
+
+// Auto-sincronizar al cargar si hay URLs guardadas
+window.addEventListener('load', () => {
+  const urls = cargarURLsSheets();
+  if (urls.catalogo || urls.accesorios) {
+    const el = document.getElementById('estado-api');
+    if (el) { el.className = 'status info'; el.textContent = '🔄 Sincronizando con Google Sheets...'; }
+    sincronizarSheets(false);
+  }
+});
+
+// ── FIN GOOGLE SHEETS SYNC ───────────────────────────────────────────────────
+
+// ── ACCESORIOS ───────────────────────────────────────────────────────────────
+const STORAGE_ACC_KEY = 'lavie_accesorios_v1';
+let accesorios = [];
+let accEditandoIdx = null;
+let accImgBase64 = null;
+
+function cargarAccesorios() {
+  try {
+    const raw = localStorage.getItem(STORAGE_ACC_KEY);
+    if (raw) { const d = JSON.parse(raw); if (Array.isArray(d)) return d; }
+  } catch(e) {}
+  return [];
+}
+function guardarAccesorios() {
+  try { localStorage.setItem(STORAGE_ACC_KEY, JSON.stringify(accesorios)); } catch(e) {}
+}
+accesorios = cargarAccesorios();
+
+function renderAccesorios() {
+  const grid = document.getElementById('acc-grid');
+  if (!accesorios.length) {
+    grid.innerHTML = '<div class="acc-empty">No hay accesorios cargados todavía.</div>';
+    return;
+  }
+  const adminClass = adminActivo ? 'admin-mode' : '';
+  grid.className = 'acc-grid ' + adminClass;
+  grid.innerHTML = accesorios.map((a, i) => {
+    const imgHtml = a.imagen
+      ? `<img class="acc-card-img" src="${a.imagen}" alt="${a.nombre}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" /><div class="acc-card-img-placeholder" style="display:none;">🛍️</div>`
+      : `<div class="acc-card-img-placeholder">🛍️</div>`;
+    const usd = dolarBlue ? `<div class="acc-card-usd">U$D ${(a.precio/dolarBlue).toFixed(2)}</div>` : '';
+    const stock = (a.stock !== undefined && a.stock !== '')
+      ? `<div class="acc-card-stock ${a.stock==0?'sin':''}">${a.stock==0?'Sin stock':'Stock: '+a.stock}</div>` : '';
+    return `<div class="acc-card">
+      ${imgHtml}
+      <div class="acc-card-body">
+        <div class="acc-card-nombre">${a.nombre}</div>
+        <div class="acc-card-precio">$${Number(a.precio).toLocaleString('es-AR')}</div>
+        ${usd}${stock}
+      </div>
+      <div class="acc-card-admin">
+        <button onclick="editarAccesorio(${i})" title="Editar">✏️</button>
+        <button onclick="eliminarAccesorio(${i})" title="Eliminar">🗑️</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function abrirModalAccesorio(idx) {
+  accEditandoIdx = (idx !== undefined) ? idx : null;
+  accImgBase64 = null;
+  const titulo = document.getElementById('modal-acc-titulo');
+  titulo.textContent = accEditandoIdx !== null ? '✏️ Editar accesorio' : '➕ Nuevo accesorio';
+  document.getElementById('acc-nombre').value = '';
+  document.getElementById('acc-precio').value = '';
+  document.getElementById('acc-stock').value = '';
+  document.getElementById('acc-img-url').value = '';
+  document.getElementById('acc-preview').style.display = 'none';
+  document.getElementById('acc-preview').src = '';
+  document.getElementById('acc-file').value = '';
+  document.getElementById('estado-acc').textContent = '';
+
+  if (accEditandoIdx !== null) {
+    const a = accesorios[accEditandoIdx];
+    document.getElementById('acc-nombre').value = a.nombre || '';
+    document.getElementById('acc-precio').value = a.precio || '';
+    document.getElementById('acc-stock').value = a.stock !== undefined ? a.stock : '';
+    if (a.imagen) {
+      if (a.imagen.startsWith('data:')) {
+        accImgBase64 = a.imagen;
+      } else {
+        document.getElementById('acc-img-url').value = a.imagen;
+      }
+      const prev = document.getElementById('acc-preview');
+      prev.src = a.imagen; prev.style.display = 'block';
+    }
+  }
+  document.getElementById('modal-acc-overlay').classList.add('visible');
+  setTimeout(() => document.getElementById('acc-nombre').focus(), 100);
+}
+
+function cerrarModalAccesorio() {
+  document.getElementById('modal-acc-overlay').classList.remove('visible');
+  accImgBase64 = null; accEditandoIdx = null;
+}
+
+function editarAccesorio(i) { abrirModalAccesorio(i); }
+
+function eliminarAccesorio(i) {
+  if (!confirm(`¿Eliminar "${accesorios[i].nombre}"?`)) return;
+  accesorios.splice(i, 1);
+  guardarAccesorios();
+  renderAccesorios();
+}
+
+function guardarAccesorio() {
+  const nombre = document.getElementById('acc-nombre').value.trim();
+  const precio = parseFloat(document.getElementById('acc-precio').value);
+  const stockVal = document.getElementById('acc-stock').value.trim();
+  const url = document.getElementById('acc-img-url').value.trim();
+  const estado = document.getElementById('estado-acc');
+
+  if (!nombre) { estado.className='status err'; estado.textContent='✗ El nombre es obligatorio.'; return; }
+  if (isNaN(precio) || precio <= 0) { estado.className='status err'; estado.textContent='✗ El precio debe ser mayor a 0.'; return; }
+
+  const imagen = accImgBase64 || (url || null);
+  const acc = { nombre, precio, stock: stockVal !== '' ? parseInt(stockVal) : '', imagen };
+
+  if (accEditandoIdx !== null) {
+    accesorios[accEditandoIdx] = acc;
+  } else {
+    accesorios.push(acc);
+  }
+  guardarAccesorios();
+  cerrarModalAccesorio();
+  renderAccesorios();
+}
+
+function previsualizarImgUrl() {
+  const url = document.getElementById('acc-img-url').value.trim();
+  const prev = document.getElementById('acc-preview');
+  if (url) { prev.src = url; prev.style.display = 'block'; accImgBase64 = null; }
+  else { prev.style.display = 'none'; }
+}
+
+function onAccFile(e) {
+  const f = e.target.files[0];
+  if (!f) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    accImgBase64 = ev.target.result;
+    const prev = document.getElementById('acc-preview');
+    prev.src = accImgBase64; prev.style.display = 'block';
+    document.getElementById('acc-img-url').value = '';
+  };
+  reader.readAsDataURL(f);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const drop = document.getElementById('acc-drop');
+  if (!drop) return;
+  drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('drag-over'); });
+  drop.addEventListener('dragleave', () => drop.classList.remove('drag-over'));
+  drop.addEventListener('drop', e => {
+    e.preventDefault(); drop.classList.remove('drag-over');
+    const f = e.dataTransfer.files[0];
+    if (f && f.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = ev => {
+        accImgBase64 = ev.target.result;
+        const prev = document.getElementById('acc-preview');
+        prev.src = accImgBase64; prev.style.display = 'block';
+        document.getElementById('acc-img-url').value = '';
+      };
+      reader.readAsDataURL(f);
+    }
+  });
+});
+
+// ── FIN ACCESORIOS ───────────────────────────────────────────────────────────
+
 renderTabla();
 
 // Ocultar hint de scroll al primer deslizamiento en mobile
@@ -2447,5 +3040,44 @@ if (tableWrap) {
   }, { once: true });
 }
 </script>
+<!-- MODAL GOOGLE SHEETS -->
+<div class="modal-overlay" id="modal-sheets-overlay">
+  <div class="sheets-modal">
+    <h3>🔄 Sincronizar con Google Sheets</h3>
+    <p>Ingresá la URL CSV de cada hoja. La sincronización agrega y actualiza productos sin borrar los existentes.</p>
+
+    <div class="sheets-steps">
+      <p>¿Cómo obtener la URL CSV de tu hoja?</p>
+      <ol>
+        <li>Abrí tu Google Sheets y andá a <strong>Archivo → Compartir → Publicar en la web</strong></li>
+        <li>Elegí la hoja deseada y en formato elegí <strong>"Valores separados por comas (.csv)"</strong></li>
+        <li>Hacé clic en <strong>Publicar</strong> y copiá el enlace que aparece</li>
+        <li>Pegalo en el campo correspondiente de abajo</li>
+      </ol>
+    </div>
+
+    <div class="sheets-input-row">
+      <label>URL CSV — Catálogo (pantallas, baterías, flex, cámaras)</label>
+      <input type="url" id="sheets-url-catalogo" placeholder="https://docs.google.com/spreadsheets/d/.../pub?output=csv" />
+      <div class="sheets-hint">La hoja debe tener columnas: <strong style="color:#ccc;">Modelo</strong> y <strong style="color:#ccc;">Precio</strong> (o similares).</div>
+    </div>
+
+    <div class="sheets-input-row">
+      <label>URL CSV — Accesorios</label>
+      <input type="url" id="sheets-url-accesorios" placeholder="https://docs.google.com/spreadsheets/d/.../pub?output=csv" />
+      <div class="sheets-hint">La hoja debe tener columnas: <strong style="color:#ccc;">Nombre</strong>, <strong style="color:#ccc;">Precio</strong>, <strong style="color:#ccc;">Stock</strong> (opcional) e <strong style="color:#ccc;">Imagen</strong> (URL, opcional).</div>
+    </div>
+
+    <div class="sheets-sync-log" id="sheets-log"></div>
+    <p class="status" id="estado-sheets" style="margin-top:8px;"></p>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="cerrarModalSheets()">Cerrar</button>
+      <button class="btn-sheets" id="btn-guardar-urls" onclick="guardarURLsSheets()" style="font-size:13px;padding:8px 16px;">💾 Guardar URLs</button>
+      <button class="btn-primary" id="btn-sync-now" onclick="sincronizarSheets(true)">🔄 Sincronizar ahora</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
