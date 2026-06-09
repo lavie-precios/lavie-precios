@@ -276,50 +276,59 @@
     /* Toolbar */
     .toolbar { gap: 7px; }
 
-    /* Tabla mobile → tarjetas apiladas */
-    .table-wrap { border: none; border-radius: 0; background: transparent; }
-    table { min-width: 0; width: 100%; font-size: 13px; }
+    /* Tabla mobile → tarjetas adaptativas */
+    .table-wrap { border: none; border-radius: 0; background: transparent; overflow: visible; }
+    table { min-width: 0; width: 100%; border-collapse: separate; border-spacing: 0 10px; }
     thead { display: none; }
     tbody tr {
       display: block;
       background: #1a1a22;
       border: 1px solid #2a2a35;
-      border-radius: 12px;
+      border-radius: 14px;
       margin-bottom: 10px;
-      padding: 12px 14px;
+      padding: 14px 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.25);
     }
     tbody tr:nth-child(even) { background: #1a1a22; }
-    tbody tr:hover { background: #20202c; }
+    tbody tr:hover { background: #20202c; border-color: #3a3a4a; }
     td {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 4px 0;
+      padding: 6px 0;
       border-bottom: none;
-      font-size: 13px;
+      font-size: 14px;
+      line-height: 1.4;
     }
     td::before {
       content: attr(data-label);
       font-size: 11px;
       color: #666;
       text-transform: uppercase;
-      letter-spacing: 0.03em;
+      letter-spacing: 0.05em;
       flex-shrink: 0;
-      margin-right: 8px;
+      margin-right: 10px;
+      font-weight: 500;
     }
     td.r, td.usd, td.ars-desc { text-align: right; }
-    /* Nombre del modelo ocupa todo el ancho */
+    td.ars-desc { font-size: 15px; font-weight: 600; }
+    td.r { font-size: 15px; }
+    /* Nombre del modelo: fila completa arriba */
     td:first-child {
       flex-direction: column;
       align-items: flex-start;
-      gap: 6px;
-      padding-bottom: 8px;
+      gap: 8px;
+      padding-bottom: 10px;
       border-bottom: 1px solid #2a2a35;
-      margin-bottom: 4px;
+      margin-bottom: 6px;
+      font-size: 15px;
+      font-weight: 500;
+      color: #f0f0f0;
     }
     td:first-child::before { display: none; }
-    /* Botones WA y pedido en la card */
-    .btn-wa-row, .btn-carrito-row { font-size: 11px; padding: 4px 10px; }
+    /* Botones más grandes en mobile */
+    .btn-wa-row { font-size: 13px; padding: 7px 14px; border-radius: 8px; }
+    .btn-carrito-row { font-size: 13px; padding: 7px 14px; border-radius: 8px; }
 
     /* Modales ocupan toda la pantalla */
     .modal, .modal-import { border-radius: 12px 12px 0 0; max-height: 92vh; }
