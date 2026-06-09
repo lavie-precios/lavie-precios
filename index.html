@@ -370,25 +370,6 @@
   }
   .storage-badge.visible { opacity: 1; }
 
-  /* ── WHATSAPP ────────────────────────────────────────────────────────────── */
-  .btn-wa {
-    display: inline-flex; align-items: center; justify-content: center;
-    background: #0e2a15; border: 1px solid #25d366; color: #25d366;
-    border-radius: 6px; padding: 2px 7px; font-size: 13px; cursor: pointer;
-    text-decoration: none; line-height: 1; transition: all 0.15s;
-    vertical-align: middle; margin-left: 4px;
-  }
-  .btn-wa:hover { background: #163d20; border-color: #4ade80; color: #4ade80; }
-
-  .acc-card-wa {
-    display: block; width: calc(100% - 1.5rem); margin: 0 0.75rem 0.75rem;
-    text-align: center; padding: 7px; border-radius: 8px;
-    background: #0e2a15; border: 1px solid #25d366; color: #25d366;
-    font-size: 12px; font-weight: 600; text-decoration: none; cursor: pointer;
-    transition: all 0.15s;
-  }
-  .acc-card-wa:hover { background: #163d20; color: #4ade80; border-color: #4ade80; }
-
   /* ── GOOGLE SHEETS SYNC ─────────────────────────────────────────────────── */
   .btn-sheets { background: #0e1f0e; border: 1px solid #2a6a2a; color: #6ade80; border-radius: 8px; padding: 6px 14px; font-size: 12px; cursor: pointer; font-family: inherit; transition: all 0.15s; display: inline-flex; align-items: center; gap: 6px; }
   .btn-sheets:hover { background: #152a15; border-color: #4ade80; }
@@ -420,6 +401,8 @@
   .acc-toolbar { margin-bottom: 1rem; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
   .btn-acc-nuevo { background: #1a1a30; border: 1px solid #7c5cbf; color: #c4a8f0; border-radius: 8px; padding: 7px 16px; font-size: 13px; cursor: pointer; font-family: inherit; transition: all 0.15s; }
   .btn-acc-nuevo:hover { background: #251a40; border-color: #a07ae0; color: #e0d0ff; }
+  .btn-acc-export { background: #0e1a10; border: 1px solid #2a6a2a; color: #6ade80; border-radius: 8px; padding: 7px 16px; font-size: 13px; cursor: pointer; font-family: inherit; transition: all 0.15s; }
+  .btn-acc-export:hover { background: #152a15; border-color: #4ade80; color: #a0f0a0; }
 
   .acc-grid {
     display: grid;
@@ -575,7 +558,7 @@
       <option value="Oled">Oled</option>
       <option value="Prime">Prime</option>
     </select>
-    <button onclick="exportarCSV()" id="btn-export-toolbar" style="margin-left:auto; display:none;">⬇ Exportar CSV</button>
+    <button onclick="exportarSegunSeccion()" id="btn-export-toolbar" style="margin-left:auto; display:none;">⬇ Exportar CSV</button>
   </div>
 
 
@@ -585,6 +568,7 @@
     <button class="tab-btn" onclick="cambiarSeccion('baterias', this)">🔋 Baterías</button>
     <button class="tab-btn" onclick="cambiarSeccion('flex', this)">⚡ Flex de Carga</button>
     <button class="tab-btn" onclick="cambiarSeccion('camaras', this)">📷 Cámaras</button>
+    <button class="tab-btn" onclick="cambiarSeccion('telefonos', this)">📱 Teléfonos</button>
     <button class="tab-btn" onclick="cambiarSeccion('accesorios', this)">🛍️ Accesorios</button>
   </div>
   <p class="section-label" id="section-label">Pantallas y displays</p>
@@ -611,9 +595,21 @@
   <div id="seccion-accesorios" style="display:none;">
     <div class="acc-toolbar" id="acc-toolbar-admin" style="display:none;">
       <button class="btn-acc-nuevo" onclick="abrirModalAccesorio()">➕ Agregar accesorio</button>
+      <button class="btn-acc-export" id="btn-export-accesorios" onclick="exportarAccesoriosCSV()">📦 Exportar accesorios CSV</button>
     </div>
     <div class="acc-grid" id="acc-grid">
       <div class="acc-empty" id="acc-empty">No hay accesorios cargados todavía.</div>
+    </div>
+  </div>
+
+  <!-- Sección Teléfonos (grilla de tarjetas igual que accesorios) -->
+  <div id="seccion-telefonos" style="display:none;">
+    <div class="acc-toolbar" id="tel-toolbar-admin" style="display:none;">
+      <button class="btn-acc-nuevo" onclick="abrirModalAccesorio('telefono')">➕ Agregar teléfono</button>
+      <button class="btn-acc-export" id="btn-export-telefonos" onclick="exportarTelefonosCSV()">📦 Exportar teléfonos CSV</button>
+    </div>
+    <div class="acc-grid" id="tel-grid">
+      <div class="acc-empty" id="tel-empty">No hay teléfonos cargados todavía.</div>
     </div>
   </div>
 
@@ -624,8 +620,16 @@
 <!-- MODAL ACCESORIO -->
 <div class="modal-overlay" id="modal-acc-overlay">
   <div class="modal" style="max-width:480px;">
-    <h3 id="modal-acc-titulo">➕ Nuevo accesorio</h3>
-    <p class="modal-desc">Completá los datos del accesorio. La imagen es opcional.</p>
+    <h3 id="modal-acc-titulo">➕ Nuevo producto</h3>
+    <p class="modal-desc">Completá los datos. La imagen es opcional.</p>
+
+    <div style="margin-bottom:0.8rem;">
+      <label style="font-size:12px;color:#888;display:block;margin-bottom:4px;">Categoría *</label>
+      <select id="acc-categoria" style="width:100%;background:#0f0f13;border:1px solid #2a2a35;color:#f0f0f0;border-radius:8px;padding:8px 12px;font-size:13px;outline:none;font-family:inherit;">
+        <option value="accesorio">🛍️ Accesorio</option>
+        <option value="telefono">📱 Teléfono</option>
+      </select>
+    </div>
 
     <div style="margin-bottom:0.8rem;">
       <label style="font-size:12px;color:#888;display:block;margin-bottom:4px;">Nombre *</label>
@@ -2358,6 +2362,7 @@ const SECCIONES = {
   baterias:  { label: 'Baterías',             test: p => esBateria(p) },
   flex:      { label: 'Flex de carga',         test: p => esFlex(p) },
   camaras:   { label: 'Cámaras traseras',      test: p => esCamara(p) },
+  telefonos: { label: 'Teléfonos' },
   accesorios:{ label: 'Accesorios' },
 };
 function esBateria(p) { return /bater[ií]a/i.test(p.modelo); }
@@ -2372,17 +2377,32 @@ function cambiarSeccion(sec, btn) {
   if (sl) sl.textContent = SECCIONES[sec] ? SECCIONES[sec].label : '';
 
   const esAcc = sec === 'accesorios';
-  document.getElementById('seccion-tabla').style.display = esAcc ? 'none' : '';
-  document.getElementById('seccion-accesorios').style.display = esAcc ? '' : 'none';
+  const esTel = sec === 'telefonos';
+  const esGrilla = esAcc || esTel;
 
-  // Mostrar toolbar admin de accesorios solo si está logueado
+  document.getElementById('seccion-tabla').style.display = esGrilla ? 'none' : '';
+  document.getElementById('seccion-accesorios').style.display = esAcc ? '' : 'none';
+  document.getElementById('seccion-telefonos').style.display = esTel ? '' : 'none';
+
+  // Toolbars admin
   const accAdmin = document.getElementById('acc-toolbar-admin');
   if (accAdmin) accAdmin.style.display = (esAcc && adminActivo) ? 'flex' : 'none';
+  const telAdmin = document.getElementById('tel-toolbar-admin');
+  if (telAdmin) telAdmin.style.display = (esTel && adminActivo) ? 'flex' : 'none';
 
-  // Ocultar/mostrar barra de búsqueda y filtros en accesorios
-  document.getElementById('buscar').closest('.toolbar').style.display = esAcc ? 'none' : '';
+  // Ocultar barra búsqueda en grillas
+  document.getElementById('buscar').closest('.toolbar').style.display = esGrilla ? 'none' : '';
 
-  if (esAcc) renderAccesorios(); else renderTabla();
+  // Botón exportar de la derecha (solo catálogo tabla)
+  const btnExp = document.getElementById('btn-export-toolbar');
+  if (btnExp) {
+    btnExp.textContent = '⬇ Exportar CSV';
+    btnExp.style.display = (!esGrilla && adminActivo) ? 'flex' : 'none';
+  }
+
+  if (esAcc) renderAccesorios();
+  else if (esTel) renderTelefonos();
+  else renderTabla();
 }
 
 // ── QUITAR DUPLICADOS ─────────────────────────────────────────────────────────
@@ -2407,15 +2427,6 @@ function quitarDuplicados() {
     : 'ℹ No se encontraron duplicados.';
 }
 
-// ── WHATSAPP ─────────────────────────────────────────────────────────────────
-const WA_NUMERO = '5493624371449';
-const WA_MENSAJE_BASE = 'Hola, gracias por comunicarse con Lavie! Déjanos tu consulta y te respondemos a la brevedad...';
-
-function waLink(modelo, precio) {
-  const msg = WA_MENSAJE_BASE + (modelo ? `\n\nProducto consultado: *${modelo}*` + (precio ? ` — $${Number(precio).toLocaleString('es-AR')}` : '') : '');
-  return `https://wa.me/${WA_NUMERO}?text=${encodeURIComponent(msg)}`;
-}
-
 // ── TABLA ────────────────────────────────────────────────────────────────────
 function renderTabla() {
   const buscar=document.getElementById('buscar').value.toLowerCase();
@@ -2432,11 +2443,10 @@ function renderTabla() {
     const i = idx(p.modelo);
     const btnARS = `<button class="btn-editar-precio" title="Editar precio ARS" onclick="editarPrecioARS(${i}, this)">✏️</button>`;
     const btnUSD = dolarBlue ? `<button class="btn-editar-precio" title="Editar precio en USD (convierte a ARS)" onclick="editarPrecioUSD(${i}, this)">✏️</button>` : '';
-    const btnEliminar = adminActivo ? `<button class="btn-eliminar-modelo" title="Eliminar modelo" onclick="eliminarModelo(${i})">🗑️</button>` : '';
-    const btnWA = `<a class="btn-wa" href="${waLink(p.modelo, p.precio)}" target="_blank" title="Consultar por WhatsApp">💬</a>`;
+    const btnEliminar = `<button class="btn-eliminar-modelo" title="Eliminar modelo" onclick="eliminarModelo(${i})">🗑️</button>`;
     const celdaUSD = usd !== '—' ? `<span class="precio-editable">U$D ${usd}</span>${btnUSD}` : '—';
     return `<tr>
-      <td class="${n}">${p.modelo}${badge}${btnEliminar}${btnWA}</td>
+      <td class="${n}">${p.modelo}${badge}${btnEliminar}</td>
       <td class="r${n}"><span class="precio-editable">$${p.precio.toLocaleString('es-AR')}</span>${btnARS}</td>
       <td class="ars-desc${n}">$${desc.toLocaleString('es-AR')}</td>
       <td class="usd${n}">${celdaUSD}</td>
@@ -2460,6 +2470,46 @@ function exportarCSV() {
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');
   a.href=url; a.download='lavie_catalogo.csv';
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a); URL.revokeObjectURL(url);
+}
+
+function exportarSegunSeccion() {
+  if (seccionActual === 'accesorios') {
+    exportarAccesoriosCSV();
+  } else {
+    exportarCSV();
+  }
+}
+
+function exportarAccesoriosCSV() {
+  if (!accesorios.length) {
+    alert('No hay accesorios para exportar.');
+    return;
+  }
+  let csv = 'Nombre,Precio,Stock,Imagen\n';
+  accesorios.forEach(a => {
+    const nombre = String(a.nombre || '').replace(/"/g, '""');
+    const precio = a.precio || 0;
+    const stock = a.stock !== '' && a.stock !== null && a.stock !== undefined ? a.stock : '';
+    // La imagen puede ser una URL o un base64; ambos se guardan en la columna Imagen
+    const imagen = String(a.imagen || '').replace(/"/g, '""');
+    csv += `"${nombre}",${precio},${stock},"${imagen}"\n`;
+  });
+  const tieneBase64 = accesorios.some(a => a.imagen && a.imagen.startsWith('data:'));
+  if (tieneBase64) {
+    const ok = confirm(
+      '⚠️ Algunos accesorios tienen imágenes subidas desde PC (base64).\n\n' +
+      'Google Sheets puede truncar imágenes muy pesadas.\n' +
+      'Para mejor compatibilidad, usá URLs públicas (Imgur, Google Drive, etc.) en el campo URL del modal.\n\n' +
+      '¿Exportar igual?'
+    );
+    if (!ok) return;
+  }
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'lavie_accesorios.csv';
   document.body.appendChild(a); a.click();
   document.body.removeChild(a); URL.revokeObjectURL(url);
 }
@@ -2538,15 +2588,23 @@ async function intentarLogin() {
 function activarModoAdmin() {
   document.getElementById('admin-tools').style.display = 'flex';
   document.getElementById('badge-admin').style.display = 'inline-flex';
-  document.getElementById('btn-export-toolbar').style.display = 'flex';
+  const btnExp2 = document.getElementById('btn-export-toolbar');
+  if (btnExp2) {
+    btnExp2.style.display = 'flex';
+    btnExp2.textContent = seccionActual === 'accesorios' ? '📦 Exportar accesorios CSV' : '⬇ Exportar CSV';
+  }
   const btnAdmin = document.getElementById('btn-admin');
   btnAdmin.textContent = '🔓 Cerrar sesión';
   btnAdmin.classList.add('logged');
   document.body.classList.add('admin-activo');
-  // Accesorios
+  // Accesorios / Teléfonos
   if (seccionActual === 'accesorios') {
     document.getElementById('acc-toolbar-admin').style.display = 'flex';
     renderAccesorios();
+  }
+  if (seccionActual === 'telefonos') {
+    document.getElementById('tel-toolbar-admin').style.display = 'flex';
+    renderTelefonos();
   }
 }
 
@@ -2555,6 +2613,8 @@ function cerrarSesion() {
   document.getElementById('admin-tools').style.display = 'none';
   document.getElementById('badge-admin').style.display = 'none';
   document.getElementById('btn-export-toolbar').style.display = 'none';
+  const telAdminBar = document.getElementById('tel-toolbar-admin');
+  if (telAdminBar) telAdminBar.style.display = 'none';
   const btnAdmin = document.getElementById('btn-admin');
   btnAdmin.textContent = '🔒 Admin';
   btnAdmin.classList.remove('logged');
@@ -2840,21 +2900,41 @@ async function sincronizarSheets(mostrarLog) {
         const stock = stockRaw !== '' ? parseInt(stockRaw) : '';
         const imagen = colImagen >= 0 ? String(row[colImagen] || '').trim() : null;
 
-        const existe = accesorios.find(a => a.nombre.toLowerCase() === nombre.toLowerCase());
-        if (existe) {
-          existe.precio = precio;
-          if (stockRaw !== '') existe.stock = stock;
-          if (imagen) existe.imagen = imagen;
-          act++;
+        // Detect Categoria column
+        const colCat = headers.findIndex(h => /categ/i.test(h));
+        const catRaw = colCat >= 0 ? String(row[colCat] || '').trim().toLowerCase() : '';
+        const esTelRow = catRaw === 'telefono' || catRaw === 'teléfono' || catRaw === 'telefono';
+
+        if (esTelRow) {
+          const existe = telefonos.find(a => a.nombre.toLowerCase() === nombre.toLowerCase());
+          if (existe) {
+            existe.precio = precio;
+            if (stockRaw !== '') existe.stock = stock;
+            if (imagen) existe.imagen = imagen;
+            act++;
+          } else {
+            telefonos.push({ nombre, precio, stock, imagen: imagen || null, categoria: 'telefono' });
+            agr++;
+          }
         } else {
-          accesorios.push({ nombre, precio, stock, imagen: imagen || null });
-          agr++;
+          const existe = accesorios.find(a => a.nombre.toLowerCase() === nombre.toLowerCase());
+          if (existe) {
+            existe.precio = precio;
+            if (stockRaw !== '') existe.stock = stock;
+            if (imagen) existe.imagen = imagen;
+            act++;
+          } else {
+            accesorios.push({ nombre, precio, stock, imagen: imagen || null });
+            agr++;
+          }
         }
       });
       totalAcc = agr + act;
       guardarAccesorios();
+      guardarTelefonos();
       if (seccionActual === 'accesorios') renderAccesorios();
-      if (mostrarLog) sheetLog(`   ✓ ${agr} agregados, ${act} actualizados en accesorios.`, 'ok');
+      if (seccionActual === 'telefonos') renderTelefonos();
+      if (mostrarLog) sheetLog(`   ✓ ${agr} agregados, ${act} actualizados en accesorios/teléfonos.`, 'ok');
     } catch(e) {
       errores++;
       if (mostrarLog) sheetLog('   ✗ Error accesorios: ' + e.message, 'err');
@@ -2892,8 +2972,6 @@ window.addEventListener('load', () => {
     const el = document.getElementById('estado-api');
     if (el) { el.className = 'status info'; el.textContent = '🔄 Sincronizando con Google Sheets...'; }
     sincronizarSheets(false);
-    // Auto-sync cada 5 minutos
-    setInterval(() => sincronizarSheets(false), 5 * 60 * 1000);
   }
 });
 
@@ -2939,7 +3017,6 @@ function renderAccesorios() {
         <div class="acc-card-precio">$${Number(a.precio).toLocaleString('es-AR')}</div>
         ${usd}${stock}
       </div>
-      <a class="acc-card-wa" href="${waLink(a.nombre, a.precio)}" target="_blank">💬 Consultar por WhatsApp</a>
       <div class="acc-card-admin">
         <button onclick="editarAccesorio(${i})" title="Editar">✏️</button>
         <button onclick="eliminarAccesorio(${i})" title="Eliminar">🗑️</button>
@@ -2948,11 +3025,37 @@ function renderAccesorios() {
   }).join('');
 }
 
-function abrirModalAccesorio(idx) {
-  accEditandoIdx = (idx !== undefined) ? idx : null;
+let accEditandoCat = 'accesorio'; // tracks which list is being edited
+
+function abrirModalAccesorio(catOrIdx, idx) {
+  // Supports: abrirModalAccesorio('telefono') — new telefono
+  //           abrirModalAccesorio('accesorio') — new accesorio
+  //           abrirModalAccesorio() — new from current section
+  //           abrirModalAccesorio('edit-acc', i) / abrirModalAccesorio('edit-tel', i) — edit
+  let editIdx = null;
+  let cat = 'accesorio';
+
+  if (catOrIdx === 'edit-acc') { editIdx = idx; cat = 'accesorio'; }
+  else if (catOrIdx === 'edit-tel') { editIdx = idx; cat = 'telefono'; }
+  else if (catOrIdx === 'telefono') { cat = 'telefono'; }
+  else if (catOrIdx === 'accesorio') { cat = 'accesorio'; }
+  else if (catOrIdx === undefined) {
+    cat = (seccionActual === 'telefonos') ? 'telefono' : 'accesorio';
+  }
+
+  accEditandoIdx = editIdx;
+  accEditandoCat = cat;
   accImgBase64 = null;
+
   const titulo = document.getElementById('modal-acc-titulo');
-  titulo.textContent = accEditandoIdx !== null ? '✏️ Editar accesorio' : '➕ Nuevo accesorio';
+  const esEdit = editIdx !== null;
+  const esTel = cat === 'telefono';
+  titulo.textContent = esEdit ? (esTel ? '✏️ Editar teléfono' : '✏️ Editar accesorio')
+                              : (esTel ? '➕ Nuevo teléfono'  : '➕ Nuevo accesorio');
+
+  const catSel = document.getElementById('acc-categoria');
+  if (catSel) catSel.value = cat;
+
   document.getElementById('acc-nombre').value = '';
   document.getElementById('acc-precio').value = '';
   document.getElementById('acc-stock').value = '';
@@ -2962,19 +3065,19 @@ function abrirModalAccesorio(idx) {
   document.getElementById('acc-file').value = '';
   document.getElementById('estado-acc').textContent = '';
 
-  if (accEditandoIdx !== null) {
-    const a = accesorios[accEditandoIdx];
-    document.getElementById('acc-nombre').value = a.nombre || '';
-    document.getElementById('acc-precio').value = a.precio || '';
-    document.getElementById('acc-stock').value = a.stock !== undefined ? a.stock : '';
-    if (a.imagen) {
-      if (a.imagen.startsWith('data:')) {
-        accImgBase64 = a.imagen;
-      } else {
-        document.getElementById('acc-img-url').value = a.imagen;
+  if (esEdit) {
+    const lista = esTel ? telefonos : accesorios;
+    const a = lista[editIdx];
+    if (a) {
+      document.getElementById('acc-nombre').value = a.nombre || '';
+      document.getElementById('acc-precio').value = a.precio || '';
+      document.getElementById('acc-stock').value = a.stock !== undefined ? a.stock : '';
+      if (a.imagen) {
+        if (a.imagen.startsWith('data:')) { accImgBase64 = a.imagen; }
+        else { document.getElementById('acc-img-url').value = a.imagen; }
+        const prev = document.getElementById('acc-preview');
+        prev.src = a.imagen; prev.style.display = 'block';
       }
-      const prev = document.getElementById('acc-preview');
-      prev.src = a.imagen; prev.style.display = 'block';
     }
   }
   document.getElementById('modal-acc-overlay').classList.add('visible');
@@ -2983,10 +3086,11 @@ function abrirModalAccesorio(idx) {
 
 function cerrarModalAccesorio() {
   document.getElementById('modal-acc-overlay').classList.remove('visible');
-  accImgBase64 = null; accEditandoIdx = null;
+  accImgBase64 = null; accEditandoIdx = null; accEditandoCat = 'accesorio';
 }
 
-function editarAccesorio(i) { abrirModalAccesorio(i); }
+function editarAccesorio(i) { abrirModalAccesorio('edit-acc', i); }
+function editarTelefono(i)  { abrirModalAccesorio('edit-tel', i); }
 
 function eliminarAccesorio(i) {
   if (!confirm(`¿Eliminar "${accesorios[i].nombre}"?`)) return;
@@ -2995,27 +3099,47 @@ function eliminarAccesorio(i) {
   renderAccesorios();
 }
 
+function eliminarTelefono(i) {
+  if (!confirm(`¿Eliminar "${telefonos[i].nombre}"?`)) return;
+  telefonos.splice(i, 1);
+  guardarTelefonos();
+  renderTelefonos();
+}
+
 function guardarAccesorio() {
   const nombre = document.getElementById('acc-nombre').value.trim();
   const precio = parseFloat(document.getElementById('acc-precio').value);
   const stockVal = document.getElementById('acc-stock').value.trim();
   const url = document.getElementById('acc-img-url').value.trim();
   const estado = document.getElementById('estado-acc');
+  const catSelect = document.getElementById('acc-categoria');
+  const categoria = catSelect ? catSelect.value : 'accesorio';
 
   if (!nombre) { estado.className='status err'; estado.textContent='✗ El nombre es obligatorio.'; return; }
   if (isNaN(precio) || precio <= 0) { estado.className='status err'; estado.textContent='✗ El precio debe ser mayor a 0.'; return; }
 
   const imagen = accImgBase64 || (url || null);
-  const acc = { nombre, precio, stock: stockVal !== '' ? parseInt(stockVal) : '', imagen };
+  const acc = { nombre, precio, stock: stockVal !== '' ? parseInt(stockVal) : '', imagen, categoria };
 
-  if (accEditandoIdx !== null) {
-    accesorios[accEditandoIdx] = acc;
+  if (categoria === 'telefono') {
+    if (accEditandoIdx !== null && accEditandoCat === 'telefono') {
+      telefonos[accEditandoIdx] = acc;
+    } else {
+      telefonos.push(acc);
+    }
+    guardarTelefonos();
+    cerrarModalAccesorio();
+    renderTelefonos();
   } else {
-    accesorios.push(acc);
+    if (accEditandoIdx !== null && accEditandoCat !== 'telefono') {
+      accesorios[accEditandoIdx] = acc;
+    } else {
+      accesorios.push(acc);
+    }
+    guardarAccesorios();
+    cerrarModalAccesorio();
+    renderAccesorios();
   }
-  guardarAccesorios();
-  cerrarModalAccesorio();
-  renderAccesorios();
 }
 
 function previsualizarImgUrl() {
@@ -3061,6 +3185,74 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // ── FIN ACCESORIOS ───────────────────────────────────────────────────────────
 
+// ── TELÉFONOS ─────────────────────────────────────────────────────────────────
+const STORAGE_TEL_KEY = 'lavie_telefonos_v1';
+let telefonos = [];
+
+function cargarTelefonos() {
+  try {
+    const raw = localStorage.getItem(STORAGE_TEL_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch(e) { return []; }
+}
+function guardarTelefonos() {
+  try { localStorage.setItem(STORAGE_TEL_KEY, JSON.stringify(telefonos)); } catch(e) {}
+}
+telefonos = cargarTelefonos();
+
+function renderTelefonos() {
+  const grid = document.getElementById('tel-grid');
+  if (!grid) return;
+  if (!telefonos.length) {
+    grid.innerHTML = '<div class="acc-empty">No hay teléfonos cargados todavía.</div>';
+    return;
+  }
+  const adminClass = adminActivo ? 'admin-mode' : '';
+  grid.innerHTML = telefonos.map((a, i) => {
+    const img = a.imagen
+      ? `<img class="acc-card-img" src="${a.imagen}" alt="${a.nombre}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" /><div class="acc-card-img-placeholder" style="display:none;">📱</div>`
+      : `<div class="acc-card-img-placeholder">📱</div>`;
+    const usd = dolarBlue ? `<div class="acc-card-usd">≈ USD ${(a.precio/dolarBlue).toFixed(0)}</div>` : '';
+    const stockNum = parseInt(a.stock);
+    const stock = a.stock !== '' && !isNaN(stockNum)
+      ? `<div class="acc-card-stock${stockNum === 0 ? ' sin' : ''}">${stockNum === 0 ? '✗ Sin stock' : '✓ Stock: ' + stockNum}</div>` : '';
+    return `<div class="acc-card ${adminClass}">
+      ${img}
+      <div class="acc-card-body">
+        <div class="acc-card-nombre">${a.nombre}</div>
+        <div class="acc-card-precio">$${Number(a.precio).toLocaleString('es-AR')}</div>
+        ${usd}${stock}
+      </div>
+      <div class="acc-card-admin">
+        <button onclick="editarTelefono(${i})" title="Editar">✏️</button>
+        <button onclick="eliminarTelefono(${i})" title="Eliminar">🗑️</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function exportarTelefonosCSV() {
+  if (!telefonos.length) { alert('No hay teléfonos para exportar.'); return; }
+  const tieneBase64 = telefonos.some(a => a.imagen && a.imagen.startsWith('data:'));
+  if (tieneBase64) {
+    const ok = confirm('⚠️ Algunos teléfonos tienen imágenes subidas desde PC (base64).\n\nGoogle Sheets puede truncar imágenes muy pesadas.\nSe recomienda usar URLs públicas (Imgur, Google Drive, etc.).\n\n¿Exportar igual?');
+    if (!ok) return;
+  }
+  let csv = 'Nombre,Precio,Stock,Imagen,Categoria\n';
+  telefonos.forEach(a => {
+    const nombre = String(a.nombre || '').replace(/"/g, '""');
+    const imagen = String(a.imagen || '').replace(/"/g, '""');
+    csv += `"${nombre}",${a.precio || 0},${a.stock !== '' ? a.stock : ''},"${imagen}","telefono"\n`;
+  });
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'lavie_telefonos.csv';
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a); URL.revokeObjectURL(url);
+}
+// ── FIN TELÉFONOS ─────────────────────────────────────────────────────────────
+
 renderTabla();
 
 // Ocultar hint de scroll al primer deslizamiento en mobile
@@ -3097,7 +3289,7 @@ if (tableWrap) {
     <div class="sheets-input-row">
       <label>URL CSV — Accesorios</label>
       <input type="url" id="sheets-url-accesorios" placeholder="https://docs.google.com/spreadsheets/d/.../pub?output=csv" />
-      <div class="sheets-hint">La hoja debe tener columnas: <strong style="color:#ccc;">Nombre</strong>, <strong style="color:#ccc;">Precio</strong>, <strong style="color:#ccc;">Stock</strong> (opcional) e <strong style="color:#ccc;">Imagen</strong> (URL, opcional).</div>
+      <div class="sheets-hint">La hoja debe tener columnas: <strong style="color:#ccc;">Nombre</strong>, <strong style="color:#ccc;">Precio</strong>, <strong style="color:#ccc;">Stock</strong> (opcional), <strong style="color:#ccc;">Imagen</strong> (URL, opcional) y <strong style="color:#ccc;">Categoria</strong> (opcional: <em>accesorio</em> o <em>telefono</em>).</div>
     </div>
 
     <div class="sheets-sync-log" id="sheets-log"></div>
