@@ -225,8 +225,6 @@
 
   /* Tablet (≤768px) */
   @media (max-width: 768px) {
-    body { padding: 1rem 0.75rem; }
-
     header { gap: 8px; }
     .logo-text { font-size: 17px; }
 
@@ -331,8 +329,6 @@
 
   /* Mobile (≤480px) */
   @media (max-width: 480px) {
-    body { padding: 0.75rem 0.5rem; }
-
     /* Header: logo arriba, acciones abajo */
     header { flex-direction: column; align-items: flex-start; gap: 10px; }
     header > div { width: 100%; flex-wrap: wrap; }
@@ -907,8 +903,53 @@
     height: auto;
     border-radius: 12px;
   }
-  @media (max-width: 600px) {
-    .logo-img-header img { max-width: 200px; }
+
+  /* Mobile (<=1024px): logo-img-header pasa a estar arriba del header centrado.
+     La imagen está fuera del .container en el HTML, así que usamos order en body
+     para reordenarla visualmente. body ya es flex (layout lateral) en desktop,
+     pero en mobile los paneles están ocultos, así que podemos aprovechar el flujo. */
+  @media (max-width: 1024px) {
+    /* body ya es flex; en mobile side-panels están ocultos.
+       Hacemos body flex-column para que logo, container queden apilados */
+    body {
+      flex-direction: column;
+      align-items: stretch;
+      padding: 0;
+    }
+    .logo-img-header {
+      order: 0;
+      width: 100%;
+      padding: 1rem 1rem 0.5rem 1rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .logo-img-header img {
+      max-width: 220px;
+      border-radius: 10px;
+      display: block;
+      margin: 0 auto;
+    }
+    .container {
+      order: 1;
+      padding: 1rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .logo-img-header {
+      padding: 0.75rem 0.75rem 0.4rem 0.75rem;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .logo-img-header img {
+      max-width: 160px;
+      border-radius: 8px;
+      display: block;
+      margin: 0 auto;
+    }
   }
 </style>
 </head>
