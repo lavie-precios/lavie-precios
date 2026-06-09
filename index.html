@@ -247,7 +247,7 @@
 
     /* Tabla: scroll horizontal con columnas mínimas definidas */
     .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 10px; }
-    table { min-width: 480px; }
+    table { min-width: 580px; }
     th, td { padding: 8px 10px; font-size: 12px; }
   }
 
@@ -277,11 +277,15 @@
     .toolbar { gap: 7px; }
 
     /* Tabla mobile: columna ARS principal, las demás compactas */
-    table { min-width: 420px; font-size: 12px; }
+    table { min-width: 500px; font-size: 12px; }
     th, td { padding: 7px 8px; }
 
     /* Ocultar columna USD en pantallas muy chicas (queda el ARS y el desc.) */
-    th:last-child, td:last-child { display: none; }
+    th:nth-child(4), td:nth-child(4) { display: none; }
+    /* Compactar columna acciones */
+    .td-acciones { padding: 5px 6px; }
+    .btn-wa-row, .btn-carrito-row { font-size: 11px; padding: 3px 6px; }
+    .btn-carrito-row { display: none; } /* solo WA en mobile muy chico */
 
     /* Modales ocupan toda la pantalla */
     .modal, .modal-import { border-radius: 12px 12px 0 0; max-height: 92vh; }
@@ -478,6 +482,232 @@
 
   .acc-empty { color: #555; font-size: 13px; grid-column: 1/-1; text-align: center; padding: 3rem 0; }
 
+  /* ── BOTÓN WHATSAPP FLOTANTE ─────────────────────────────────────────────── */
+  .whatsapp-fab {
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    text-decoration: none;
+  }
+  .whatsapp-fab-btn {
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    background: #25D366;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 18px rgba(37,211,102,0.45), 0 2px 8px rgba(0,0,0,0.35);
+    transition: transform 0.18s, box-shadow 0.18s, background 0.18s;
+    flex-shrink: 0;
+  }
+  .whatsapp-fab:hover .whatsapp-fab-btn {
+    transform: scale(1.10);
+    background: #20c05a;
+    box-shadow: 0 6px 24px rgba(37,211,102,0.6), 0 2px 10px rgba(0,0,0,0.4);
+  }
+  .whatsapp-fab-btn svg {
+    width: 32px;
+    height: 32px;
+    fill: #fff;
+  }
+  .whatsapp-fab-tooltip {
+    background: #1a1a22;
+    border: 1px solid #25D366;
+    color: #e0f8e8;
+    font-size: 12px;
+    padding: 7px 13px;
+    border-radius: 10px;
+    max-width: 200px;
+    line-height: 1.45;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.4);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s, transform 0.2s;
+    transform: translateX(8px);
+    white-space: nowrap;
+    font-family: system-ui, -apple-system, sans-serif;
+  }
+  .whatsapp-fab:hover .whatsapp-fab-tooltip {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  /* Pulso animado de atención */
+  .whatsapp-fab-btn::after {
+    content: '';
+    position: absolute;
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    background: rgba(37,211,102,0.35);
+    animation: waPulse 2.2s ease-out infinite;
+  }
+  @keyframes waPulse {
+    0%   { transform: scale(1); opacity: 0.7; }
+    70%  { transform: scale(1.55); opacity: 0; }
+    100% { transform: scale(1.55); opacity: 0; }
+  }
+  @media (max-width: 480px) {
+    .whatsapp-fab { bottom: 18px; right: 16px; }
+    .whatsapp-fab-tooltip { display: none; }
+  }
+
+  /* ── BOTONES POR PRODUCTO EN TABLA ───────────────────────────────────────── */
+  .btn-wa-row {
+    display: inline-flex; align-items: center; justify-content: center;
+    background: #0d2010; border: 1px solid #25D366; color: #25D366;
+    border-radius: 6px; padding: 3px 8px; font-size: 12px; cursor: pointer;
+    gap: 4px; transition: background 0.15s, transform 0.1s;
+    vertical-align: middle; white-space: nowrap; text-decoration: none;
+    font-family: inherit; line-height: 1.4;
+  }
+  .btn-wa-row:hover { background: #153020; transform: scale(1.04); }
+
+  .btn-carrito-row {
+    display: inline-flex; align-items: center; justify-content: center;
+    background: #0e1525; border: 1px solid #60a5fa; color: #60a5fa;
+    border-radius: 6px; padding: 3px 8px; font-size: 12px; cursor: pointer;
+    gap: 4px; transition: background 0.15s, transform 0.1s, border-color 0.15s;
+    vertical-align: middle; white-space: nowrap; font-family: inherit; line-height: 1.4;
+  }
+  .btn-carrito-row:hover { background: #152030; transform: scale(1.04); }
+  .btn-carrito-row.en-carrito {
+    background: #0e2010; border-color: #4ade80; color: #4ade80;
+  }
+
+  .td-acciones { text-align: right; white-space: nowrap; }
+  .td-acciones .btn-wa-row, .td-acciones .btn-carrito-row { margin-left: 4px; }
+
+  /* ── CARRITO PANEL ───────────────────────────────────────────────────────── */
+  .carrito-fab {
+    position: fixed; bottom: 100px; right: 28px; z-index: 9998;
+    display: none; /* shown via JS when cart has items */
+  }
+  .carrito-fab-btn {
+    width: 52px; height: 52px; border-radius: 50%;
+    background: #1a2840; border: 2px solid #60a5fa;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 3px 14px rgba(96,165,250,0.4);
+    cursor: pointer; transition: transform 0.18s, box-shadow 0.18s;
+    position: relative;
+  }
+  .carrito-fab-btn:hover { transform: scale(1.1); box-shadow: 0 5px 20px rgba(96,165,250,0.55); }
+  .carrito-fab-btn svg { width: 26px; height: 26px; fill: #60a5fa; }
+  .carrito-count {
+    position: absolute; top: -6px; right: -6px;
+    background: #cc2255; color: #fff; font-size: 11px; font-weight: 700;
+    border-radius: 50%; width: 20px; height: 20px;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+  }
+
+  /* Panel carrito lateral / modal */
+  .carrito-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7); z-index: 10000;
+    align-items: flex-end; justify-content: flex-end;
+  }
+  .carrito-overlay.visible { display: flex; }
+  .carrito-panel {
+    background: #16161f; border: 1px solid #2a2a35;
+    border-radius: 16px 0 0 16px;
+    width: 100%; max-width: 420px; height: 100vh;
+    display: flex; flex-direction: column;
+    box-shadow: -6px 0 32px rgba(0,0,0,0.5);
+    animation: slideInRight 0.22s ease;
+  }
+  @keyframes slideInRight {
+    from { transform: translateX(60px); opacity: 0; }
+    to   { transform: translateX(0); opacity: 1; }
+  }
+  .carrito-header {
+    padding: 1.2rem 1.4rem; border-bottom: 1px solid #2a2a35;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .carrito-header h2 { font-size: 16px; font-weight: 600; color: #fff; }
+  .carrito-header-sub { font-size: 12px; color: #888; margin-top: 2px; }
+  .carrito-close {
+    background: #1a1a22; border: 1px solid #333; color: #888;
+    border-radius: 8px; padding: 6px 10px; cursor: pointer; font-size: 16px;
+    transition: color 0.15s; line-height: 1;
+  }
+  .carrito-close:hover { color: #f0a0a0; border-color: #cc2255; }
+
+  .carrito-lista {
+    flex: 1; overflow-y: auto; padding: 0.8rem 1rem;
+  }
+  .carrito-item {
+    display: flex; align-items: center; gap: 10px;
+    background: #1a1a22; border: 1px solid #2a2a35; border-radius: 10px;
+    padding: 10px 12px; margin-bottom: 8px;
+    transition: border-color 0.15s;
+  }
+  .carrito-item:hover { border-color: #60a5fa; }
+  .carrito-item-nombre { flex: 1; font-size: 12px; color: #ddd; line-height: 1.35; }
+  .carrito-item-precio { font-size: 13px; font-weight: 600; color: #4ade80; white-space: nowrap; }
+  .carrito-item-qty {
+    display: flex; align-items: center; gap: 4px;
+  }
+  .qty-btn {
+    background: #0f0f13; border: 1px solid #2a2a35; color: #ccc;
+    border-radius: 5px; width: 24px; height: 24px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; font-size: 14px; line-height: 1;
+    transition: background 0.15s;
+  }
+  .qty-btn:hover { background: #252535; border-color: #60a5fa; }
+  .qty-num { font-size: 13px; color: #fff; min-width: 18px; text-align: center; }
+  .carrito-item-del {
+    background: none; border: none; color: #555; cursor: pointer;
+    font-size: 15px; padding: 2px 4px; border-radius: 4px;
+    transition: color 0.15s;
+  }
+  .carrito-item-del:hover { color: #f87171; }
+
+  .carrito-empty {
+    text-align: center; color: #555; font-size: 13px;
+    padding: 3rem 1rem;
+  }
+  .carrito-empty .ce-icon { font-size: 2.5rem; margin-bottom: 8px; }
+
+  .carrito-footer {
+    padding: 1rem 1.2rem; border-top: 1px solid #2a2a35; flex-shrink: 0;
+  }
+  .carrito-total-row {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 10px;
+  }
+  .carrito-total-label { font-size: 13px; color: #888; }
+  .carrito-total-val { font-size: 20px; font-weight: 700; color: #4ade80; }
+  .carrito-total-usd { font-size: 11px; color: #60a5fa; text-align: right; margin-top: 2px; }
+
+  .btn-pedir-wa {
+    width: 100%; padding: 13px; background: #25D366; border: none;
+    border-radius: 10px; color: #fff; font-size: 15px; font-weight: 700;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    gap: 8px; transition: background 0.15s, transform 0.1s;
+    font-family: inherit;
+  }
+  .btn-pedir-wa:hover { background: #20c05a; transform: scale(1.02); }
+  .btn-vaciar-carrito {
+    width: 100%; margin-top: 8px; padding: 8px; background: transparent;
+    border: 1px solid #333; border-radius: 8px; color: #666; font-size: 12px;
+    cursor: pointer; transition: color 0.15s, border-color 0.15s; font-family: inherit;
+  }
+  .btn-vaciar-carrito:hover { color: #f87171; border-color: #f87171; }
+
+  @media (max-width: 480px) {
+    .carrito-panel { max-width: 100%; border-radius: 16px 16px 0 0; height: 92vh; }
+    .carrito-overlay { align-items: flex-end; }
+    .carrito-fab { bottom: 80px; right: 16px; }
+  }
+
   /* Logo imagen centrada */
   .logo-img-header {
     display: flex;
@@ -584,6 +814,7 @@
             <th class="r">Precio ARS</th>
             <th class="r">Con 5% desc. <span class="badge-desc">efectivo</span></th>
             <th class="r">USD blue</th>
+            <th class="r">Acciones</th>
           </tr>
         </thead>
         <tbody id="tabla-body"></tbody>
@@ -2307,7 +2538,7 @@ function confirmarImport() {
   const el = document.getElementById('estado-api');
   el.className = 'status ok';
   el.textContent = '✓ Importación exitosa: ' + msgs.join(', ') + '.';
-  setTimeout(() => { productos.forEach(p => p.nueva = false); renderTabla(); }, 5000);
+  setTimeout(() => { productos.forEach(p => p.nueva = false); renderTabla(); }, 120000);
 }
 
 function setEstadoImport(tipo, msg) {
@@ -2434,7 +2665,7 @@ function renderTabla() {
   const tbody=document.getElementById('tabla-body');
   const secFn = SECCIONES[seccionActual] ? SECCIONES[seccionActual].test : () => true;
   const filtrados=productos.filter(p=>secFn(p)&&p.modelo.toLowerCase().includes(buscar)&&(tipo===''||p.modelo.includes(tipo)));
-  if (!filtrados.length) { tbody.innerHTML='<tr><td colspan="4" style="text-align:center;color:#555;padding:2rem;">Sin resultados</td></tr>'; return; }
+  if (!filtrados.length) { tbody.innerHTML='<tr><td colspan="5" style="text-align:center;color:#555;padding:2rem;">Sin resultados</td></tr>'; return; }
   const idx = (modelo) => productos.findIndex(p => p.modelo === modelo);
   tbody.innerHTML=filtrados.map(p=>{
     const desc=Math.round(p.precio*(1 - descuentoPct/100));
@@ -2445,11 +2676,19 @@ function renderTabla() {
     const btnUSD = dolarBlue ? `<button class="btn-editar-precio" title="Editar precio en USD (convierte a ARS)" onclick="editarPrecioUSD(${i}, this)">✏️</button>` : '';
     const btnEliminar = `<button class="btn-eliminar-modelo" title="Eliminar modelo" onclick="eliminarModelo(${i})">🗑️</button>`;
     const celdaUSD = usd !== '—' ? `<span class="precio-editable">U$D ${usd}</span>${btnUSD}` : '—';
+
+    // Botones de acción por fila
+    const modeloEnc = encodeURIComponent(`Hola! Quisiera consultar por el siguiente repuesto:\n\n*${p.modelo}* — $${p.precio.toLocaleString('es-AR')} ARS\n\n¿Tienen stock disponible?`);
+    const btnWARow = `<a class="btn-wa-row" href="https://wa.me/5493624371449?text=${modeloEnc}" target="_blank" rel="noopener noreferrer" title="Consultar por WhatsApp">💬</a>`;
+    const enCarrito = carrito.some(c => c.modelo === p.modelo);
+    const btnCarritoRow = `<button class="btn-carrito-row${enCarrito?' en-carrito':''}" title="${enCarrito?'Quitar del pedido':'Agregar al pedido'}" onclick="toggleCarritoItem('${p.modelo.replace(/'/g,"\\'")}', ${p.precio})">${enCarrito?'✓ En pedido':'＋ Pedido'}</button>`;
+
     return `<tr>
       <td class="${n}">${p.modelo}${badge}${btnEliminar}</td>
       <td class="r${n}"><span class="precio-editable">$${p.precio.toLocaleString('es-AR')}</span>${btnARS}</td>
       <td class="ars-desc${n}">$${desc.toLocaleString('es-AR')}</td>
       <td class="usd${n}">${celdaUSD}</td>
+      <td class="td-acciones">${btnWARow}${btnCarritoRow}</td>
     </tr>`;
   }).join('');
 }
@@ -2844,7 +3083,8 @@ async function sincronizarSheets(mostrarLog) {
   if (urls.catalogo) {
     if (mostrarLog) sheetLog('📋 Leyendo hoja de catálogo...', 'info');
     try {
-      const resp = await fetch(urls.catalogo);
+      const urlCat = urls.catalogo + (urls.catalogo.includes('?') ? '&' : '?') + '_t=' + Date.now();
+      const resp = await fetch(urlCat, { cache: 'no-store' });
       if (!resp.ok) throw new Error('HTTP ' + resp.status);
       const text = await resp.text();
       const { headers, rows } = parsearCSVSheets(text);
@@ -2853,20 +3093,21 @@ async function sincronizarSheets(mostrarLog) {
       const { colNombre, colPrecio } = detectarColumnas(headers, 'catalogo');
       if (mostrarLog) sheetLog(`   Columnas detectadas: "${headers[colNombre]}" → Modelo | "${headers[colPrecio]}" → Precio`, '');
 
-      let agr = 0, act = 0;
+      // Reemplazo completo: el catálogo local queda idéntico al de Sheets
+      const nuevosProductos = [];
       rows.forEach(row => {
         const modelo = String(row[colNombre] || '').trim();
         const precio = parseFloat(String(row[colPrecio] || '').replace(/[^0-9.,]/g, '').replace(',', '.'));
         if (!modelo || isNaN(precio) || precio <= 0) return;
-        const existe = productos.find(p => p.modelo.toLowerCase() === modelo.toLowerCase());
-        if (existe) { if (existe.precio !== precio) { existe.precio = precio; act++; } }
-        else { productos.push({ modelo, precio, nueva: true }); agr++; }
+        nuevosProductos.push({ modelo, precio, nueva: false });
       });
-      totalCat = agr + act;
+      if (!nuevosProductos.length) throw new Error('Sheets no devolvió productos válidos.');
+      productos = nuevosProductos;
+      totalCat = productos.length;
       guardarCatalogo();
       actualizarContadorModelos();
       renderTabla();
-      if (mostrarLog) sheetLog(`   ✓ ${agr} agregados, ${act} actualizados en catálogo.`, 'ok');
+      if (mostrarLog) sheetLog(`   ✓ Catálogo reemplazado: ${totalCat} productos cargados desde Sheets.`, 'ok');
     } catch(e) {
       errores++;
       if (mostrarLog) sheetLog('   ✗ Error catálogo: ' + e.message, 'err');
@@ -2877,7 +3118,8 @@ async function sincronizarSheets(mostrarLog) {
   if (urls.accesorios) {
     if (mostrarLog) sheetLog('🛍️ Leyendo hoja de accesorios...', 'info');
     try {
-      const resp = await fetch(urls.accesorios);
+      const urlAcc = urls.accesorios + (urls.accesorios.includes('?') ? '&' : '?') + '_t=' + Date.now();
+      const resp = await fetch(urlAcc, { cache: 'no-store' });
       if (!resp.ok) throw new Error('HTTP ' + resp.status);
       const text = await resp.text();
       const { headers, rows } = parsearCSVSheets(text);
@@ -2892,6 +3134,7 @@ async function sincronizarSheets(mostrarLog) {
       }
 
       let agr = 0, act = 0;
+      const nuevosAccesorios = [], nuevosTelefonos = [];
       rows.forEach(row => {
         const nombre = String(row[colNombre] || '').trim();
         const precio = parseFloat(String(row[colPrecio] || '').replace(/[^0-9.,]/g, '').replace(',', '.'));
@@ -2906,35 +3149,20 @@ async function sincronizarSheets(mostrarLog) {
         const esTelRow = catRaw === 'telefono' || catRaw === 'teléfono' || catRaw === 'telefono';
 
         if (esTelRow) {
-          const existe = telefonos.find(a => a.nombre.toLowerCase() === nombre.toLowerCase());
-          if (existe) {
-            existe.precio = precio;
-            if (stockRaw !== '') existe.stock = stock;
-            if (imagen) existe.imagen = imagen;
-            act++;
-          } else {
-            telefonos.push({ nombre, precio, stock, imagen: imagen || null, categoria: 'telefono' });
-            agr++;
-          }
+          nuevosTelefonos.push({ nombre, precio, stock, imagen: imagen || null, categoria: 'telefono' });
         } else {
-          const existe = accesorios.find(a => a.nombre.toLowerCase() === nombre.toLowerCase());
-          if (existe) {
-            existe.precio = precio;
-            if (stockRaw !== '') existe.stock = stock;
-            if (imagen) existe.imagen = imagen;
-            act++;
-          } else {
-            accesorios.push({ nombre, precio, stock, imagen: imagen || null });
-            agr++;
-          }
+          nuevosAccesorios.push({ nombre, precio, stock, imagen: imagen || null });
         }
       });
-      totalAcc = agr + act;
+      // Reemplazo completo
+      accesorios = nuevosAccesorios;
+      telefonos  = nuevosTelefonos;
+      totalAcc = accesorios.length + telefonos.length;
       guardarAccesorios();
       guardarTelefonos();
       if (seccionActual === 'accesorios') renderAccesorios();
       if (seccionActual === 'telefonos') renderTelefonos();
-      if (mostrarLog) sheetLog(`   ✓ ${agr} agregados, ${act} actualizados en accesorios/teléfonos.`, 'ok');
+      if (mostrarLog) sheetLog(`   ✓ Accesorios/Teléfonos reemplazados: ${totalAcc} ítems cargados desde Sheets.`, 'ok');
     } catch(e) {
       errores++;
       if (mostrarLog) sheetLog('   ✗ Error accesorios: ' + e.message, 'err');
@@ -2962,7 +3190,7 @@ async function sincronizarSheets(mostrarLog) {
   }
 
   // Ocultar badge "nueva" después de 5 seg
-  if (totalCat) setTimeout(() => { productos.forEach(p => p.nueva = false); renderTabla(); }, 5000);
+  if (totalCat) setTimeout(() => { productos.forEach(p => p.nueva = false); renderTabla(); }, 120000);
 }
 
 // Auto-sincronizar al cargar si hay URLs guardadas
@@ -3253,6 +3481,125 @@ function exportarTelefonosCSV() {
 }
 // ── FIN TELÉFONOS ─────────────────────────────────────────────────────────────
 
+// ── CARRITO / PEDIDO ─────────────────────────────────────────────────────────
+const STORAGE_CARRITO_KEY = 'lavie_carrito_v1';
+let carrito = [];
+
+function cargarCarritoStorage() {
+  try { const r = localStorage.getItem(STORAGE_CARRITO_KEY); return r ? JSON.parse(r) : []; } catch(e) { return []; }
+}
+function guardarCarritoStorage() {
+  try { localStorage.setItem(STORAGE_CARRITO_KEY, JSON.stringify(carrito)); } catch(e) {}
+}
+carrito = cargarCarritoStorage();
+
+function toggleCarritoItem(modelo, precio) {
+  const idx = carrito.findIndex(c => c.modelo === modelo);
+  if (idx >= 0) {
+    carrito.splice(idx, 1);
+  } else {
+    carrito.push({ modelo, precio, qty: 1 });
+  }
+  guardarCarritoStorage();
+  actualizarCarritoUI();
+  renderTabla();
+}
+
+function cambiarQty(modelo, delta) {
+  const item = carrito.find(c => c.modelo === modelo);
+  if (!item) return;
+  item.qty = Math.max(1, item.qty + delta);
+  guardarCarritoStorage();
+  actualizarCarritoUI();
+  renderCarritoLista();
+}
+
+function quitarItemCarrito(modelo) {
+  carrito = carrito.filter(c => c.modelo !== modelo);
+  guardarCarritoStorage();
+  actualizarCarritoUI();
+  renderCarritoLista();
+  renderTabla();
+}
+
+function vaciarCarrito() {
+  if (!carrito.length) return;
+  if (!confirm('¿Vaciar el pedido?')) return;
+  carrito = [];
+  guardarCarritoStorage();
+  actualizarCarritoUI();
+  renderCarritoLista();
+  renderTabla();
+}
+
+function actualizarCarritoUI() {
+  const total = carrito.reduce((s, c) => s + c.precio * c.qty, 0);
+  const qty   = carrito.reduce((s, c) => s + c.qty, 0);
+  const fab = document.getElementById('carrito-fab');
+  if (fab) fab.style.display = carrito.length ? 'block' : 'none';
+  const cnt = document.getElementById('carrito-count');
+  if (cnt) cnt.textContent = qty;
+  const totARS = document.getElementById('carrito-total-ars');
+  const totUSD = document.getElementById('carrito-total-usd');
+  const footer = document.getElementById('carrito-footer');
+  const sub = document.getElementById('carrito-header-sub');
+  if (totARS) totARS.textContent = '$' + total.toLocaleString('es-AR');
+  if (totUSD && dolarBlue) totUSD.textContent = '≈ U$D ' + (total / dolarBlue).toFixed(2);
+  if (footer) footer.style.display = carrito.length ? 'block' : 'none';
+  if (sub) sub.textContent = qty + ' producto' + (qty !== 1 ? 's' : '');
+}
+
+function renderCarritoLista() {
+  const lista = document.getElementById('carrito-lista');
+  if (!lista) return;
+  if (!carrito.length) {
+    lista.innerHTML = `<div class="carrito-empty"><div class="ce-icon">🛒</div><div>Tu pedido está vacío.<br>Agregá productos desde el catálogo.</div></div>`;
+    return;
+  }
+  lista.innerHTML = carrito.map(item => {
+    const ms = item.modelo.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    return `<div class="carrito-item">
+      <div class="carrito-item-nombre">${item.modelo}</div>
+      <div class="carrito-item-qty">
+        <button class="qty-btn" onclick="cambiarQty('${ms}', -1)">−</button>
+        <span class="qty-num">${item.qty}</span>
+        <button class="qty-btn" onclick="cambiarQty('${ms}', 1)">＋</button>
+      </div>
+      <div class="carrito-item-precio">$${(item.precio * item.qty).toLocaleString('es-AR')}</div>
+      <button class="carrito-item-del" onclick="quitarItemCarrito('${ms}')" title="Quitar">✕</button>
+    </div>`;
+  }).join('');
+}
+
+function abrirCarrito() {
+  renderCarritoLista();
+  actualizarCarritoUI();
+  document.getElementById('carrito-overlay').classList.add('visible');
+  document.body.style.overflow = 'hidden';
+}
+
+function cerrarCarrito() {
+  document.getElementById('carrito-overlay').classList.remove('visible');
+  document.body.style.overflow = '';
+}
+
+function enviarPedidoWA() {
+  if (!carrito.length) return;
+  const total = carrito.reduce((s, c) => s + c.precio * c.qty, 0);
+  const usdLine = dolarBlue ? `\n💵 Total USD blue: ~U$D ${(total / dolarBlue).toFixed(2)}` : '';
+  let msg = `Hola! Quisiera hacer el siguiente pedido:\n\n`;
+  carrito.forEach(item => {
+    msg += `▪ *${item.modelo}*`;
+    if (item.qty > 1) msg += ` (x${item.qty})`;
+    msg += ` — $${(item.precio * item.qty).toLocaleString('es-AR')} ARS\n`;
+  });
+  msg += `\n💰 *Total: $${total.toLocaleString('es-AR')} ARS*${usdLine}\n\n¿Tienen stock disponible?`;
+  window.open(`https://wa.me/5493624371449?text=${encodeURIComponent(msg)}`, '_blank', 'noopener,noreferrer');
+}
+
+window.addEventListener('load', () => { actualizarCarritoUI(); });
+// ── FIN CARRITO ───────────────────────────────────────────────────────────────
+
 renderTabla();
 
 // Ocultar hint de scroll al primer deslizamiento en mobile
@@ -3302,6 +3649,69 @@ if (tableWrap) {
     </div>
   </div>
 </div>
+
+
+<!-- BOTÓN CARRITO FLOTANTE -->
+<div class="carrito-fab" id="carrito-fab" onclick="abrirCarrito()">
+  <div class="carrito-fab-btn">
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4H6zm0 0M3 6h18M16 10a4 4 0 01-8 0"/>
+    </svg>
+    <span class="carrito-count" id="carrito-count">0</span>
+  </div>
+</div>
+
+<!-- PANEL CARRITO -->
+<div class="carrito-overlay" id="carrito-overlay" onclick="if(event.target===this)cerrarCarrito()">
+  <div class="carrito-panel">
+    <div class="carrito-header">
+      <div>
+        <h2>🛒 Mi pedido</h2>
+        <div class="carrito-header-sub" id="carrito-header-sub">0 productos</div>
+      </div>
+      <button class="carrito-close" onclick="cerrarCarrito()">✕</button>
+    </div>
+
+    <div class="carrito-lista" id="carrito-lista">
+      <div class="carrito-empty">
+        <div class="ce-icon">🛒</div>
+        <div>Tu pedido está vacío.<br>Agregá productos desde el catálogo.</div>
+      </div>
+    </div>
+
+    <div class="carrito-footer" id="carrito-footer" style="display:none;">
+      <div class="carrito-total-row">
+        <span class="carrito-total-label">Total estimado</span>
+        <div>
+          <div class="carrito-total-val" id="carrito-total-ars">$0</div>
+          <div class="carrito-total-usd" id="carrito-total-usd"></div>
+        </div>
+      </div>
+      <button class="btn-pedir-wa" onclick="enviarPedidoWA()">
+        <svg width="20" height="20" viewBox="0 0 32 32" fill="white"><path d="M16.003 2.667C8.64 2.667 2.667 8.64 2.667 16c0 2.347.627 4.587 1.76 6.52L2.667 29.333l6.987-1.733A13.28 13.28 0 0 0 16.003 29.333C23.36 29.333 29.333 23.36 29.333 16S23.36 2.667 16.003 2.667zm6.067 18.093c-.333-.173-1.96-.96-2.267-1.067-.307-.107-.533-.173-.747.173-.213.347-.827 1.067-.96 1.28-.133.213-.267.24-.6.08-.333-.173-1.387-.507-2.64-1.613-.973-.853-1.627-1.907-1.813-2.24-.187-.333-.013-.507.16-.68.16-.16.333-.4.507-.613.173-.213.227-.347.333-.573.107-.227.053-.427-.027-.6-.08-.173-.747-1.8-1.013-2.467-.267-.64-.547-.547-.747-.547-.187 0-.413-.027-.64-.027-.227 0-.587.08-.893.4-.307.32-1.16 1.12-1.16 2.747s1.187 3.187 1.36 3.413c.173.227 2.347 3.573 5.68 5.013.8.347 1.413.547 1.893.707.8.253 1.52.213 2.093.133.64-.093 1.96-.8 2.24-1.573.28-.773.28-1.44.2-1.573-.08-.133-.307-.213-.64-.387z"/></svg>
+        Enviar pedido por WhatsApp
+      </button>
+      <button class="btn-vaciar-carrito" onclick="vaciarCarrito()">🗑 Vaciar pedido</button>
+    </div>
+  </div>
+</div>
+
+<!-- BOTÓN WHATSAPP FLOTANTE -->
+<a
+  class="whatsapp-fab"
+  href="https://wa.me/5493624371449?text=Hola%2C%20gracias%20por%20comunicarte%20con%20Lavie%2C%20d%C3%A9janos%20tu%20consulta%20y%20te%20respondemos%20a%20la%20brevedad%E2%80%A6"
+  target="_blank"
+  rel="noopener noreferrer"
+  title="Contactanos por WhatsApp"
+  aria-label="Contactar por WhatsApp"
+>
+  <span class="whatsapp-fab-tooltip">💬 Consultanos por WhatsApp</span>
+  <span class="whatsapp-fab-btn">
+    <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+      <path d="M16.003 2.667C8.64 2.667 2.667 8.64 2.667 16c0 2.347.627 4.587 1.76 6.52L2.667 29.333l6.987-1.733A13.28 13.28 0 0 0 16.003 29.333C23.36 29.333 29.333 23.36 29.333 16S23.36 2.667 16.003 2.667zm0 24a11.013 11.013 0 0 1-5.627-1.547l-.4-.24-4.147 1.027 1.053-3.84-.267-.4A10.987 10.987 0 0 1 5.004 16c0-6.08 4.92-11 11-11s11 4.92 11 11-4.92 11-11 11zm6.067-8.24c-.333-.173-1.96-.96-2.267-1.067-.307-.107-.533-.173-.747.173-.213.347-.827 1.067-.96 1.28-.133.213-.267.24-.6.08-.333-.173-1.387-.507-2.64-1.613-.973-.853-1.627-1.907-1.813-2.24-.187-.333-.013-.507.16-.68.16-.16.333-.4.507-.613.173-.213.227-.347.333-.573.107-.227.053-.427-.027-.6-.08-.173-.747-1.8-1.013-2.467-.267-.64-.547-.547-.747-.547-.187 0-.413-.027-.64-.027-.227 0-.587.08-.893.4-.307.32-1.16 1.12-1.16 2.747s1.187 3.187 1.36 3.413c.173.227 2.347 3.573 5.68 5.013.8.347 1.413.547 1.893.707.8.253 1.52.213 2.093.133.64-.093 1.96-.8 2.24-1.573.28-.773.28-1.44.2-1.573-.08-.133-.307-.213-.64-.387z"/>
+    </svg>
+  </span>
+</a>
 
 </body>
 </html>
