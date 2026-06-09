@@ -2975,9 +2975,19 @@ function editarDescuento(btn) {
 // ── GOOGLE SHEETS SYNC ───────────────────────────────────────────────────────
 const STORAGE_SHEETS_KEY = 'lavie_sheets_urls_v1';
 
+const SHEETS_URL_CATALOGO_DEFAULT = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT3qy4Ab-D_Z3-23zPdedPqquZ8FgaPLR8Oebw79aDdiXukdPMoiqqsy56OeQzURJv9vpZ_t_ddyjkF/pub?gid=839347534&single=true&output=csv';
+
 function cargarURLsSheets() {
-  try { const r = localStorage.getItem(STORAGE_SHEETS_KEY); if (r) return JSON.parse(r); } catch(e) {}
-  return { catalogo: '', accesorios: '' };
+  try {
+    const r = localStorage.getItem(STORAGE_SHEETS_KEY);
+    if (r) {
+      const parsed = JSON.parse(r);
+      // Si el admin no guardó URL de catálogo, usar la default hardcodeada
+      if (!parsed.catalogo) parsed.catalogo = SHEETS_URL_CATALOGO_DEFAULT;
+      return parsed;
+    }
+  } catch(e) {}
+  return { catalogo: SHEETS_URL_CATALOGO_DEFAULT, accesorios: '' };
 }
 function guardarURLsSheets() {
   const urlCat = document.getElementById('sheets-url-catalogo').value.trim();
