@@ -245,10 +245,10 @@
     .btn-export { margin-left: 0; width: 100%; justify-content: center; }
     #btn-export-toolbar { margin-left: 0 !important; width: 100%; justify-content: center; }
 
-    /* Tabla: scroll horizontal con columnas mínimas definidas */
+    /* Tabla tablet: scroll horizontal solo si hace falta */
     .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 10px; }
-    table { min-width: 580px; }
-    th, td { padding: 8px 10px; font-size: 12px; }
+    table { min-width: 420px; }
+    th, td { padding: 7px 10px; font-size: 12px; }
   }
 
   /* Mobile (≤480px) */
@@ -276,16 +276,50 @@
     /* Toolbar */
     .toolbar { gap: 7px; }
 
-    /* Tabla mobile: columna ARS principal, las demás compactas */
-    table { min-width: 500px; font-size: 12px; }
-    th, td { padding: 7px 8px; }
-
-    /* Ocultar columna USD en pantallas muy chicas (queda el ARS y el desc.) */
-    th:nth-child(4), td:nth-child(4) { display: none; }
-    /* Compactar columna acciones */
-    .td-acciones { padding: 5px 6px; }
-    .btn-wa-row, .btn-carrito-row { font-size: 11px; padding: 3px 6px; margin-right: 2px; }
-    .btn-carrito-row { display: none; } /* solo WA en mobile muy chico */
+    /* Tabla mobile → tarjetas apiladas */
+    .table-wrap { border: none; border-radius: 0; background: transparent; }
+    table { min-width: 0; width: 100%; font-size: 13px; }
+    thead { display: none; }
+    tbody tr {
+      display: block;
+      background: #1a1a22;
+      border: 1px solid #2a2a35;
+      border-radius: 12px;
+      margin-bottom: 10px;
+      padding: 12px 14px;
+    }
+    tbody tr:nth-child(even) { background: #1a1a22; }
+    tbody tr:hover { background: #20202c; }
+    td {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 4px 0;
+      border-bottom: none;
+      font-size: 13px;
+    }
+    td::before {
+      content: attr(data-label);
+      font-size: 11px;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      flex-shrink: 0;
+      margin-right: 8px;
+    }
+    td.r, td.usd, td.ars-desc { text-align: right; }
+    /* Nombre del modelo ocupa todo el ancho */
+    td:first-child {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 6px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #2a2a35;
+      margin-bottom: 4px;
+    }
+    td:first-child::before { display: none; }
+    /* Botones WA y pedido en la card */
+    .btn-wa-row, .btn-carrito-row { font-size: 11px; padding: 4px 10px; }
 
     /* Modales ocupan toda la pantalla */
     .modal, .modal-import { border-radius: 12px 12px 0 0; max-height: 92vh; }
@@ -2690,9 +2724,9 @@ function renderTabla() {
           <div style="display:flex;gap:5px;flex-wrap:wrap;">${btnWARow}${btnCarritoRow}</div>
         </div>
       </td>
-      <td class="r${n}"><span class="precio-editable">$${p.precio.toLocaleString('es-AR')}</span>${btnARS}</td>
-      <td class="ars-desc${n}">$${desc.toLocaleString('es-AR')}</td>
-      <td class="usd${n}">${celdaUSD}</td>
+      <td class="r${n}" data-label="Precio ARS"><span class="precio-editable">$${p.precio.toLocaleString('es-AR')}</span>${btnARS}</td>
+      <td class="ars-desc${n}" data-label="Con desc.">$${desc.toLocaleString('es-AR')}</td>
+      <td class="usd${n}" data-label="USD">${celdaUSD}</td>
     </tr>`;
   }).join('');
 }
