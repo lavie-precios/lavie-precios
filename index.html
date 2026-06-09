@@ -284,7 +284,7 @@
     th:nth-child(4), td:nth-child(4) { display: none; }
     /* Compactar columna acciones */
     .td-acciones { padding: 5px 6px; }
-    .btn-wa-row, .btn-carrito-row { font-size: 11px; padding: 3px 6px; }
+    .btn-wa-row, .btn-carrito-row { font-size: 11px; padding: 3px 6px; margin-right: 2px; }
     .btn-carrito-row { display: none; } /* solo WA en mobile muy chico */
 
     /* Modales ocupan toda la pantalla */
@@ -580,8 +580,8 @@
     background: #0e2010; border-color: #4ade80; color: #4ade80;
   }
 
-  .td-acciones { text-align: right; white-space: nowrap; }
-  .td-acciones .btn-wa-row, .td-acciones .btn-carrito-row { margin-left: 4px; }
+  /* botones en columna modelo */
+  .btn-wa-row, .btn-carrito-row { margin-right: 2px; }
 
   /* ── CARRITO PANEL ───────────────────────────────────────────────────────── */
   .carrito-fab {
@@ -814,7 +814,7 @@
             <th class="r">Precio ARS</th>
             <th class="r">Con 5% desc. <span class="badge-desc">efectivo</span></th>
             <th class="r">USD blue</th>
-            <th class="r">Acciones</th>
+
           </tr>
         </thead>
         <tbody id="tabla-body"></tbody>
@@ -2684,11 +2684,15 @@ function renderTabla() {
     const btnCarritoRow = `<button class="btn-carrito-row${enCarrito?' en-carrito':''}" title="${enCarrito?'Quitar del pedido':'Agregar al pedido'}" onclick="toggleCarritoItem('${p.modelo.replace(/'/g,"\\'")}', ${p.precio})">${enCarrito?'✓ En pedido':'＋ Pedido'}</button>`;
 
     return `<tr>
-      <td class="${n}">${p.modelo}${badge}${btnEliminar}</td>
+      <td class="${n}">
+        <div style="display:flex;flex-direction:column;gap:5px;align-items:flex-start;">
+          <span>${p.modelo}${badge}${btnEliminar}</span>
+          <div style="display:flex;gap:5px;flex-wrap:wrap;">${btnWARow}${btnCarritoRow}</div>
+        </div>
+      </td>
       <td class="r${n}"><span class="precio-editable">$${p.precio.toLocaleString('es-AR')}</span>${btnARS}</td>
       <td class="ars-desc${n}">$${desc.toLocaleString('es-AR')}</td>
       <td class="usd${n}">${celdaUSD}</td>
-      <td class="td-acciones">${btnWARow}${btnCarritoRow}</td>
     </tr>`;
   }).join('');
 }
