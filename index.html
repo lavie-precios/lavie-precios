@@ -245,10 +245,88 @@
     .btn-export { margin-left: 0; width: 100%; justify-content: center; }
     #btn-export-toolbar { margin-left: 0 !important; width: 100%; justify-content: center; }
 
-    /* Tabla tablet: scroll horizontal solo si hace falta */
-    .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 10px; }
-    table { min-width: 420px; }
-    th, td { padding: 7px 10px; font-size: 12px; }
+    /* Tabla tablet (481-768px): grilla de 2 columnas de tarjetas */
+    .table-wrap {
+      border: none; border-radius: 0;
+      background: transparent; overflow: visible;
+    }
+    table { min-width: 0; width: 100%; border-collapse: separate; border-spacing: 0; }
+    thead { display: none; }
+    tbody {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+    tbody tr {
+      display: flex;
+      flex-direction: column;
+      background: #1a1a22;
+      border: 1px solid #2a2a35;
+      border-radius: 14px;
+      padding: 14px 14px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+      height: 100%;
+    }
+    tbody tr:nth-child(even) { background: #1a1a22; }
+    tbody tr:hover { background: #20202c; border-color: #cc2255; }
+
+    td {
+      display: block;
+      padding: 3px 0;
+      border-bottom: none;
+      font-size: 13px;
+      line-height: 1.4;
+      text-align: left;
+    }
+    td::before { display: none; }
+    td.r, td.usd, td.ars-desc { text-align: left; }
+
+    td:first-child {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      font-size: 14px;
+      font-weight: 600;
+      color: #f0f0f0;
+      line-height: 1.35;
+      word-break: break-word;
+    }
+    td:first-child > div {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      height: 100%;
+    }
+    td:first-child > div > span:first-child {
+      font-size: 14px;
+      font-weight: 600;
+      color: #f0f0f0;
+      display: block;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #2a2a35;
+      margin-bottom: 8px;
+      word-break: break-word;
+      line-height: 1.35;
+    }
+    td:first-child .btn-wa-row,
+    td:first-child .btn-carrito-row {
+      width: 100%;
+      font-size: 12px;
+      padding: 7px 8px;
+      border-radius: 8px;
+      justify-content: center;
+      text-align: center;
+    }
+    td:first-child > div > div {
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 5px !important;
+      margin-top: 4px;
+    }
+    td.ars-desc { font-size: 16px; font-weight: 700; color: #4ade80; margin-top: 4px; }
+    td.usd { font-size: 12px; color: #60a5fa; margin-bottom: 4px; }
+    td.r { font-size: 14px; color: #e0e0e0; margin-top: 2px; }
   }
 
   /* Mobile (≤480px) */
@@ -266,69 +344,129 @@
     /* Botones login/actualizar */
     #btn-admin, #btn-actualizar { font-size: 12px; padding: 6px 10px; }
 
-    /* Cards: todas en fila de 3 pequeñas, o 1 columna si muy chico */
-    .cards { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    /* Cards stats: 2 columnas equilibradas */
+    .cards { grid-template-columns: repeat(2, 1fr); gap: 8px; }
     .card { padding: 0.7rem 0.8rem; border-radius: 10px; }
-    .card-value { font-size: 17px; }
+    .card-value { font-size: 18px; }
     .card-label { font-size: 10px; }
     .card-sub { font-size: 10px; }
 
     /* Toolbar */
     .toolbar { gap: 7px; }
 
-    /* Tabla mobile → tarjetas adaptativas */
-    .table-wrap { border: none; border-radius: 0; background: transparent; overflow: visible; }
-    table { min-width: 0; width: 100%; border-collapse: separate; border-spacing: 0 10px; }
+    /* ── TABLA → GRILLA DE TARJETAS 2 COLUMNAS ── */
+    .table-wrap {
+      border: none; border-radius: 0;
+      background: transparent; overflow: visible;
+    }
+    /* Usamos el tbody como grilla de 2 columnas */
+    table { min-width: 0; width: 100%; border-collapse: separate; border-spacing: 0; }
     thead { display: none; }
+    tbody {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
     tbody tr {
-      display: block;
+      display: flex;
+      flex-direction: column;
       background: #1a1a22;
       border: 1px solid #2a2a35;
       border-radius: 14px;
-      margin-bottom: 10px;
-      padding: 14px 16px;
+      padding: 12px 12px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+      /* Asegura que todas las tarjetas tengan misma altura dentro de la fila */
+      height: 100%;
     }
     tbody tr:nth-child(even) { background: #1a1a22; }
-    tbody tr:hover { background: #20202c; border-color: #3a3a4a; }
+    tbody tr:hover { background: #20202c; border-color: #cc2255; }
+
+    /* Todas las celdas en columna, sin "::before" genérico */
     td {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 6px 0;
+      display: block;
+      padding: 3px 0;
       border-bottom: none;
-      font-size: 14px;
+      font-size: 13px;
       line-height: 1.4;
+      text-align: left;
     }
-    td::before {
-      content: attr(data-label);
-      font-size: 11px;
-      color: #666;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      flex-shrink: 0;
-      margin-right: 10px;
-      font-weight: 500;
-    }
-    td.r, td.usd, td.ars-desc { text-align: right; }
-    td.ars-desc { font-size: 15px; font-weight: 600; }
-    td.r { font-size: 15px; }
-    /* Nombre del modelo: fila completa arriba */
+    td::before { display: none; }
+    td.r, td.usd, td.ars-desc { text-align: left; }
+
+    /* Nombre del modelo: primera celda — ocupa toda la anchura, con separador */
+    /* Primera td: nombre del modelo + botones de acción */
     td:first-child {
+      flex: 1;
+      display: flex;
       flex-direction: column;
-      align-items: flex-start;
-      gap: 8px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid #2a2a35;
-      margin-bottom: 6px;
-      font-size: 15px;
-      font-weight: 500;
+      gap: 0;
+      font-size: 13px;
+      font-weight: 600;
       color: #f0f0f0;
+      line-height: 1.35;
+      word-break: break-word;
     }
-    td:first-child::before { display: none; }
-    /* Botones más grandes en mobile */
-    .btn-wa-row { font-size: 13px; padding: 7px 14px; border-radius: 8px; }
-    .btn-carrito-row { font-size: 13px; padding: 7px 14px; border-radius: 8px; }
+    /* El contenedor interno del nombre + botones */
+    td:first-child > div {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      height: 100%;
+    }
+    /* El span con el nombre del modelo */
+    td:first-child > div > span:first-child {
+      font-size: 13px;
+      font-weight: 600;
+      color: #f0f0f0;
+      display: block;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #2a2a35;
+      margin-bottom: 8px;
+      word-break: break-word;
+      line-height: 1.35;
+    }
+    /* Botones WA y carrito dentro de la primera td */
+    td:first-child .btn-wa-row,
+    td:first-child .btn-carrito-row {
+      width: 100%;
+      font-size: 11px;
+      padding: 6px 6px;
+      border-radius: 8px;
+      justify-content: center;
+      text-align: center;
+      margin-bottom: 4px;
+    }
+    /* El div que agrupa los botones */
+    td:first-child > div > div {
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 5px !important;
+      margin-top: 4px;
+    }
+
+    /* Precio ARS: resaltado */
+    td.ars-desc {
+      font-size: 16px;
+      font-weight: 700;
+      color: #4ade80;
+      margin-top: 4px;
+    }
+    /* Precio USD */
+    td.usd {
+      font-size: 12px;
+      color: #60a5fa;
+      margin-bottom: 4px;
+    }
+    /* Precio numérico ARS */
+    td.r {
+      font-size: 14px;
+      color: #e0e0e0;
+      margin-top: 2px;
+    }
+
+    /* Admin: botones de editar/eliminar más accesibles */
+    .btn-editar-precio { font-size: 11px; }
+    .btn-eliminar-modelo { font-size: 11px; }
 
     /* Modales ocupan toda la pantalla */
     .modal, .modal-import { border-radius: 12px 12px 0 0; max-height: 92vh; }
@@ -338,10 +476,15 @@
     .login-box { border-radius: 16px 16px 0 0; max-width: 100%; padding: 1.5rem 1.25rem; }
   }
 
-  /* Muy chico (≤360px): cards en 1 columna */
+  /* Muy chico (≤360px): igual 2 columnas pero con fuente un poco menor */
   @media (max-width: 360px) {
     .cards { grid-template-columns: 1fr 1fr; }
     .admin-tools button span, .admin-tools button { font-size: 11px; }
+    tbody { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    tbody tr { padding: 10px 10px; }
+    td:first-child { font-size: 12px; }
+    td.ars-desc { font-size: 14px; }
+    .btn-wa-row, .btn-carrito-row { font-size: 10px; padding: 5px 6px; }
   }
 
   /* ── PANELES LATERALES ───────────────────────────────────────────────────── */
