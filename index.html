@@ -640,6 +640,21 @@
   .acc-card-usd { font-size: 11px; color: #60a5fa; }
   .acc-card-stock { font-size: 11px; color: #4ade80; margin-top: 2px; }
   .acc-card-stock.sin { color: #f87171; }
+  .stock-badge {
+    display: inline-block;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .stock-con {
+    background: rgba(74, 222, 128, 0.1);
+    color: #4ade80;
+  }
+  .stock-sin {
+    background: rgba(248, 113, 113, 0.1);
+    color: #f87171;
+  }
 
   .acc-card-admin {
     display: none;
@@ -734,39 +749,6 @@
     70%  { transform: scale(1.55); opacity: 0; }
     100% { transform: scale(1.55); opacity: 0; }
   }
-
-  /* ── STOCK BADGE EN TABLA ────────────────────────────────────────────────── */
-  .stock-badge {
-    display: inline-flex; align-items: center; gap: 3px;
-    font-size: 11px; padding: 2px 7px; border-radius: 20px;
-    font-weight: 500; white-space: nowrap; cursor: default;
-    vertical-align: middle;
-  }
-  .stock-badge.disponible {
-    background: #0e1a10; color: #4ade80; border: 1px solid #2a4a2a;
-  }
-  .stock-badge.sin-stock {
-    background: #1a0e0e; color: #f87171; border: 1px solid #4a2a2a;
-  }
-  .stock-badge.sin-info {
-    background: #1a1a22; color: #888; border: 1px solid #2a2a35;
-  }
-  .btn-editar-stock {
-    display: none;
-    background: none; border: none; color: #555; font-size: 11px;
-    padding: 2px 4px; cursor: pointer; border-radius: 4px;
-    margin-left: 4px; transition: color 0.15s, background 0.15s;
-    vertical-align: middle; line-height: 1;
-  }
-  .btn-editar-stock:hover { color: #60a5fa; background: #0e1525; border: none; }
-  body.admin-activo .btn-editar-stock { display: inline-flex; align-items: center; }
-  .stock-inline-input {
-    background: #0f0f13; border: 1px solid #60a5fa; color: #f0f0f0;
-    border-radius: 6px; padding: 2px 7px; font-size: 12px; width: 70px;
-    outline: none; font-family: inherit; text-align: center;
-  }
-  .stock-inline-input:focus { border-color: #93c5fd; box-shadow: 0 0 0 2px rgba(96,165,250,0.2); }
-
   @media (max-width: 480px) {
     .whatsapp-fab { bottom: 18px; right: 16px; }
     .whatsapp-fab-tooltip { display: none; }
@@ -1071,10 +1053,11 @@
         <thead>
           <tr>
             <th>Modelo</th>
+            <th class="r">Stock</th>
             <th class="r">Precio ARS</th>
             <th class="r">Con 5% desc. <span class="badge-desc">efectivo</span></th>
             <th class="r">USD blue</th>
-            <th class="r">Stock</th>
+
           </tr>
         </thead>
         <tbody id="tabla-body"></tbody>
@@ -1193,6 +1176,12 @@
       <div class="col-map-row">
         <label>Precio →</label>
         <select id="col-precio"></select>
+      </div>
+      <div class="col-map-row">
+        <label>Stock →</label>
+        <select id="col-stock">
+          <option value="">(No importar stock)</option>
+        </select>
       </div>
     </div>
 
@@ -2535,7 +2524,7 @@ let historialCambios = []; // stack de snapshots anteriores
 
 function tomarSnapshot() {
   // Guarda copia profunda del estado actual ANTES de modificar
-  const snap = productos.map(({ modelo, precio }) => ({ modelo, precio }));
+  const snap = productos.map(({ modelo, precio, stock }) => ({ modelo, precio, stock }));
   historialCambios.push(snap);
   if (historialCambios.length > MAX_HISTORIAL) historialCambios.shift();
   actualizarBtnDeshacer();
@@ -2565,7 +2554,7 @@ function actualizarBtnDeshacer() {
 
 function guardarCatalogo() {
   try {
-    const datos = productos.map(({ modelo, precio, stock }) => ({ modelo, precio, stock: stock !== undefined ? stock : '' }));
+    const datos = productos.map(({ modelo, precio, stock }) => ({ modelo, precio, stock }));
     localStorage.setItem(STORAGE_KEY, JSON.stringify(datos));
     // Mostrar badge de guardado brevemente
     const badge = document.getElementById('badge-guardado');
@@ -2724,12 +2713,15 @@ function cargarDatosImport(rows) {
   const opts = importHeaders.map(h => `<option value="${h}">${h}</option>`).join('');
   document.getElementById('col-modelo').innerHTML = opts;
   document.getElementById('col-precio').innerHTML = opts;
+  document.getElementById('col-stock').innerHTML = `<option value="">(No importar stock)</option>` + opts;
 
   // Auto-detectar columnas
   const cm = importHeaders.find(h => /modelo|product|nombre|descripcion|item|name/i.test(h)) || importHeaders[0];
   const cp = importHeaders.find(h => /precio|price|costo|valor|value|importe/i.test(h)) || importHeaders[Math.min(1, importHeaders.length-1)];
+  const cs = importHeaders.find(h => /stock|cantidad|qty|quantity|disponible/i.test(h)) || '';
   document.getElementById('col-modelo').value = cm;
   document.getElementById('col-precio').value = cp;
+  document.getElementById('col-stock').value = cs;
 
   document.getElementById('col-map').style.display = 'block';
   actualizarPreview();
@@ -2738,18 +2730,22 @@ function cargarDatosImport(rows) {
 
   document.getElementById('col-modelo').onchange = actualizarPreview;
   document.getElementById('col-precio').onchange = actualizarPreview;
+  document.getElementById('col-stock').onchange = actualizarPreview;
 }
 
 function actualizarPreview() {
   const colM = document.getElementById('col-modelo').value;
   const colP = document.getElementById('col-precio').value;
+  const colS = document.getElementById('col-stock').value;
   const muestra = importRows.slice(0, 5);
   const tabla = document.getElementById('import-table');
+  
   tabla.innerHTML = `
-    <thead><tr><th>Modelo</th><th>Precio ARS</th></tr></thead>
+    <thead><tr><th>Modelo</th><th>Stock</th><th>Precio ARS</th></tr></thead>
     <tbody>${muestra.map(r => {
       const p = limpiarPrecio(r[colP]);
-      return `<tr><td>${r[colM] || '—'}</td><td style="color:#4ade80">${p ? '$' + Number(p).toLocaleString('es-AR') : '—'}</td></tr>`;
+      const s = colS ? (r[colS] !== undefined ? String(r[colS]).trim() : '—') : '—';
+      return `<tr><td>${r[colM] || '—'}</td><td>${s}</td><td style="color:#4ade80">${p ? '$' + Number(p).toLocaleString('es-AR') : '—'}</td></tr>`;
     }).join('')}</tbody>`;
   document.getElementById('import-preview-title').textContent = `Vista previa (${muestra.length} de ${importRows.length} filas):`;
   document.getElementById('import-preview').style.display = 'block';
@@ -2764,8 +2760,17 @@ function limpiarPrecio(val) {
 function confirmarImport() {
   const colM = document.getElementById('col-modelo').value;
   const colP = document.getElementById('col-precio').value;
+  const colS = document.getElementById('col-stock').value;
   const nuevos = importRows
-    .map(r => ({ modelo: String(r[colM] || '').trim(), precio: limpiarPrecio(r[colP]) }))
+    .map(r => {
+      const stockRaw = colS ? String(r[colS] || '').trim() : '';
+      const stock = stockRaw !== '' ? parseInt(stockRaw) : '';
+      return {
+        modelo: String(r[colM] || '').trim(),
+        precio: limpiarPrecio(r[colP]),
+        stock: isNaN(stock) ? '' : stock
+      };
+    })
     .filter(p => p.modelo && p.precio > 0);
 
   if (!nuevos.length) {
@@ -2782,8 +2787,15 @@ function confirmarImport() {
     tomarSnapshot();
     nuevos.forEach(d => {
       const existe = productos.find(p => p.modelo.toLowerCase() === d.modelo.toLowerCase());
-      if (existe) { existe.precio = d.precio; existe.nueva = true; actualizados++; }
-      else { productos.push({ modelo: d.modelo, precio: d.precio, stock: '', nueva: true }); agregados++; }
+      if (existe) { 
+        existe.precio = d.precio; 
+        if (d.stock !== undefined && d.stock !== '') {
+          existe.stock = d.stock;
+        }
+        existe.nueva = true; 
+        actualizados++; 
+      }
+      else { productos.push({ modelo: d.modelo, precio: d.precio, stock: d.stock, nueva: true }); agregados++; }
     });
   }
 
@@ -2925,7 +2937,7 @@ function renderTabla() {
   const tbody=document.getElementById('tabla-body');
   const secFn = SECCIONES[seccionActual] ? SECCIONES[seccionActual].test : () => true;
   const filtrados=productos.filter(p=>secFn(p)&&p.modelo.toLowerCase().includes(buscar)&&(tipo===''||p.modelo.includes(tipo)));
-  if (!filtrados.length) { tbody.innerHTML='<tr><td colspan="6" style="text-align:center;color:#555;padding:2rem;">Sin resultados</td></tr>'; return; }
+  if (!filtrados.length) { tbody.innerHTML='<tr><td colspan="5" style="text-align:center;color:#555;padding:2rem;">Sin resultados</td></tr>'; return; }
   const idx = (modelo) => productos.findIndex(p => p.modelo === modelo);
   tbody.innerHTML=filtrados.map(p=>{
     const desc=Math.round(p.precio*(1 - descuentoPct/100));
@@ -2937,31 +2949,15 @@ function renderTabla() {
     const btnEliminar = `<button class="btn-eliminar-modelo" title="Eliminar modelo" onclick="eliminarModelo(${i})">🗑️</button>`;
     const celdaUSD = usd !== '—' ? `<span class="precio-editable">U$D ${usd}</span>${btnUSD}` : '—';
 
-    // Stock + mensaje WA dinámico según stock
-    const stockNum = (p.stock !== undefined && p.stock !== null && p.stock !== '') ? parseInt(p.stock) : null;
-    const tieneStock = stockNum !== null && !isNaN(stockNum);
-    const hayStock = tieneStock && stockNum > 0;
-    const sinStock = tieneStock && stockNum === 0;
-    const stockMsg = hayStock
-      ? 'Sí hay stock en este momento ✅'
-      : sinStock
-        ? 'Consultar si hay stock en este momento ❓'
-        : '¿Tienen stock disponible?';
-    const modeloEnc = encodeURIComponent(`Hola! Quisiera consultar por el siguiente repuesto:\n\n*${p.modelo}* — $${p.precio.toLocaleString('es-AR')} ARS\n\n${stockMsg}`);
+    const stockVal = (p.stock !== undefined && p.stock !== '')
+      ? `<span class="stock-badge ${p.stock == 0 ? 'stock-sin' : 'stock-con'}">${p.stock == 0 ? 'Sin stock' : p.stock}</span>`
+      : '—';
+
+    // Botones de acción por fila
+    const modeloEnc = encodeURIComponent(`Hola! Quisiera consultar por el siguiente repuesto:\n\n*${p.modelo}* — $${p.precio.toLocaleString('es-AR')} ARS\n\n¿Tienen stock disponible?`);
     const btnWARow = `<a class="btn-wa-row" href="https://wa.me/5493624371449?text=${modeloEnc}" target="_blank" rel="noopener noreferrer" title="Consultar por WhatsApp"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.124.558 4.122 1.528 5.857L0 24l6.335-1.505A11.943 11.943 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.933 0-3.742-.516-5.295-1.414l-.38-.225-3.76.893.952-3.65-.248-.393A9.937 9.937 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg> Consultar</a>`;
     const enCarrito = carrito.some(c => c.modelo === p.modelo);
-    const btnCarritoRow = `<button class="btn-carrito-row${enCarrito?' en-carrito':''}" title="${enCarrito?'Quitar del pedido':'Agregar al pedido'}" onclick="toggleCarritoItem('${p.modelo.replace(/'/g,"\'")}', ${p.precio})">${enCarrito?'✓ En pedido':'＋ Pedido'}</button>`;
-
-    // Celda de stock con edición inline para admin
-    const btnEditStock = `<button class="btn-editar-stock" title="Editar stock" onclick="editarStock(${i}, this)">✏️</button>`;
-    let stockCellContent;
-    if (sinStock) {
-      stockCellContent = `<span class="stock-badge sin-stock" title="Sin stock">✗ 0</span>${btnEditStock}`;
-    } else if (hayStock) {
-      stockCellContent = `<span class="stock-badge disponible" title="Stock disponible">✓ ${stockNum}</span>${btnEditStock}`;
-    } else {
-      stockCellContent = `<span class="stock-badge sin-info" title="Stock no cargado">— —</span>${btnEditStock}`;
-    }
+    const btnCarritoRow = `<button class="btn-carrito-row${enCarrito?' en-carrito':''}" title="${enCarrito?'Quitar del pedido':'Agregar al pedido'}" onclick="toggleCarritoItem('${p.modelo.replace(/'/g,"\\'")}', ${p.precio})">${enCarrito?'✓ En pedido':'＋ Pedido'}</button>`;
 
     return `<tr>
       <td class="${n}">
@@ -2970,10 +2966,10 @@ function renderTabla() {
           <div style="display:flex;gap:5px;flex-wrap:wrap;">${btnWARow}${btnCarritoRow}</div>
         </div>
       </td>
+      <td class="r${n} stock-cell" data-label="Stock" style="text-align: right;">${stockVal}</td>
       <td class="r${n}" data-label="Precio ARS"><span class="precio-editable">$${p.precio.toLocaleString('es-AR')}</span>${btnARS}</td>
       <td class="ars-desc${n}" data-label="Con desc.">$${desc.toLocaleString('es-AR')}</td>
       <td class="usd${n}" data-label="USD">${celdaUSD}</td>
-      <td class="r${n}" data-label="Stock" style="white-space:nowrap;">${stockCellContent}</td>
     </tr>`;
   }).join('');
 }
@@ -2984,12 +2980,12 @@ function exportarCSV() {
   const tipo=document.getElementById('filtro-tipo').value;
   const secFn = SECCIONES[seccionActual] ? SECCIONES[seccionActual].test : () => true;
   const filtrados=productos.filter(p=>secFn(p)&&p.modelo.toLowerCase().includes(buscar)&&(tipo===''||p.modelo.includes(tipo)));
-  let csv=`Modelo,Precio ARS,ARS con ${descuentoPct}% desc.,USD Blue,Stock\n`;
+  let csv=`Modelo,Stock,Precio ARS,ARS con ${descuentoPct}% desc.,USD Blue\n`;
   filtrados.forEach(p=>{
     const desc=Math.round(p.precio*(1 - descuentoPct/100));
     const usd=dolarBlue?(p.precio/dolarBlue).toFixed(2):'';
-    const stockExp = (p.stock !== undefined && p.stock !== '') ? p.stock : '';
-    csv+=`"${p.modelo}",${p.precio},${desc},${usd},${stockExp}\n`;
+    const stock = p.stock !== undefined ? p.stock : '';
+    csv+=`"${p.modelo}",${stock},${p.precio},${desc},${usd}\n`;
   });
   const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
   const url=URL.createObjectURL(blob);
@@ -3228,46 +3224,6 @@ function eliminarModelo(idx) {
   guardarCatalogo();
   renderTabla();
 }
-function editarStock(idx, btn) {
-  const td = btn.closest('td');
-  const badge = td.querySelector('.stock-badge');
-  const valorActual = (productos[idx].stock !== undefined && productos[idx].stock !== null && productos[idx].stock !== '') ? productos[idx].stock : '';
-
-  if (badge) badge.style.display = 'none';
-  btn.style.display = 'none';
-
-  const input = document.createElement('input');
-  input.type = 'number';
-  input.className = 'stock-inline-input';
-  input.value = valorActual;
-  input.min = 0;
-  input.placeholder = '0';
-  td.insertBefore(input, btn);
-  input.focus();
-  input.select();
-
-  const confirmar = () => {
-    const raw = input.value.trim();
-    if (raw !== '' && !isNaN(parseInt(raw, 10)) && parseInt(raw, 10) >= 0) {
-      tomarSnapshot();
-      productos[idx].stock = parseInt(raw, 10);
-      guardarCatalogo();
-    } else if (raw === '') {
-      tomarSnapshot();
-      productos[idx].stock = '';
-      guardarCatalogo();
-    }
-    renderTabla();
-  };
-
-  input.addEventListener('keydown', e => {
-    if (e.key === 'Enter') confirmar();
-    if (e.key === 'Escape') renderTabla();
-  });
-  input.addEventListener('blur', confirmar);
-}
-
-
 
 
 function editarDescuento(btn) {
@@ -3428,8 +3384,12 @@ async function sincronizarSheets(mostrarLog) {
       const { headers, rows } = parsearCSVSheets(text);
       if (!headers.length || !rows.length) throw new Error('La hoja está vacía o no tiene datos.');
 
-      const { colNombre, colPrecio } = detectarColumnas(headers, 'catalogo');
-      if (mostrarLog) sheetLog(`   Columnas detectadas: "${headers[colNombre]}" → Modelo | "${headers[colPrecio]}" → Precio`, '');
+      const { colNombre, colPrecio, colStock } = detectarColumnas(headers, 'catalogo');
+      if (mostrarLog) {
+        let det = `   Columnas detectadas: "${headers[colNombre]}" → Modelo | "${headers[colPrecio]}" → Precio`;
+        if (colStock >= 0) det += ` | "${headers[colStock]}" → Stock`;
+        sheetLog(det, '');
+      }
 
       // Reemplazo completo: el catálogo local queda idéntico al de Sheets
       const nuevosProductos = [];
@@ -3437,9 +3397,9 @@ async function sincronizarSheets(mostrarLog) {
         const modelo = String(row[colNombre] || '').trim();
         const precio = parseFloat(String(row[colPrecio] || '').replace(/[^0-9.,]/g, '').replace(',', '.'));
         if (!modelo || isNaN(precio) || precio <= 0) return;
-        const stockRawCat = (typeof colStock !== 'undefined' && colStock >= 0) ? String(row[colStock] || '').trim() : '';
-        const stockCat = stockRawCat !== '' && !isNaN(parseInt(stockRawCat)) ? parseInt(stockRawCat) : '';
-        nuevosProductos.push({ modelo, precio, stock: stockCat, nueva: false });
+        const stockRaw = colStock >= 0 ? String(row[colStock] || '').trim() : '';
+        const stock = stockRaw !== '' ? parseInt(stockRaw) : '';
+        nuevosProductos.push({ modelo, precio, stock: isNaN(stock) ? '' : stock, nueva: false });
       });
       if (!nuevosProductos.length) throw new Error('Sheets no devolvió productos válidos.');
       productos = nuevosProductos;
