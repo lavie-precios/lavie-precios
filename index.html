@@ -35,7 +35,7 @@
   header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; flex-wrap: wrap; gap: 12px; }
   .logo { display: flex; align-items: center; gap: 10px; }
   .logo-icon { width: 36px; height: 36px; background: #cc2255; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; color: #fff; }
-  .logo-text { font-size: 20px; font-weight: 600; color: #fff; }
+  .logo-text { font-size: 22px; font-weight: 400; color: #fff; font-family: 'Anton', system-ui, sans-serif; letter-spacing: 0.5px; }
   .logo-sub { font-size: 12px; color: #888; margin-top: 1px; }
 
   .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 1.5rem; }
@@ -226,7 +226,7 @@
   /* Tablet (≤768px) */
   @media (max-width: 768px) {
     header { gap: 8px; }
-    .logo-text { font-size: 17px; }
+    .logo-text { font-size: 19px; }
 
     /* Header actions: wrap más ordenado */
     header > div { gap: 6px; }
@@ -989,6 +989,9 @@
     }
   }
 </style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
 </head>
 <body>
 
@@ -999,7 +1002,7 @@
 
   <header>
     <div class="logo">
-      <div class="logo-icon">L</div>
+
       <div>
         <div class="logo-text">Lavié Smartphones</div>
         <div class="logo-sub">Catálogo de repuestos · <span id="logo-total-modelos">1280</span> productos</div>
