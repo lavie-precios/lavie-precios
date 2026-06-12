@@ -1071,10 +1071,10 @@
         <thead>
           <tr>
             <th>Modelo</th>
+            <th class="r">Stock</th>
             <th class="r">Precio ARS</th>
             <th class="r">Con 5% desc. <span class="badge-desc">efectivo</span></th>
             <th class="r">USD blue</th>
-            <th class="r">Stock</th>
           </tr>
         </thead>
         <tbody id="tabla-body"></tbody>
@@ -2983,10 +2983,10 @@ function renderTabla() {
           <div style="display:flex;gap:5px;flex-wrap:wrap;">${btnWARow}${btnCarritoRow}</div>
         </div>
       </td>
+      <td class="r${n}" data-label="Stock" style="white-space:nowrap;">${stockCellContent}</td>
       <td class="r${n}" data-label="Precio ARS"><span class="precio-editable">$${p.precio.toLocaleString('es-AR')}</span>${btnARS}</td>
       <td class="ars-desc${n}" data-label="Con desc.">$${desc.toLocaleString('es-AR')}</td>
       <td class="usd${n}" data-label="USD">${celdaUSD}</td>
-      <td class="r${n}" data-label="Stock" style="white-space:nowrap;">${stockCellContent}</td>
     </tr>`;
   }).join('');
 }
@@ -3450,7 +3450,7 @@ async function sincronizarSheets(mostrarLog) {
       const { headers, rows } = parsearCSVSheets(text);
       if (!headers.length || !rows.length) throw new Error('La hoja está vacía o no tiene datos.');
 
-      const { colNombre, colPrecio } = detectarColumnas(headers, 'catalogo');
+      const { colNombre, colPrecio, colStock } = detectarColumnas(headers, 'catalogo');
       if (mostrarLog) sheetLog(`   Columnas detectadas: "${headers[colNombre]}" → Modelo | "${headers[colPrecio]}" → Precio`, '');
 
       // Reemplazo completo: el catálogo local queda idéntico al de Sheets
@@ -3459,7 +3459,7 @@ async function sincronizarSheets(mostrarLog) {
         const modelo = String(row[colNombre] || '').trim();
         const precio = parseFloat(String(row[colPrecio] || '').replace(/[^0-9.,]/g, '').replace(',', '.'));
         if (!modelo || isNaN(precio) || precio <= 0) return;
-        const stockRawCat = (typeof colStock !== 'undefined' && colStock >= 0) ? String(row[colStock] || '').trim() : '';
+        const stockRawCat = (colStock >= 0) ? String(row[colStock] || '').trim() : '';
         const stockCat = stockRawCat !== '' && !isNaN(parseInt(stockRawCat)) ? parseInt(stockRawCat) : '';
         nuevosProductos.push({ modelo, precio, stock: stockCat, nueva: false });
       });
