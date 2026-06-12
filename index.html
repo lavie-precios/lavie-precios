@@ -11,8 +11,11 @@
     background: #0f0f13;
     color: #f0f0f0;
     min-height: 100vh;
-    padding: 2rem 1rem;
+    padding: 0;
     position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
   }
   body::before {
     content: '';
@@ -30,7 +33,7 @@
     position: relative;
     z-index: 1;
   }
-  .container { max-width: 900px; margin: 0 auto; }
+  .container { max-width: 900px; margin: 0 auto; width: 100%; padding: 2rem 1rem; }
 
   header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; flex-wrap: wrap; gap: 12px; }
   .logo { display: flex; align-items: center; gap: 10px; }
@@ -929,25 +932,26 @@
 
   /* Logo imagen centrada */
   .logo-img-header {
+    width: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
     padding: 1.2rem 0 0.8rem 0;
+    /* Asegura que salga del flujo del container y ocupe todo el ancho */
+    position: relative;
+    left: 0;
+    right: 0;
   }
   .logo-img-header img {
     max-width: 280px;
     width: 100%;
     height: auto;
     border-radius: 12px;
+    display: block;
+    margin: 0 auto;
   }
 
-  /* Mobile (<=1024px): logo-img-header pasa a estar arriba del header centrado.
-     La imagen está fuera del .container en el HTML, así que usamos order en body
-     para reordenarla visualmente. body ya es flex (layout lateral) en desktop,
-     pero en mobile los paneles están ocultos, así que podemos aprovechar el flujo. */
   @media (max-width: 1024px) {
-    /* body ya es flex; en mobile side-panels están ocultos.
-       Hacemos body flex-column para que logo, container queden apilados */
     body {
       flex-direction: column;
       align-items: stretch;
