@@ -998,6 +998,23 @@
       margin: 0 auto;
     }
   }
+
+  /* Ocultar elementos en USD para usuarios no admin */
+  .usd-only-admin {
+    display: none !important;
+  }
+  body.admin-activo .usd-only-admin {
+    display: table-cell !important;
+  }
+  body.admin-activo div.usd-only-admin,
+  body.admin-activo span.usd-only-admin {
+    display: block !important;
+  }
+  @media (max-width: 768px) {
+    body.admin-activo td.usd-only-admin {
+      display: block !important;
+    }
+  }
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1093,7 +1110,7 @@
             <th class="r">Stock</th>
             <th class="r">Precio ARS</th>
             <th class="r">Con 5% desc. <span class="badge-desc">efectivo</span></th>
-            <th class="r">USD blue</th>
+            <th class="r usd-only-admin">USD blue</th>
           </tr>
         </thead>
         <tbody id="tabla-body"></tbody>
@@ -3030,7 +3047,7 @@ function renderTabla() {
       <td class="r${n}" data-label="Stock" style="white-space:nowrap;">${stockCellContent}</td>
       <td class="r${n}" data-label="Precio ARS"><span class="precio-editable">$${p.precio.toLocaleString('es-AR')}</span>${btnARS}</td>
       <td class="ars-desc${n}" data-label="Con desc.">$${desc.toLocaleString('es-AR')}</td>
-      <td class="usd${n}" data-label="USD">${celdaUSD}</td>
+      <td class="usd${n} usd-only-admin" data-label="USD">${celdaUSD}</td>
     </tr>`;
   }).join('');
 }
@@ -3641,7 +3658,7 @@ function renderAccesorios() {
     const imgHtml = a.imagen
       ? `<img class="acc-card-img" src="${a.imagen}" alt="${a.nombre}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" /><div class="acc-card-img-placeholder" style="display:none;">🛍️</div>`
       : `<div class="acc-card-img-placeholder">🛍️</div>`;
-    const usd = dolarBlue ? `<div class="acc-card-usd">U$D ${(a.precio/dolarBlue).toFixed(2)}</div>` : '';
+    const usd = dolarBlue ? `<div class="acc-card-usd usd-only-admin">U$D ${(a.precio/dolarBlue).toFixed(2)}</div>` : '';
     const stock = (a.stock !== undefined && a.stock !== '')
       ? `<div class="acc-card-stock ${a.stock==0?'sin':''}">${a.stock==0?'Sin stock':'Stock: '+a.stock}</div>` : '';
     return `<div class="acc-card">
@@ -3857,7 +3874,7 @@ function renderTelefonos() {
     const img = a.imagen
       ? `<img class="acc-card-img" src="${a.imagen}" alt="${a.nombre}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" /><div class="acc-card-img-placeholder" style="display:none;">📱</div>`
       : `<div class="acc-card-img-placeholder">📱</div>`;
-    const usd = dolarBlue ? `<div class="acc-card-usd">≈ USD ${(a.precio/dolarBlue).toFixed(0)}</div>` : '';
+    const usd = dolarBlue ? `<div class="acc-card-usd usd-only-admin">≈ USD ${(a.precio/dolarBlue).toFixed(0)}</div>` : '';
     const stockNum = parseInt(a.stock);
     const stock = a.stock !== '' && !isNaN(stockNum)
       ? `<div class="acc-card-stock${stockNum === 0 ? ' sin' : ''}">${stockNum === 0 ? '✗ Sin stock' : '✓ Stock: ' + stockNum}</div>` : '';
@@ -4003,7 +4020,7 @@ function cerrarCarrito() {
 function enviarPedidoWA() {
   if (!carrito.length) return;
   const total = carrito.reduce((s, c) => s + c.precio * c.qty, 0);
-  const usdLine = dolarBlue ? `\n💵 Total USD blue: ~U$D ${(total / dolarBlue).toFixed(2)}` : '';
+  const usdLine = (dolarBlue && adminActivo) ? `\n💵 Total USD blue: ~U$D ${(total / dolarBlue).toFixed(2)}` : '';
   let msg = `Hola! Quisiera hacer el siguiente pedido:\n\n`;
   carrito.forEach(item => {
     msg += `▪ *${item.modelo}*`;
@@ -4101,7 +4118,7 @@ if (tableWrap) {
         <span class="carrito-total-label">Total estimado</span>
         <div>
           <div class="carrito-total-val" id="carrito-total-ars">$0</div>
-          <div class="carrito-total-usd" id="carrito-total-usd"></div>
+          <div class="carrito-total-usd usd-only-admin" id="carrito-total-usd"></div>
         </div>
       </div>
       <button class="btn-pedir-wa" onclick="enviarPedidoWA()">
