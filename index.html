@@ -3134,7 +3134,8 @@ function renderTabla() {
     if (sinStock) {
       stockCellContent = `<span class="stock-badge sin-stock" title="Sin stock">✗ Sin Stock <span class="stock-cero">(0)</span></span>${btnEditStock}`;
     } else if (hayStock) {
-      stockCellContent = `<span class="stock-badge disponible" title="Stock disponible">✓ ${stockNum}</span>${btnEditStock}`;
+      const stockTexto = adminActivo ? `✓ ${stockNum}` : '✓ Stock disponible';
+      stockCellContent = `<span class="stock-badge disponible" title="Stock disponible">${stockTexto}</span>${btnEditStock}`;
     } else {
       stockCellContent = `<span class="stock-badge sin-info" title="Stock no cargado">— —</span>${btnEditStock}`;
     }
@@ -3240,7 +3241,7 @@ let descuentoPct = (() => {
 document.addEventListener('DOMContentLoaded', () => {
   const span = document.getElementById('descuento-val');
   if (span) span.textContent = descuentoPct;
-  const th = document.querySelector('thead th:nth-child(3)');
+  const th = document.querySelector('thead th:nth-child(4)');
   if (th) th.innerHTML = `Con ${descuentoPct}% desc. <span class="badge-desc">efectivo</span>`;
 });
 
@@ -3831,8 +3832,9 @@ function renderAccesorios() {
       ? `<img class="acc-card-img" src="${a.imagen}" alt="${a.nombre}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" /><div class="acc-card-img-placeholder" style="display:none;">🛍️</div>`
       : `<div class="acc-card-img-placeholder">🛍️</div>`;
     const usd = dolarBlue ? `<div class="acc-card-usd usd-only-admin">U$D ${(a.precio/dolarBlue).toFixed(2)}</div>` : '';
+    const stockTexto = a.stock == 0 ? 'Sin stock' : (adminActivo ? 'Stock: ' + a.stock : 'Stock disponible');
     const stock = (a.stock !== undefined && a.stock !== '')
-      ? `<div class="acc-card-stock ${a.stock==0?'sin':''}">${a.stock==0?'Sin stock':'Stock: '+a.stock}</div>` : '';
+      ? `<div class="acc-card-stock ${a.stock==0?'sin':''}">${stockTexto}</div>` : '';
     return `<div class="acc-card">
       ${imgHtml}
       <div class="acc-card-body">
@@ -4290,8 +4292,9 @@ function renderTelefonos() {
       : `<div class="acc-card-img-placeholder">📱</div>`;
     const usd = dolarBlue ? `<div class="acc-card-usd usd-only-admin">≈ USD ${(a.precio/dolarBlue).toFixed(0)}</div>` : '';
     const stockNum = parseInt(a.stock);
+    const stockTexto = stockNum === 0 ? '✗ Sin stock' : (adminActivo ? '✓ Stock: ' + stockNum : '✓ Stock disponible');
     const stock = a.stock !== '' && !isNaN(stockNum)
-      ? `<div class="acc-card-stock${stockNum === 0 ? ' sin' : ''}">${stockNum === 0 ? '✗ Sin stock' : '✓ Stock: ' + stockNum}</div>` : '';
+      ? `<div class="acc-card-stock${stockNum === 0 ? ' sin' : ''}">${stockTexto}</div>` : '';
     return `<div class="acc-card ${adminClass}">
       ${img}
       <div class="acc-card-body">
