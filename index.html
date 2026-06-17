@@ -4185,7 +4185,7 @@ function eliminarCliente(i) {
   clientes.splice(i, 1);
   guardarClientes();
   renderClientes();
-  syncToSheet({ sheet: 'clientes', action: 'delete', campo: 'nombre', valor: nombre });
+  syncToSheet({ sheet: 'clientes', action: 'delete', campo: 'Nombre', valor: nombre });
 }
 
 function guardarCliente() {
@@ -4225,9 +4225,17 @@ function guardarCliente() {
   syncToSheet({ 
     sheet: 'clientes', 
     action: 'upsert', 
-    campo: 'nombre', 
+    campo: 'Nombre', 
     valor: nombreOriginal,
-    item: cli 
+    item: {
+      Nombre: cli.nombre,
+      Telefono: cli.telefono,
+      Email: cli.email,
+      Direccion: cli.direccion,
+      ComprasMes: cli.compras_mes,
+      Saldo: cli.saldo,
+      Notas: cli.notas
+    }
   });
 }
 
