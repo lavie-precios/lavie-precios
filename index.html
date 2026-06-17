@@ -1208,6 +1208,19 @@
       <input type="text" id="cli-compras-mes" placeholder="Ej: 2 pantallas Oled, 1 batería" style="width:100%;background:#0f0f13;border:1px solid #2a2a35;color:#f0f0f0;border-radius:8px;padding:8px 12px;font-size:13px;outline:none;font-family:inherit;" />
     </div>
 
+    <div style="margin-bottom:0.8rem; border: 1px solid #2a2a35; padding: 10px; border-radius: 8px; background: #1a1a22;">
+      <label style="font-size:11px;color:#888;display:block;margin-bottom:6px;font-weight:600;">🛒 Cargar producto del catálogo</label>
+      <div style="display:flex; gap:6px; margin-bottom: 6px;">
+        <select id="cli-sel-producto" style="flex:1; background:#0f0f13; border:1px solid #2a2a35; color:#f0f0f0; border-radius:8px; padding:6px 10px; font-size:12px; outline:none; font-family:inherit; max-width: 70%;">
+          <!-- Options cargadas dinámicamente -->
+        </select>
+        <button class="btn-primary" type="button" style="font-size:11px; padding:6px 12px; margin:0;" onclick="agregarProductoACompras()">＋ Agregar</button>
+      </div>
+      <label style="font-size:11px; color:#aaa; display:flex; align-items:center; gap:6px; cursor:pointer; user-select:none;">
+        <input type="checkbox" id="cli-restar-saldo" checked style="accent-color:#cc2255;" /> Registrar como deuda (restar del saldo)
+      </label>
+    </div>
+
     <div style="margin-bottom:0.8rem;">
       <label style="font-size:12px;color:#888;display:block;margin-bottom:4px;">Saldo (ARS) (+ a favor, - deuda)</label>
       <input type="number" id="cli-saldo" placeholder="Ej: 15000 (a favor) o -5000 (deuda)" style="width:100%;background:#0f0f13;border:1px solid #2a2a35;color:#f0f0f0;border-radius:8px;padding:8px 12px;font-size:13px;outline:none;font-family:inherit;" />
@@ -4093,6 +4106,11 @@ function abrirModalCliente(idx) {
   document.getElementById('cli-saldo').value = '';
   document.getElementById('cli-notes').value = '';
   document.getElementById('estado-cli').textContent = '';
+  
+  // Llenar selector de productos del catálogo
+  llenarSelectProductos();
+  const checkboxRestar = document.getElementById('cli-restar-saldo');
+  if (checkboxRestar) checkboxRestar.checked = true;
 
   if (esEdit) {
     const c = clientes[idx];
@@ -4108,6 +4126,50 @@ function abrirModalCliente(idx) {
   }
   document.getElementById('modal-cli-overlay').classList.add('visible');
   setTimeout(() => document.getElementById('cli-nombre').focus(), 100);
+}
+
+function llenarSelectProductos() {
+  const sel = document.getElementById('cli-sel-producto');
+  if (!sel) return;
+  
+  const items = [];
+  productos.forEach(p => items.push({ label: `[Repuesto] ${p.modelo} — $${p.precio.toLocaleString('es-AR')}`, name: p.modelo, precio: p.precio }));
+  accesorios.forEach(a => items.push({ label: `[Accesorio] ${a.nombre} — $${a.precio.toLocaleString('es-AR')}`, name: a.nombre, precio: a.precio }));
+  telefonos.forEach(t => items.push({ label: `[Teléfono] ${t.nombre} — $${t.precio.toLocaleString('es-AR')}`, name: t.nombre, precio: t.precio }));
+  
+  items.sort((a, b) => a.label.localeCompare(b.label));
+  
+  sel.innerHTML = '<option value="">-- Seleccionar producto --</option>' + 
+    items.map((it, idx) => `<option value="${idx}">${it.label}</option>`).join('');
+  sel._items = items;
+}
+
+function agregarProductoACompras() {
+  const sel = document.getElementById('cli-sel-producto');
+  if (!sel || sel.value === '') return;
+  const idx = parseInt(sel.value);
+  const item = sel._items[idx];
+  if (!item) return;
+
+  const comprasInput = document.getElementById('cli-compras-mes');
+  const actual = comprasInput.value.trim();
+  const textoAgregar = `${item.name} ($${item.precio.toLocaleString('es-AR')})`;
+  
+  if (actual === '') {
+    comprasInput.value = textoAgregar;
+  } else {
+    comprasInput.value = actual + ', ' + textoAgregar;
+  }
+
+  const checkboxRestar = document.getElementById('cli-restar-saldo');
+  if (checkboxRestar && checkboxRestar.checked) {
+    const saldoInput = document.getElementById('cli-saldo');
+    let saldoActual = parseFloat(saldoInput.value);
+    if (isNaN(saldoActual)) saldoActual = 0;
+    saldoInput.value = saldoActual - item.precio;
+  }
+  
+  sel.value = '';
 }
 
 function cerrarModalCliente() {
