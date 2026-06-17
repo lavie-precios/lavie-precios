@@ -1073,6 +1073,14 @@
       <div class="card-value" id="total-modelos">1280</div>
       <div class="card-sub">en catálogo</div>
     </div>
+    <div class="card" id="card-clientes" style="display:none; flex-direction:column; justify-content:center;">
+      <div class="card-label">Clientes registrados</div>
+      <div class="card-value" style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+        <span id="total-clientes-card">0</span>
+        <button class="btn-sheets" style="margin:0; padding:6px 10px; font-size:11px; font-weight:600; border-radius:6px; display:inline-flex; align-items:center; gap:4px; cursor:pointer;" onclick="cambiarSeccion('clientes', this)">👥 Ir a Clientes</button>
+      </div>
+      <div class="card-sub">base de datos</div>
+    </div>
   </div>
 
   <div class="toolbar">
@@ -1140,8 +1148,83 @@
     </div>
   </div>
 
+  <!-- Sección Clientes (tabla para listado de clientes) -->
+  <div id="seccion-clientes" style="display:none;">
+    <div class="acc-toolbar" id="cli-toolbar-admin" style="display:none;">
+      <button class="btn-acc-nuevo" onclick="abrirModalCliente()">➕ Agregar cliente</button>
+      <button class="btn-acc-export" id="btn-export-clientes" onclick="exportarClientesCSV()">📦 Exportar clientes CSV</button>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Teléfono</th>
+            <th>Email</th>
+            <th>Dirección</th>
+            <th>Compras del Mes</th>
+            <th>Saldo</th>
+            <th>Notas / Observaciones</th>
+            <th class="cli-actions-header" style="display:none;">Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="clientes-tabla-body"></tbody>
+      </table>
+    </div>
+  </div>
+
   <p class="status" id="estado-api"></p>
 
+</div>
+
+<!-- MODAL CLIENTE -->
+<div class="modal-overlay" id="modal-cli-overlay">
+  <div class="modal" style="max-width:480px;">
+    <h3 id="modal-cli-titulo">➕ Nuevo cliente</h3>
+    <p class="modal-desc">Completá los datos del cliente.</p>
+
+    <div style="margin-bottom:0.8rem;">
+      <label style="font-size:12px;color:#888;display:block;margin-bottom:4px;">Nombre *</label>
+      <input type="text" id="cli-nombre" placeholder="Nombre completo" style="width:100%;background:#0f0f13;border:1px solid #2a2a35;color:#f0f0f0;border-radius:8px;padding:8px 12px;font-size:13px;outline:none;font-family:inherit;" />
+    </div>
+
+    <div style="margin-bottom:0.8rem;">
+      <label style="font-size:12px;color:#888;display:block;margin-bottom:4px;">Teléfono</label>
+      <input type="text" id="cli-telefono" placeholder="Ej: +54 9 362 4266977" style="width:100%;background:#0f0f13;border:1px solid #2a2a35;color:#f0f0f0;border-radius:8px;padding:8px 12px;font-size:13px;outline:none;font-family:inherit;" />
+    </div>
+
+    <div style="margin-bottom:0.8rem;">
+      <label style="font-size:12px;color:#888;display:block;margin-bottom:4px;">Email</label>
+      <input type="email" id="cli-email" placeholder="correo@ejemplo.com" style="width:100%;background:#0f0f13;border:1px solid #2a2a35;color:#f0f0f0;border-radius:8px;padding:8px 12px;font-size:13px;outline:none;font-family:inherit;" />
+    </div>
+
+    <div style="margin-bottom:0.8rem;">
+      <label style="font-size:12px;color:#888;display:block;margin-bottom:4px;">Dirección / Localidad</label>
+      <input type="text" id="cli-direccion" placeholder="Ej: Resistencia, Chaco" style="width:100%;background:#0f0f13;border:1px solid #2a2a35;color:#f0f0f0;border-radius:8px;padding:8px 12px;font-size:13px;outline:none;font-family:inherit;" />
+    </div>
+
+    <div style="margin-bottom:0.8rem;">
+      <label style="font-size:12px;color:#888;display:block;margin-bottom:4px;">Compras del Mes</label>
+      <input type="text" id="cli-compras-mes" placeholder="Ej: 2 pantallas Oled, 1 batería" style="width:100%;background:#0f0f13;border:1px solid #2a2a35;color:#f0f0f0;border-radius:8px;padding:8px 12px;font-size:13px;outline:none;font-family:inherit;" />
+    </div>
+
+    <div style="margin-bottom:0.8rem;">
+      <label style="font-size:12px;color:#888;display:block;margin-bottom:4px;">Saldo (ARS) (+ a favor, - deuda)</label>
+      <input type="number" id="cli-saldo" placeholder="Ej: 15000 (a favor) o -5000 (deuda)" style="width:100%;background:#0f0f13;border:1px solid #2a2a35;color:#f0f0f0;border-radius:8px;padding:8px 12px;font-size:13px;outline:none;font-family:inherit;" />
+    </div>
+
+    <div style="margin-bottom:0.8rem;">
+      <label style="font-size:12px;color:#888;display:block;margin-bottom:4px;">Notas / Observaciones</label>
+      <textarea id="cli-notes" placeholder="Ej: Cliente mayorista..." style="width:100%;height:60px;background:#0f0f13;border:1px solid #2a2a35;color:#f0f0f0;border-radius:8px;padding:8px 12px;font-size:13px;outline:none;font-family:inherit;resize:vertical;"></textarea>
+    </div>
+
+    <p class="status" id="estado-cli" style="margin-top:6px;"></p>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="cerrarModalCliente()">Cancelar</button>
+      <button class="btn-primary" onclick="guardarCliente()">💾 Guardar</button>
+    </div>
+  </div>
 </div>
 
 <!-- MODAL ACCESORIO -->
@@ -2929,6 +3012,7 @@ const SECCIONES = {
   camaras:   { label: 'Cámaras traseras',      test: p => esCamara(p) },
   telefonos: { label: 'Teléfonos' },
   accesorios:{ label: 'Accesorios' },
+  clientes:  { label: 'Clientes' },
 };
 function esBateria(p) { return /bater[ií]a/i.test(p.modelo); }
 function esFlex(p)    { return /flex de carga/i.test(p.modelo); }
@@ -2943,30 +3027,35 @@ function cambiarSeccion(sec, btn) {
 
   const esAcc = sec === 'accesorios';
   const esTel = sec === 'telefonos';
-  const esGrilla = esAcc || esTel;
+  const esCli = sec === 'clientes';
+  const esGrilla = esAcc || esTel || esCli;
 
   document.getElementById('seccion-tabla').style.display = esGrilla ? 'none' : '';
   document.getElementById('seccion-accesorios').style.display = esAcc ? '' : 'none';
   document.getElementById('seccion-telefonos').style.display = esTel ? '' : 'none';
+  document.getElementById('seccion-clientes').style.display = esCli ? '' : 'none';
 
   // Toolbars admin
   const accAdmin = document.getElementById('acc-toolbar-admin');
   if (accAdmin) accAdmin.style.display = (esAcc && adminActivo) ? 'flex' : 'none';
   const telAdmin = document.getElementById('tel-toolbar-admin');
   if (telAdmin) telAdmin.style.display = (esTel && adminActivo) ? 'flex' : 'none';
+  const cliAdmin = document.getElementById('cli-toolbar-admin');
+  if (cliAdmin) cliAdmin.style.display = (esCli && adminActivo) ? 'flex' : 'none';
 
-  // Ocultar barra búsqueda en grillas
+  // Ocultar barra búsqueda en grillas/clientes
   document.getElementById('buscar').closest('.toolbar').style.display = esGrilla ? 'none' : '';
 
   // Botón exportar de la derecha (solo catálogo tabla)
   const btnExp = document.getElementById('btn-export-toolbar');
   if (btnExp) {
-    btnExp.textContent = '⬇ Exportar CSV';
+    btnExp.textContent = esCli ? '📦 Exportar clientes CSV' : (esAcc ? '📦 Exportar accesorios CSV' : '⬇ Exportar CSV');
     btnExp.style.display = (!esGrilla && adminActivo) ? 'flex' : 'none';
   }
 
   if (esAcc) renderAccesorios();
   else if (esTel) renderTelefonos();
+  else if (esCli) renderClientes();
   else renderTabla();
 }
 
@@ -3076,6 +3165,8 @@ function exportarCSV() {
 function exportarSegunSeccion() {
   if (seccionActual === 'accesorios') {
     exportarAccesoriosCSV();
+  } else if (seccionActual === 'clientes') {
+    exportarClientesCSV();
   } else {
     exportarCSV();
   }
@@ -3190,13 +3281,18 @@ function activarModoAdmin() {
   const btnExp2 = document.getElementById('btn-export-toolbar');
   if (btnExp2) {
     btnExp2.style.display = 'flex';
-    btnExp2.textContent = seccionActual === 'accesorios' ? '📦 Exportar accesorios CSV' : '⬇ Exportar CSV';
+    btnExp2.textContent = seccionActual === 'clientes' ? '📦 Exportar clientes CSV' : (seccionActual === 'accesorios' ? '📦 Exportar accesorios CSV' : '⬇ Exportar CSV');
   }
   const btnAdmin = document.getElementById('btn-admin');
   btnAdmin.textContent = '🔓 Cerrar sesión';
   btnAdmin.classList.add('logged');
   document.body.classList.add('admin-activo');
-  // Accesorios / Teléfonos
+  
+  // Mostrar tarjeta Clientes en el header
+  const cardCli = document.getElementById('card-clientes');
+  if (cardCli) cardCli.style.display = 'flex';
+
+  // Accesorios / Teléfonos / Clientes
   if (seccionActual === 'accesorios') {
     document.getElementById('acc-toolbar-admin').style.display = 'flex';
     renderAccesorios();
@@ -3204,6 +3300,10 @@ function activarModoAdmin() {
   if (seccionActual === 'telefonos') {
     document.getElementById('tel-toolbar-admin').style.display = 'flex';
     renderTelefonos();
+  }
+  if (seccionActual === 'clientes') {
+    document.getElementById('cli-toolbar-admin').style.display = 'flex';
+    renderClientes();
   }
 }
 
@@ -3214,13 +3314,21 @@ function cerrarSesion() {
   document.getElementById('btn-export-toolbar').style.display = 'none';
   const telAdminBar = document.getElementById('tel-toolbar-admin');
   if (telAdminBar) telAdminBar.style.display = 'none';
+  const cliAdminBar = document.getElementById('cli-toolbar-admin');
+  if (cliAdminBar) cliAdminBar.style.display = 'none';
   const btnAdmin = document.getElementById('btn-admin');
   btnAdmin.textContent = '🔒 Admin';
   btnAdmin.classList.remove('logged');
   document.body.classList.remove('admin-activo');
-  // Accesorios
+  
+  // Ocultar tarjeta Clientes en el header
+  const cardCli = document.getElementById('card-clientes');
+  if (cardCli) cardCli.style.display = 'none';
+
+  // Accesorios / Clientes
   document.getElementById('acc-toolbar-admin').style.display = 'none';
   if (seccionActual === 'accesorios') renderAccesorios();
+  if (seccionActual === 'clientes') renderClientes();
 }
 
 // ── EDICIÓN INLINE DE PRECIOS ─────────────────────────────────────────────────
@@ -3393,15 +3501,17 @@ function cargarURLsSheets() {
       const parsed = JSON.parse(r);
       // Si el admin no guardó URL de catálogo, usar la default hardcodeada
       if (!parsed.catalogo) parsed.catalogo = SHEETS_URL_CATALOGO_DEFAULT;
+      if (!parsed.clientes) parsed.clientes = '';
       return parsed;
     }
   } catch(e) {}
-  return { catalogo: SHEETS_URL_CATALOGO_DEFAULT, accesorios: '' };
+  return { catalogo: SHEETS_URL_CATALOGO_DEFAULT, accesorios: '', clientes: '' };
 }
 function guardarURLsSheets() {
   const urlCat = document.getElementById('sheets-url-catalogo').value.trim();
   const urlAcc = document.getElementById('sheets-url-accesorios').value.trim();
-  try { localStorage.setItem(STORAGE_SHEETS_KEY, JSON.stringify({ catalogo: urlCat, accesorios: urlAcc })); } catch(e) {}
+  const urlCli = document.getElementById('sheets-url-clientes').value.trim();
+  try { localStorage.setItem(STORAGE_SHEETS_KEY, JSON.stringify({ catalogo: urlCat, accesorios: urlAcc, clientes: urlCli })); } catch(e) {}
   const el = document.getElementById('estado-sheets');
   el.className = 'status ok'; el.textContent = '✓ URLs guardadas correctamente.';
 }
@@ -3410,6 +3520,7 @@ function abrirModalSheets() {
   const urls = cargarURLsSheets();
   document.getElementById('sheets-url-catalogo').value = urls.catalogo || '';
   document.getElementById('sheets-url-accesorios').value = urls.accesorios || '';
+  document.getElementById('sheets-url-clientes').value = urls.clientes || '';
   document.getElementById('estado-sheets').textContent = '';
   document.getElementById('sheets-log').className = 'sheets-sync-log';
   document.getElementById('sheets-log').innerHTML = '';
@@ -3481,10 +3592,12 @@ async function sincronizarSheets(mostrarLog) {
   // Si se llama desde el modal, leer los inputs también
   const urlCatInput = document.getElementById('sheets-url-catalogo');
   const urlAccInput = document.getElementById('sheets-url-accesorios');
+  const urlCliInput = document.getElementById('sheets-url-clientes');
   if (urlCatInput) urls.catalogo = urlCatInput.value.trim() || urls.catalogo;
   if (urlAccInput) urls.accesorios = urlAccInput.value.trim() || urls.accesorios;
+  if (urlCliInput) urls.clientes = urlCliInput.value.trim() || urls.clientes;
 
-  if (!urls.catalogo && !urls.accesorios) {
+  if (!urls.catalogo && !urls.accesorios && !urls.clientes) {
     if (mostrarLog) {
       const el = document.getElementById('estado-sheets');
       el.className = 'status err'; el.textContent = '✗ No hay URLs configuradas. Ingresá al menos una.';
@@ -3498,7 +3611,7 @@ async function sincronizarSheets(mostrarLog) {
   const logEl = document.getElementById('sheets-log');
   if (mostrarLog && logEl) { logEl.className = 'sheets-sync-log visible'; logEl.innerHTML = ''; }
 
-  let totalCat = 0, totalAcc = 0, errores = 0;
+  let totalCat = 0, totalAcc = 0, totalCli = 0, errores = 0;
 
   // ── Sincronizar catálogo principal ─────────────────────────────────────────
   if (urls.catalogo) {
@@ -3592,12 +3705,58 @@ async function sincronizarSheets(mostrarLog) {
     }
   }
 
+  // ── Sincronizar clientes ────────────────────────────────────────────────────
+  if (urls.clientes) {
+    if (mostrarLog) sheetLog('👥 Leyendo hoja de clientes...', 'info');
+    try {
+      const urlCli = urls.clientes + (urls.clientes.includes('?') ? '&' : '?') + '_t=' + Date.now();
+      const resp = await fetch(urlCli, { cache: 'no-store' });
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      const text = await resp.text();
+      const { headers, rows } = parsearCSVSheets(text);
+      if (!headers.length || !rows.length) throw new Error('La hoja está vacía o no tiene datos.');
+
+      const h = headers.map(x => String(x).toLowerCase().trim());
+      const colNombre = h.findIndex(x => ['nombre', 'name', 'cliente'].some(k => x.includes(k)));
+      const colTel = h.findIndex(x => ['telefono', 'teléfono', 'phone', 'celular', 'tel'].some(k => x.includes(k)));
+      const colEmail = h.findIndex(x => ['email', 'correo', 'mail'].some(k => x.includes(k)));
+      const colDir = h.findIndex(x => ['direccion', 'dirección', 'localidad', 'ciudad', 'address'].some(k => x.includes(k)));
+      const colCompras = h.findIndex(x => ['compras', 'comprasmes', 'compras del mes', 'comprado'].some(k => x.includes(k)));
+      const colSaldo = h.findIndex(x => ['saldo', 'deuda', 'balance'].some(k => x.includes(k)));
+      const colNotas = h.findIndex(x => ['notas', 'observaciones', 'nota', 'observacion', 'notes', 'comentarios'].some(k => x.includes(k)));
+
+      const nuevosClientes = [];
+      rows.forEach(row => {
+        const nombre = String(row[colNombre >= 0 ? colNombre : 0] || '').trim();
+        if (!nombre) return;
+        const telefono = colTel >= 0 ? String(row[colTel] || '').trim() : '';
+        const email = colEmail >= 0 ? String(row[colEmail] || '').trim() : '';
+        const direccion = colDir >= 0 ? String(row[colDir] || '').trim() : '';
+        const compras_mes = colCompras >= 0 ? String(row[colCompras] || '').trim() : '';
+        const saldoRaw = colSaldo >= 0 ? String(row[colSaldo] || '').trim() : '';
+        const saldo = saldoRaw !== '' ? parseFloat(saldoRaw.replace(/[^0-9.-]/g, '').replace(',', '.')) : '';
+        const notas = colNotas >= 0 ? String(row[colNotas] || '').trim() : '';
+        nuevosClientes.push({ nombre, telefono, email, direccion, compras_mes, saldo, notas });
+      });
+
+      clientes = nuevosClientes;
+      totalCli = clientes.length;
+      guardarClientes();
+      if (seccionActual === 'clientes') renderClientes();
+      if (mostrarLog) sheetLog(`   ✓ Clientes reemplazados: ${totalCli} clientes cargados desde Sheets.`, 'ok');
+    } catch(e) {
+      errores++;
+      if (mostrarLog) sheetLog('   ✗ Error clientes: ' + e.message, 'err');
+    }
+  }
+
   if (btnSync) { btnSync.disabled = false; btnSync.textContent = '🔄 Sincronizar ahora'; }
 
   // Estado final
   const resumen = [];
   if (totalCat) resumen.push(totalCat + ' productos en catálogo');
   if (totalAcc) resumen.push(totalAcc + ' accesorios');
+  if (totalCli) resumen.push(totalCli + ' clientes');
   const elEstado = document.getElementById('estado-sheets') || document.getElementById('estado-api');
   if (elEstado && mostrarLog) {
     elEstado.className = errores ? 'status err' : 'status ok';
@@ -3607,7 +3766,7 @@ async function sincronizarSheets(mostrarLog) {
   }
 
   // Actualizar el estado general de la página también
-  if (!mostrarLog && (totalCat || totalAcc) && !errores) {
+  if (!mostrarLog && (totalCat || totalAcc || totalCli) && !errores) {
     const el = document.getElementById('estado-api');
     if (el) { el.className = 'status ok'; el.textContent = '✓ Datos sincronizados desde Google Sheets.'; }
   }
@@ -3619,7 +3778,7 @@ async function sincronizarSheets(mostrarLog) {
 // Auto-sincronizar al cargar si hay URLs guardadas
 window.addEventListener('load', () => {
   const urls = cargarURLsSheets();
-  if (urls.catalogo || urls.accesorios) {
+  if (urls.catalogo || urls.accesorios || urls.clientes) {
     const el = document.getElementById('estado-api');
     if (el) { el.className = 'status info'; el.textContent = '🔄 Sincronizando con Google Sheets...'; }
     sincronizarSheets(false);
@@ -3847,6 +4006,191 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // ── FIN ACCESORIOS ───────────────────────────────────────────────────────────
 
+// ── CLIENTES ─────────────────────────────────────────────────────────────────
+const STORAGE_CLI_KEY = 'lavie_clientes_v1';
+let clientes = [];
+let cliEditandoIdx = null;
+
+function cargarClientes() {
+  try {
+    const raw = localStorage.getItem(STORAGE_CLI_KEY);
+    if (raw) { const d = JSON.parse(raw); if (Array.isArray(d)) return d; }
+  } catch(e) {}
+  return [];
+}
+function guardarClientes() {
+  try { localStorage.setItem(STORAGE_CLI_KEY, JSON.stringify(clientes)); } catch(e) {}
+  actualizarContadorClientes();
+}
+
+function actualizarContadorClientes() {
+  const n = clientes.length;
+  const el = document.getElementById('total-clientes-card');
+  if (el) el.textContent = n;
+}
+
+clientes = cargarClientes();
+actualizarContadorClientes();
+
+function renderClientes() {
+  const tbody = document.getElementById('clientes-tabla-body');
+  if (!tbody) return;
+  
+  const headers = document.querySelectorAll('.cli-actions-header');
+  headers.forEach(h => h.style.display = adminActivo ? '' : 'none');
+
+  if (!clientes.length) {
+    tbody.innerHTML = `<tr><td colspan="${adminActivo ? 8 : 7}" style="text-align:center;color:#555;padding:2rem;">No hay clientes cargados todavía.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = clientes.map((c, i) => {
+    const accionesHtml = adminActivo 
+      ? `<td class="r" data-label="Acciones" style="white-space:nowrap;">
+          <button class="btn-editar-precio" style="margin-right:5px;" onclick="editarCliente(${i})" title="Editar">✏️</button>
+          <button class="btn-eliminar-modelo" onclick="eliminarCliente(${i})" title="Eliminar">🗑️</button>
+         </td>`
+      : '';
+    
+    // Formatear saldo
+    const saldoNum = parseFloat(c.saldo);
+    let saldoHtml = '<span style="color:#888;">—</span>';
+    if (!isNaN(saldoNum)) {
+      if (saldoNum > 0) {
+        saldoHtml = `<span class="stock-badge disponible" style="font-weight:600;">+$${saldoNum.toLocaleString('es-AR')} (a favor)</span>`;
+      } else if (saldoNum < 0) {
+        saldoHtml = `<span class="stock-badge sin-stock" style="font-weight:600;">-$${Math.abs(saldoNum).toLocaleString('es-AR')} (deuda)</span>`;
+      } else {
+        saldoHtml = '<span class="stock-badge sin-info" style="color:#888;">Al día</span>';
+      }
+    }
+
+    return `<tr>
+      <td data-label="Nombre" style="font-weight:600;">${c.nombre || '—'}</td>
+      <td data-label="Teléfono">${c.telefono || '—'}</td>
+      <td data-label="Email">${c.email || '—'}</td>
+      <td data-label="Dirección">${c.direccion || '—'}</td>
+      <td data-label="Compras del Mes">${c.compras_mes || '—'}</td>
+      <td data-label="Saldo">${saldoHtml}</td>
+      <td data-label="Notas">${c.notas || '—'}</td>
+      ${accionesHtml}
+    </tr>`;
+  }).join('');
+}
+
+function abrirModalCliente(idx) {
+  cliEditandoIdx = idx !== undefined ? idx : null;
+  const esEdit = cliEditandoIdx !== null;
+
+  const titulo = document.getElementById('modal-cli-titulo');
+  titulo.textContent = esEdit ? '✏️ Editar cliente' : '➕ Nuevo cliente';
+
+  document.getElementById('cli-nombre').value = '';
+  document.getElementById('cli-telefono').value = '';
+  document.getElementById('cli-email').value = '';
+  document.getElementById('cli-direccion').value = '';
+  document.getElementById('cli-compras-mes').value = '';
+  document.getElementById('cli-saldo').value = '';
+  document.getElementById('cli-notes').value = '';
+  document.getElementById('estado-cli').textContent = '';
+
+  if (esEdit) {
+    const c = clientes[idx];
+    if (c) {
+      document.getElementById('cli-nombre').value = c.nombre || '';
+      document.getElementById('cli-telefono').value = c.telefono || '';
+      document.getElementById('cli-email').value = c.email || '';
+      document.getElementById('cli-direccion').value = c.direccion || '';
+      document.getElementById('cli-compras-mes').value = c.compras_mes || '';
+      document.getElementById('cli-saldo').value = c.saldo !== undefined ? c.saldo : '';
+      document.getElementById('cli-notes').value = c.notas || '';
+    }
+  }
+  document.getElementById('modal-cli-overlay').classList.add('visible');
+  setTimeout(() => document.getElementById('cli-nombre').focus(), 100);
+}
+
+function cerrarModalCliente() {
+  document.getElementById('modal-cli-overlay').classList.remove('visible');
+  cliEditandoIdx = null;
+}
+
+function editarCliente(i) { abrirModalCliente(i); }
+
+function eliminarCliente(i) {
+  const nombre = clientes[i].nombre;
+  if (!confirm(`¿Eliminar al cliente "${nombre}"?`)) return;
+  clientes.splice(i, 1);
+  guardarClientes();
+  renderClientes();
+  syncToSheet({ sheet: 'clientes', action: 'delete', campo: 'nombre', valor: nombre });
+}
+
+function guardarCliente() {
+  const nombre = document.getElementById('cli-nombre').value.trim();
+  const telefono = document.getElementById('cli-telefono').value.trim();
+  const email = document.getElementById('cli-email').value.trim();
+  const direccion = document.getElementById('cli-direccion').value.trim();
+  const compras_mes = document.getElementById('cli-compras-mes').value.trim();
+  const saldoVal = document.getElementById('cli-saldo').value.trim();
+  const notas = document.getElementById('cli-notes').value.trim();
+  const estado = document.getElementById('estado-cli');
+
+  if (!nombre) { estado.className='status err'; estado.textContent='✗ El nombre es obligatorio.'; return; }
+
+  const cli = { 
+    nombre, 
+    telefono, 
+    email, 
+    direccion, 
+    compras_mes, 
+    saldo: saldoVal !== '' ? parseFloat(saldoVal) : '', 
+    notas 
+  };
+  let nombreOriginal = nombre;
+
+  if (cliEditandoIdx !== null) {
+    nombreOriginal = clientes[cliEditandoIdx].nombre;
+    clientes[cliEditandoIdx] = cli;
+  } else {
+    clientes.push(cli);
+  }
+
+  guardarClientes();
+  cerrarModalCliente();
+  renderClientes();
+
+  syncToSheet({ 
+    sheet: 'clientes', 
+    action: 'upsert', 
+    campo: 'nombre', 
+    valor: nombreOriginal,
+    item: cli 
+  });
+}
+
+function exportarClientesCSV() {
+  if (!clientes.length) { alert('No hay clientes para exportar.'); return; }
+  let csv = 'Nombre,Telefono,Email,Direccion,ComprasMes,Saldo,Notas\n';
+  clientes.forEach(c => {
+    const nombre = String(c.nombre || '').replace(/"/g, '""');
+    const telefono = String(c.telefono || '').replace(/"/g, '""');
+    const email = String(c.email || '').replace(/"/g, '""');
+    const direccion = String(c.direccion || '').replace(/"/g, '""');
+    const compras = String(c.compras_mes || '').replace(/"/g, '""');
+    const saldo = c.saldo !== undefined && c.saldo !== '' ? c.saldo : '';
+    const notas = String(c.notas || '').replace(/"/g, '""');
+    csv += `"${nombre}","${telefono}","${email}","${direccion}","${compras}",${saldo},"${notas}"\n`;
+  });
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'lavie_clientes.csv';
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a); URL.revokeObjectURL(url);
+}
+// ── FIN CLIENTES ─────────────────────────────────────────────────────────────
+
 // ── TELÉFONOS ─────────────────────────────────────────────────────────────────
 const STORAGE_TEL_KEY = 'lavie_telefonos_v1';
 let telefonos = [];
@@ -4071,6 +4415,12 @@ if (tableWrap) {
       <label>URL CSV — Accesorios</label>
       <input type="url" id="sheets-url-accesorios" placeholder="https://docs.google.com/spreadsheets/d/.../pub?output=csv" />
       <div class="sheets-hint">La hoja debe tener columnas: <strong style="color:#ccc;">Nombre</strong>, <strong style="color:#ccc;">Precio</strong>, <strong style="color:#ccc;">Stock</strong> (opcional), <strong style="color:#ccc;">Imagen</strong> (URL, opcional) y <strong style="color:#ccc;">Categoria</strong> (opcional: <em>accesorio</em> o <em>telefono</em>).</div>
+    </div>
+
+    <div class="sheets-input-row">
+      <label>URL CSV — Clientes</label>
+      <input type="url" id="sheets-url-clientes" placeholder="https://docs.google.com/spreadsheets/d/.../pub?output=csv" />
+      <div class="sheets-hint">La hoja debe tener columnas: <strong style="color:#ccc;">Nombre</strong>, <strong style="color:#ccc;">Telefono</strong>, <strong style="color:#ccc;">Email</strong>, <strong style="color:#ccc;">Direccion</strong>, y <strong style="color:#ccc;">Notas</strong> (o similares).</div>
     </div>
 
     <div class="sheets-sync-log" id="sheets-log"></div>
