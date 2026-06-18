@@ -4723,7 +4723,7 @@ function renderTabla() {
   const buscar=document.getElementById('buscar').value.toLowerCase();
   const tipo=document.getElementById('filtro-tipo').value;
   const tbody=document.getElementById('tabla-body');
-  const secFn = SECCIONES[seccionActual] ? SECCIONES[seccionActual].test : () => true;
+  const secFn = (SECCIONES[seccionActual] && SECCIONES[seccionActual].test) ? SECCIONES[seccionActual].test : () => true;
   const filtrados=productos.filter(p=>(buscar==='' ? secFn(p) : true)&&p.modelo.toLowerCase().includes(buscar)&&(tipo===''||p.modelo.includes(tipo)));
   if (!filtrados.length) { tbody.innerHTML='<tr><td colspan="6" style="text-align:center;color:#555;padding:2rem;">Sin resultados</td></tr>'; return; }
   const idx = (modelo) => productos.findIndex(p => p.modelo === modelo);
@@ -4783,7 +4783,7 @@ function renderTabla() {
 function exportarCSV() {
   const buscar=document.getElementById('buscar').value.toLowerCase();
   const tipo=document.getElementById('filtro-tipo').value;
-  const secFn = SECCIONES[seccionActual] ? SECCIONES[seccionActual].test : () => true;
+  const secFn = (SECCIONES[seccionActual] && SECCIONES[seccionActual].test) ? SECCIONES[seccionActual].test : () => true;
   const filtrados=productos.filter(p=>(buscar==='' ? secFn(p) : true)&&p.modelo.toLowerCase().includes(buscar)&&(tipo===''||p.modelo.includes(tipo)));
   let csv=`Modelo,Precio ARS,ARS con ${descuentoPct}% desc.,USD Blue,Stock\n`;
   filtrados.forEach(p=>{
