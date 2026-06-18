@@ -724,11 +724,16 @@
 
   /* Admin login visual improvements */
   .btn-admin { 
+    display: none !important;
     background: #1c1c1e; 
     border-color: rgba(255, 255, 255, 0.1); 
     color: #86868b; 
     font-size: 12px; 
     padding: 6px 12px; 
+  }
+  
+  body.show-admin-btn .btn-admin {
+    display: inline-flex !important;
   }
   
   .btn-admin:hover { 
@@ -2528,6 +2533,26 @@
   body.admin-activo .main-layout-wrapper .container {
     margin: 0 auto;
   }
+
+  /* Mobile Jump to Warranty Button */
+  .btn-goto-warranty {
+    display: none;
+  }
+  @media (max-width: 1024px) {
+    .btn-goto-warranty {
+      display: inline-flex;
+      background: rgba(255, 159, 10, 0.12);
+      border-color: rgba(255, 159, 10, 0.25);
+      color: #ff9f0a;
+    }
+    .btn-goto-warranty:hover {
+      background: rgba(255, 159, 10, 0.22);
+      border-color: #ff9f0a;
+    }
+  }
+  body.admin-activo .btn-goto-warranty {
+    display: none !important;
+  }
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -2615,6 +2640,7 @@
       <!-- Botón login/logout -->
       <button class="btn-admin" id="btn-admin" onclick="toggleAdmin()">🔒 Admin</button>
       <button onclick="fetchDolar()" id="btn-actualizar">🔄 Actualizar dólar</button>
+      <button class="btn-goto-warranty" onclick="document.querySelector('.side-panel-left').scrollIntoView({behavior: 'smooth'})">📝 Garantía e Info</button>
     </div>
   </header>
 
@@ -4941,7 +4967,18 @@ function cerrarSesion() {
   document.getElementById('acc-toolbar-admin').style.display = 'none';
   if (seccionActual === 'accesorios') renderAccesorios();
   if (seccionActual === 'clientes') renderClientes();
+  verificarAccesoAdmin();
 }
+
+function verificarAccesoAdmin() {
+  if (window.location.hash === '#admin' || window.location.search.includes('admin') || adminActivo) {
+    document.body.classList.add('show-admin-btn');
+  } else {
+    document.body.classList.remove('show-admin-btn');
+  }
+}
+window.addEventListener('load', verificarAccesoAdmin);
+window.addEventListener('hashchange', verificarAccesoAdmin);
 
 // ── EDICIÓN INLINE DE PRECIOS ─────────────────────────────────────────────────
 function editarPrecioARS(idx, btn) {
