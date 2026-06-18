@@ -2680,6 +2680,7 @@
       <option value="Prime">Prime</option>
     </select>
     <button onclick="exportarSegunSeccion()" id="btn-export-toolbar" style="margin-left:auto; display:none;">⬇ Exportar CSV</button>
+    <button class="btn-acc-nuevo" id="btn-nuevo-repuesto" onclick="abrirModalRepuesto()" style="display:none; margin-left:10px;">➕ Nuevo repuesto</button>
   </div>
 
 
@@ -4691,6 +4692,11 @@ function cambiarSeccion(sec, btn) {
     btnExp.style.display = (!esGrilla && adminActivo) ? 'flex' : 'none';
   }
 
+  const btnNuevoRep = document.getElementById('btn-nuevo-repuesto');
+  if (btnNuevoRep) {
+    btnNuevoRep.style.display = (!esGrilla && adminActivo) ? 'inline-flex' : 'none';
+  }
+
   if (esAcc) renderAccesorios();
   else if (esTel) renderTelefonos();
   else if (esCli) renderClientes();
@@ -4922,6 +4928,11 @@ function activarModoAdmin() {
     btnExp2.style.display = 'flex';
     btnExp2.textContent = seccionActual === 'clientes' ? '📦 Exportar clientes CSV' : (seccionActual === 'accesorios' ? '📦 Exportar accesorios CSV' : '⬇ Exportar CSV');
   }
+  const btnNuevoRep = document.getElementById('btn-nuevo-repuesto');
+  const esGrilla = seccionActual === 'accesorios' || seccionActual === 'telefonos' || seccionActual === 'clientes';
+  if (btnNuevoRep) {
+    btnNuevoRep.style.display = !esGrilla ? 'inline-flex' : 'none';
+  }
   const btnAdmin = document.getElementById('btn-admin');
   btnAdmin.textContent = '🔓 Cerrar sesión';
   btnAdmin.classList.add('logged');
@@ -4951,6 +4962,8 @@ function cerrarSesion() {
   document.getElementById('admin-tools').style.display = 'none';
   document.getElementById('badge-admin').style.display = 'none';
   document.getElementById('btn-export-toolbar').style.display = 'none';
+  const btnNuevoRep = document.getElementById('btn-nuevo-repuesto');
+  if (btnNuevoRep) btnNuevoRep.style.display = 'none';
   const telAdminBar = document.getElementById('tel-toolbar-admin');
   if (telAdminBar) telAdminBar.style.display = 'none';
   const cliAdminBar = document.getElementById('cli-toolbar-admin');
@@ -5484,6 +5497,61 @@ function renderAccesorios() {
       </div>
     </div>`;
   }).join('');
+}
+
+function abrirModalRepuesto() {
+  document.getElementById('rep-modelo').value = '';
+  document.getElementById('rep-precio').value = '';
+  document.getElementById('rep-stock').value = '';
+  document.getElementById('estado-rep').textContent = '';
+  document.getElementById('modal-repuesto-overlay').classList.add('visible');
+  setTimeout(() => document.getElementById('rep-modelo').focus(), 100);
+}
+
+function cerrarModalRepuesto() {
+  document.getElementById('modal-repuesto-overlay').classList.remove('visible');
+}
+
+function guardarRepuesto() {
+  const modelo = document.getElementById('rep-modelo').value.trim();
+  const precio = parseFloat(document.getElementById('rep-precio').value);
+  const stockVal = document.getElementById('rep-stock').value.trim();
+  const estado = document.getElementById('estado-rep');
+
+  if (!modelo) { estado.className='status err'; estado.textContent='✗ El nombre es obligatorio.'; return; }
+  if (isNaN(precio) || precio <= 0) { estado.className='status err'; estado.textContent='✗ El precio debe ser mayor a 0.'; return; }
+
+  const rep = { modelo, precio, stock: stockVal !== '' ? parseInt(stockVal) : '', nueva: true };
+
+  // Registrar en historial para deshacer
+  guardarEstadoAnterior();
+
+  const idx = productos.findIndex(p => p.modelo.toLowerCase() === rep.modelo.toLowerCase());
+  if (idx >= 0) {
+    if (!confirm(`El producto "${rep.modelo}" ya existe en el catálogo. ¿Deseás actualizar su precio y stock?`)) return;
+    productos[idx].precio = rep.precio;
+    productos[idx].stock = rep.stock;
+  } else {
+    productos.push(rep);
+  }
+
+  guardarCatalogo();
+  actualizarBtnDeshacer();
+  cerrarModalRepuesto();
+  renderTabla();
+  actualizarContadorModelos();
+
+  syncToSheet({
+    sheet: 'catalogo',
+    action: 'upsert',
+    campo: 'modelo',
+    valor: rep.modelo,
+    item: { 
+      modelo: rep.modelo, 
+      precio: rep.precio, 
+      stock: rep.stock 
+    }
+  });
 }
 
 let accEditandoCat = 'accesorio'; // tracks which list is being edited
@@ -6105,6 +6173,36 @@ if (tableWrap) {
   }, { once: true });
 }
 </script>
+<!-- MODAL MANUAL REPUESTO -->
+<div class="modal-overlay" id="modal-repuesto-overlay">
+  <div class="modal" style="max-width:400px;">
+    <h3 id="modal-rep-titulo">➕ Nuevo repuesto</h3>
+    <p class="modal-desc">Ingresá los datos del repuesto para agregarlo al catálogo general.</p>
+
+    <div style="margin-bottom:0.8rem;">
+      <label style="font-size:12px;color:#888;display:block;margin-bottom:4px;">Nombre del modelo *</label>
+      <input type="text" id="rep-modelo" placeholder="Ej: Pantalla Samsung A32 Oled" style="width:100%;background:#0f0f13;border:1px solid #2a2a35;color:#f0f0f0;border-radius:8px;padding:8px 12px;font-size:13px;outline:none;font-family:inherit;" />
+    </div>
+
+    <div style="margin-bottom:0.8rem;">
+      <label style="font-size:12px;color:#888;display:block;margin-bottom:4px;">Precio ARS *</label>
+      <input type="number" id="rep-precio" placeholder="Ej: 22000" min="0" style="width:100%;background:#0f0f13;border:1px solid #2a2a35;color:#f0f0f0;border-radius:8px;padding:8px 12px;font-size:13px;outline:none;font-family:inherit;" />
+    </div>
+
+    <div style="margin-bottom:0.8rem;">
+      <label style="font-size:12px;color:#888;display:block;margin-bottom:4px;">Stock (opcional)</label>
+      <input type="number" id="rep-stock" placeholder="Ej: 5" min="0" style="width:100%;background:#0f0f13;border:1px solid #2a2a35;color:#f0f0f0;border-radius:8px;padding:8px 12px;font-size:13px;outline:none;font-family:inherit;" />
+    </div>
+
+    <p class="status" id="estado-rep" style="margin-top:6px;"></p>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="cerrarModalRepuesto()">Cancelar</button>
+      <button class="btn-primary" onclick="guardarRepuesto()">💾 Guardar</button>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL GOOGLE SHEETS -->
 <div class="modal-overlay" id="modal-sheets-overlay">
   <div class="sheets-modal">
