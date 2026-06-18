@@ -5524,7 +5524,7 @@ function guardarRepuesto() {
   const rep = { modelo, precio, stock: stockVal !== '' ? parseInt(stockVal) : '', nueva: true };
 
   // Registrar en historial para deshacer
-  guardarEstadoAnterior();
+  tomarSnapshot();
 
   const idx = productos.findIndex(p => p.modelo.toLowerCase() === rep.modelo.toLowerCase());
   if (idx >= 0) {
