@@ -3923,7 +3923,7 @@ function eliminarAccesorio(i) {
   accesorios.splice(i, 1);
   guardarAccesorios();
   renderAccesorios();
-  syncToSheet({ sheet: 'accesorios', action: 'delete', campo: 'nombre', valor: nombre });
+  syncToSheet({ sheet: 'accesorios', action: 'delete', campo: 'Nombre', valor: nombre });
 }
 
 function eliminarTelefono(i) {
@@ -3932,7 +3932,7 @@ function eliminarTelefono(i) {
   telefonos.splice(i, 1);
   guardarTelefonos();
   renderTelefonos();
-  syncToSheet({ sheet: 'accesorios', action: 'delete', campo: 'nombre', valor: nombre });
+  syncToSheet({ sheet: 'accesorios', action: 'delete', campo: 'Nombre', valor: nombre });
 }
 
 function guardarAccesorio() {
@@ -3974,8 +3974,15 @@ function guardarAccesorio() {
     renderAccesorios();
   }
 
-  syncToSheet({ sheet: 'accesorios', action: 'upsert', campo: 'nombre', valor: nombreOriginal,
-    item: { nombre: acc.nombre, precio: acc.precio, stock: acc.stock, imagen: acc.imagen, categoria: acc.categoria } });
+  syncToSheet({ sheet: 'accesorios', action: 'upsert', campo: 'Nombre', valor: nombreOriginal,
+    item: { 
+      Nombre: acc.nombre, 
+      Precio: acc.precio, 
+      Stock: acc.stock, 
+      Imagen: acc.imagen, 
+      Categoria: acc.categoria 
+    } 
+  });
 }
 
 function previsualizarImgUrl() {
