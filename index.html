@@ -2552,23 +2552,118 @@
     margin: 0 auto;
   }
 
-  /* Mobile Jump to Warranty Button */
+  /* Drawer lateral (Garantía) */
+  .drawer-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 2500;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+  .drawer-overlay.visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  
+  .drawer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 360px;
+    max-width: 85vw;
+    height: 100vh;
+    background: rgba(28, 28, 30, 0.96);
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    border-right: 1px solid rgba(191, 90, 242, 0.15);
+    z-index: 2600;
+    box-shadow: 10px 0 40px rgba(0, 0, 0, 0.6);
+    transform: translateX(-100%);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    flex-direction: column;
+  }
+  .drawer.visible {
+    transform: translateX(0);
+  }
+  
+  .drawer-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  
+  .drawer-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0;
+  }
+  
+  .drawer-close {
+    background: rgba(255, 255, 255, 0.08);
+    border: none;
+    color: #a1a1a6;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    transition: all 0.2s ease;
+  }
+  .drawer-close:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+  }
+  
+  .drawer-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.5rem;
+  }
+  
+  /* Hamburger menu button in header */
+  .btn-hamburger {
+    background: rgba(191, 90, 242, 0.08);
+    border: 1px solid rgba(191, 90, 242, 0.15);
+    color: #ffffff;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 12px;
+    border-radius: 10px;
+    transition: all 0.2s ease;
+    gap: 8px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    margin-right: 12px;
+  }
+  .btn-hamburger:hover {
+    background: rgba(191, 90, 242, 0.18);
+    border-color: rgba(191, 90, 242, 0.35);
+    box-shadow: 0 4px 12px rgba(191, 90, 242, 0.15);
+  }
+  
+  /* Hide hamburger button in admin mode */
+  body.admin-activo .btn-hamburger {
+    display: none !important;
+  }
+
   .btn-goto-warranty {
-    display: none;
-  }
-  @media (max-width: 1024px) {
-    .btn-goto-warranty {
-      display: inline-flex;
-      background: rgba(255, 159, 10, 0.12);
-      border-color: rgba(255, 159, 10, 0.25);
-      color: #ff9f0a;
-    }
-    .btn-goto-warranty:hover {
-      background: rgba(255, 159, 10, 0.22);
-      border-color: #ff9f0a;
-    }
-  }
-  body.admin-activo .btn-goto-warranty {
     display: none !important;
   }
 </style>
@@ -2578,58 +2673,70 @@
 </head>
 <body>
 
+<!-- Drawer Menú Lateral (Garantía) -->
+<div class="drawer-overlay" id="drawer-overlay" onclick="cerrarDrawer()"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer-header">
+    <h3 class="drawer-title">Garantía e Info</h3>
+    <button class="drawer-close" onclick="cerrarDrawer()">✕</button>
+  </div>
+  <div class="drawer-content">
+    <div class="side-panel-info" style="background:none; border:none; box-shadow:none; padding:0; margin:0; backdrop-filter:none; -webkit-backdrop-filter:none;">
+      <div class="brand-hashtags" style="border-bottom:none; margin-bottom:1.5rem; color:#bf5af2;">#LAVIÉGAMER · #LAVIÉAUDIO · #LAVIÉTECNOLOGÍA</div>
+      <div class="warranty-header" style="margin-bottom: 1.5rem;">
+        <div class="warranty-title" style="font-size:14px;">Condiciones de</div>
+        <div class="warranty-subtitle" style="font-size:20px;">GARANTÍA</div>
+      </div>
+      <ul class="warranty-list">
+        <li class="warranty-item">
+          <span class="emoji">✅</span>
+          <div class="warranty-text">Los repuestos se cambian por mismo producto, misma marca y mismo modelo. No se hacen devoluciones o cambios por otros modelos.</div>
+        </li>
+        <li class="warranty-item">
+          <span class="emoji">✅</span>
+          <div class="warranty-text">
+            <ul>
+              <li><strong>90 días</strong> de garantía en calidad OLED</li>
+              <li><strong>180 días</strong> de garantía en WUZIP</li>
+              <li><strong>365 días</strong> de garantía en calidad PREMIUM</li>
+            </ul>
+          </div>
+        </li>
+        <li class="warranty-item">
+          <span class="emoji">✅</span>
+          <div class="warranty-text">Mantener la película protectora y embalaje del producto.</div>
+        </li>
+        <li class="warranty-item">
+          <span class="emoji">✅</span>
+          <div class="warranty-text">Mantener sello de garantía de la empresa.</div>
+        </li>
+        <li class="warranty-item">
+          <span class="emoji">✅</span>
+          <div class="warranty-text">No golpear, no mojar, no rayar, no ensuciar y no cortar el flex.</div>
+        </li>
+        <li class="warranty-item">
+          <span class="emoji">✅</span>
+          <div class="warranty-text">No se cambia por mal uso.</div>
+        </li>
+        <li class="warranty-item">
+          <span class="emoji">✅</span>
+          <div class="warranty-text">No se cambian productos con marcas de instalación (con pegamentos y otros, ya colocado no se cambia).</div>
+        </li>
+      </ul>
+      <div class="brand-signature" style="margin-top:2rem;">
+        <span class="brand-name">LAVIÉ</span>
+        <span class="brand-sub">smartphones</span>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="logo-img-header">
     <img src="data:image/jpeg;base64,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" alt="Lavié Smartphones" />
   </div>
   <div class="main-layout-wrapper">
     <div class="side-column side-column-left">
-      <div class="side-panel-left side-panel-info">
-        <div class="brand-hashtags">#LAVIÉGAMER → #LAVIÉAUDIO → #LAVIÉTECNOLOGÍA → #LAVIÉHOGAR →</div>
-        <div class="warranty-header">
-          <div class="warranty-title">Condiciones de</div>
-          <div class="warranty-subtitle">GARANTÍA</div>
-        </div>
-        <ul class="warranty-list">
-          <li class="warranty-item">
-            <span class="emoji">✅</span>
-            <div class="warranty-text">Los repuestos se cambian por mismo producto, misma marca y mismo modelo. No se hacen devoluciones o cambios por otros modelos.</div>
-          </li>
-          <li class="warranty-item">
-            <span class="emoji">✅</span>
-            <div class="warranty-text">
-              <ul>
-                <li><strong>90 días</strong> de garantía en calidad OLED</li>
-                <li><strong>180 días</strong> de garantía en WUZIP</li>
-                <li><strong>365 días</strong> de garantía en calidad PREMIUM</li>
-              </ul>
-            </div>
-          </li>
-          <li class="warranty-item">
-            <span class="emoji">✅</span>
-            <div class="warranty-text">Mantener la película protectora y embalaje del producto.</div>
-          </li>
-          <li class="warranty-item">
-            <span class="emoji">✅</span>
-            <div class="warranty-text">Mantener sello de garantía de la empresa.</div>
-          </li>
-          <li class="warranty-item">
-            <span class="emoji">✅</span>
-            <div class="warranty-text">No golpear, no mojar, no rayar, no ensuciar y no cortar el flex.</div>
-          </li>
-          <li class="warranty-item">
-            <span class="emoji">✅</span>
-            <div class="warranty-text">No se cambia por mal uso.</div>
-          </li>
-          <li class="warranty-item">
-            <span class="emoji">✅</span>
-            <div class="warranty-text">No se cambian productos con marcas de instalación (con pegamentos y otros, ya colocado no se cambia).</div>
-          </li>
-        </ul>
-        <div class="brand-signature">
-          <span class="brand-name">LAVIÉ</span>
-          <span class="brand-sub">smartphones</span>
-        </div>
-      </div>
+
 
       <!-- New Horarios y Locales Panel -->
       <div class="side-panel-hours side-panel-info">
@@ -2683,7 +2790,12 @@
 
   <header>
     <div class="logo">
-
+      <button class="btn-hamburger" onclick="abrirDrawer()" aria-label="Abrir Garantía">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+          <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+        </svg>
+        <span>📝 Garantía</span>
+      </button>
       <div>
         <div class="logo-text">Lavié Smartphones</div>
         <div class="logo-sub">Catálogo de repuestos · <span id="logo-total-modelos">1280</span> productos</div>
@@ -2708,7 +2820,6 @@
       <!-- Botón login/logout -->
       <button class="btn-admin" id="btn-admin" onclick="toggleAdmin()">🔒 Admin</button>
       <button onclick="fetchDolar()" id="btn-actualizar">🔄 Actualizar dólar</button>
-      <button class="btn-goto-warranty" onclick="document.querySelector('.side-panel-left').scrollIntoView({behavior: 'smooth'})">📝 Garantía e Info</button>
     </div>
   </header>
 
@@ -6241,6 +6352,18 @@ if (tableWrap) {
     const hint = document.getElementById('scroll-hint');
     if (hint) hint.style.display = 'none';
   }, { once: true });
+}
+
+function abrirDrawer() {
+  document.getElementById('drawer').classList.add('visible');
+  document.getElementById('drawer-overlay').classList.add('visible');
+  document.body.style.overflow = 'hidden';
+}
+
+function cerrarDrawer() {
+  document.getElementById('drawer').classList.remove('visible');
+  document.getElementById('drawer-overlay').classList.remove('visible');
+  document.body.style.overflow = '';
 }
 </script>
 <!-- MODAL MANUAL REPUESTO -->
