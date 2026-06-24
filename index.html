@@ -3093,12 +3093,6 @@
 
   <p class="status" id="estado-api"></p>
 
-  <div style="display: flex; justify-content: center; margin-top: 2.5rem; margin-bottom: 1.5rem;">
-    <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" style="background: rgba(191, 90, 242, 0.08); border: 1px solid rgba(191, 90, 242, 0.15); color: #ffffff; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; padding: 10px 20px; border-radius: 10px; font-weight: 600; font-size: 14px; gap: 8px; transition: all 0.2s ease;" onmouseover="this.style.background='rgba(191, 90, 242, 0.18)'; this.style.borderColor='rgba(191, 90, 242, 0.35)';" onmouseout="this.style.background='rgba(191, 90, 242, 0.08)'; this.style.borderColor='rgba(191, 90, 242, 0.15)';">
-      <span>⬆ Volver al Inicio</span>
-    </button>
-  </div>
-
   </div>
   <div class="side-column side-column-right" style="visibility: hidden; height: 0; pointer-events: none;"></div>
 </div>
@@ -3294,6 +3288,9 @@
 </script>
 
 <script>
+let limiteProductos = 50;
+let lastBuscar = '';
+let lastTipo = '';
 const PRODUCTOS_ORIGINALES = [
   {modelo:"J1 Ace HD",precio:11400,nueva:false},
   {modelo:"J1 2016 HD",precio:9300,nueva:false},
@@ -4958,6 +4955,7 @@ function esFlex(p)    { return /flex de carga/i.test(p.modelo); }
 function esCamara(p)  { return /camara trasera/i.test(p.modelo); }
 
 function cambiarSeccion(sec, btn) {
+  limiteProductos = 50;
   seccionActual = sec;
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
@@ -5029,12 +5027,22 @@ function quitarDuplicados() {
 function renderTabla() {
   const buscar=document.getElementById('buscar').value.toLowerCase();
   const tipo=document.getElementById('filtro-tipo').value;
+  
+  if (buscar !== lastBuscar || tipo !== lastTipo) {
+    limiteProductos = 50;
+    lastBuscar = buscar;
+    lastTipo = tipo;
+  }
+  
   const tbody=document.getElementById('tabla-body');
   const secFn = (SECCIONES[seccionActual] && SECCIONES[seccionActual].test) ? SECCIONES[seccionActual].test : () => true;
   const filtrados=productos.filter(p=>(buscar==='' ? secFn(p) : true)&&p.modelo.toLowerCase().includes(buscar)&&(tipo===''||p.modelo.includes(tipo)));
   if (!filtrados.length) { tbody.innerHTML='<tr><td colspan="6" style="text-align:center;color:#555;padding:2rem;">Sin resultados</td></tr>'; return; }
+  
+  const aMostrar = filtrados.slice(0, limiteProductos);
   const idx = (modelo) => productos.findIndex(p => p.modelo === modelo);
-  tbody.innerHTML=filtrados.map(p=>{
+  
+  let html = aMostrar.map(p=>{
     const desc=Math.round(p.precio*(1 - descuentoPct/100));
     const usd=dolarBlue?(p.precio/dolarBlue).toFixed(2):'—';
     const n=p.nueva?' nueva':''; const badge=p.nueva?'<span class="badge-nueva">✨ nuevo</span>':'';
@@ -5084,6 +5092,18 @@ function renderTabla() {
       <td class="usd${n} usd-only-admin" data-label="USD">${celdaUSD}</td>
     </tr>`;
   }).join('');
+  
+  if (filtrados.length > limiteProductos) {
+    html += `<tr style="grid-column: span 2; width: 100%;">
+      <td colspan="6" style="text-align: center; padding: 1.5rem 0; border: none; background: transparent;">
+        <button class="btn-cargar-mas" onclick="limiteProductos += 50; renderTabla();" style="background: rgba(191, 90, 242, 0.08); border: 1px solid rgba(191, 90, 242, 0.15); color: #ffffff; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; padding: 10px 20px; border-radius: 10px; font-weight: 600; font-size: 13px; gap: 8px; transition: all 0.2s ease;" onmouseover="this.style.background='rgba(191, 90, 242, 0.18)'; this.style.borderColor='rgba(191, 90, 242, 0.35)';" onmouseout="this.style.background='rgba(191, 90, 242, 0.08)'; this.style.borderColor='rgba(191, 90, 242, 0.15)';">
+          <span>＋ Cargar más artículos (${filtrados.length - limiteProductos} restantes)</span>
+        </button>
+      </td>
+    </tr>`;
+  }
+  
+  tbody.innerHTML = html;
 }
 
 // ── EXPORTAR CSV ─────────────────────────────────────────────────────────────
