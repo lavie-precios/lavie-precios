@@ -5095,9 +5095,14 @@ function renderTabla() {
   if (filtrados.length > limiteProductos) {
     html += `<tr style="grid-column: span 2; width: 100%;">
       <td colspan="6" style="text-align: center; padding: 1.5rem 0; border: none; background: transparent;">
-        <button class="btn-cargar-mas" onclick="limiteProductos += 25; renderTabla();" style="background: rgba(191, 90, 242, 0.08); border: 1px solid rgba(191, 90, 242, 0.15); color: #ffffff; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; padding: 10px 20px; border-radius: 10px; font-weight: 600; font-size: 13px; gap: 8px; transition: all 0.2s ease;" onmouseover="this.style.background='rgba(191, 90, 242, 0.18)'; this.style.borderColor='rgba(191, 90, 242, 0.35)';" onmouseout="this.style.background='rgba(191, 90, 242, 0.08)'; this.style.borderColor='rgba(191, 90, 242, 0.15)';">
-          <span>＋ Cargar más artículos (${filtrados.length - limiteProductos} restantes)</span>
-        </button>
+        <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; align-items: center;">
+          <button class="btn-cargar-mas" onclick="limiteProductos += 25; renderTabla();" style="background: rgba(191, 90, 242, 0.08); border: 1px solid rgba(191, 90, 242, 0.15); color: #ffffff; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; padding: 10px 20px; border-radius: 10px; font-weight: 600; font-size: 13px; gap: 8px; transition: all 0.2s ease;" onmouseover="this.style.background='rgba(191, 90, 242, 0.18)'; this.style.borderColor='rgba(191, 90, 242, 0.35)';" onmouseout="this.style.background='rgba(191, 90, 242, 0.08)'; this.style.borderColor='rgba(191, 90, 242, 0.15)';">
+            <span>＋ Cargar más artículos (${filtrados.length - limiteProductos} restantes)</span>
+          </button>
+          <button class="btn-cargar-completo" onclick="limiteProductos = ${filtrados.length}; renderTabla();" style="background: rgba(191, 90, 242, 0.08); border: 1px solid rgba(191, 90, 242, 0.15); color: #ffffff; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; padding: 10px 20px; border-radius: 10px; font-weight: 600; font-size: 13px; gap: 8px; transition: all 0.2s ease;" onmouseover="this.style.background='rgba(191, 90, 242, 0.18)'; this.style.borderColor='rgba(191, 90, 242, 0.35)';" onmouseout="this.style.background='rgba(191, 90, 242, 0.08)'; this.style.borderColor='rgba(191, 90, 242, 0.15)';">
+            <span>⚡ Cargar catálogo completo</span>
+          </button>
+        </div>
       </td>
     </tr>`;
   }
